@@ -1,6 +1,6 @@
 
 # --- static ---
-__DYNAMIC_CLASS = 'dynamicclasses'
+__DYNAMIC_CLASS = 'dynamicclasses' # TODO singleton pattern for multiple global directories --> dynamicClasses, URN, instancenames (type aware), plugins
 
 def dynamicclass():
     return __DYNAMIC_CLASS

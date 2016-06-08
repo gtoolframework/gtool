@@ -351,10 +351,10 @@ class factory(object):
                         'class': globals()[attributeValues['type']],
                         'args': {
                             'singleton': paramDict['singleton'],
-                            'posargs': attributeValues['args']['posargs'] if 'posargs' in attributeValues[
-                                'args'] else [],
+                            'posargs': attributeValues['args']['posargs'] if 'posargs' in attributeValues['args'] else [],
                             'kwargs': attributeValues['args']['kwargs'] if 'kwargs' in attributeValues['args'] else [],
-                        }
+                        },
+                    'store': []
                     }
                 }
             attribsDict['__dynamic_properties__'].append(attributeName)

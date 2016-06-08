@@ -4,11 +4,6 @@ import gtool.types.common as t
 from gtool.namespace import namespace, registerClass
 from gtool.filewalker import filematch, filematchspace
 
-# TODO singleton pattern for multiple global directories --> dynamicClasses, URN, instancenames (type aware), plugins
-
-generatedClasses = [] # this should be a singleton Class/Object - http://stackoverflow.com/questions/6760685/creating-a-singleton-in-python
-generatedClassesActual = []
-
 def testCode1(k):
     print('test 1 checks it object magic methods works')
     print('---- testing 1 begins ----')
