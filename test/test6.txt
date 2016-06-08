@@ -1,0 +1,6 @@
+TESTCLASSSIX::
+    *file = test*
+    *moo = 1
+    @testprop1:: multiple: String (maxlength = 5)
+    @testprop2:: single: Number (max = 8)
+    @testprop3:: single: Choice (choices = [yes, no])

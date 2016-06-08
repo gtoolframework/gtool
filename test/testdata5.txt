@@ -1,0 +1,3 @@
+@testprop1: Ipsum lorum
+@testprop2: 2
+@testprop3: yes

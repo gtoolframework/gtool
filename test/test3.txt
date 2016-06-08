@@ -1,0 +1,10 @@
+TESTCLASS::
+    @testprop1:: multiple: String (
+        [argA1, argA2],
+        argB,
+        arg0 = 1,
+        arg1 = [0,1],
+    )
+    @testprop2:: single: Number (max = 8)
+    @testprop3:: single: Choice (choices = [yes, no])
+    @testprop4:: single: Number (max = 8)

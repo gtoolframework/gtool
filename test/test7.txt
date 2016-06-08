@@ -1,0 +1,9 @@
+TESTCLASSSEVEN::
+    *file = cr
+    *moo = 1
+    @testprop1:: single: String
+
+TESTCLASSSEVENB::
+    *file = cri
+    *moo = 1
+    @testprop1:: single: Number

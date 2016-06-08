@@ -1,0 +1,4 @@
+TESTCLASSFIVE::
+    @testprop1:: single: String (maxlength = 20)
+    @testprop2:: single: Number (min = 0, max = 3)
+    @testprop3:: single: Choice (choices = [yes, no])
