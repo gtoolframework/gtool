@@ -4,7 +4,6 @@ class attribute(object):
                  posargs=None, kwargs=None, parent=None,
                  attributename=None, **keywordargs):
 
-        print('attrib init: start')
         self.args = pargs
         self.kwargs = keywordargs
         self.__init__ = dict()
@@ -13,25 +12,26 @@ class attribute(object):
         initdict['validatedict'] = None
         initdict['class'] = typeclass
         initdict['posargs'] = posargs
-        initdict['kwargs'] = kwargs
+        initdict['kwargs'] = kwargs # TODO should preprocess into dict
         # make each storage list unique, do not load with values on init
         self.__storage__ = [] # prevents weakly referenced shared list problem
         self.__parent__ = parent
         self.__attributename__ = attributename
-
-        print('attrib init: end')
 
     @property
     def attrtype(self):
         return self.__init__['class']
 
     def __convert__(self, value):
-        return self.__init__['class'].__converter__()
+        return self.__init__['class'].__converter__()(value) # return a type from type definition (such at gtool.types.common)
 
     def __validators__(self, item):
+        # need to extract the provided validators but only return those that the type uses
+        # kwargs will contain other values that aren't used for validation
+        _kwargDict = {pair[0]:pair[1] for pair in self.__init__['kwargs']}
         validatorDict = {}
         for validator in item.__validators__:
-            validatorDict[validator] = self.__init__['kwargs'].get(validator, None)
+            validatorDict[validator] = _kwargDict.get(validator, None)
         return validatorDict
 
     def __validate__(self, item):

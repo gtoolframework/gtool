@@ -283,13 +283,47 @@ def test9():
     b.__load__([x,y]) # should work
     print(b)
 
+def test10():
+    def testCode(k):
+        print(
+            'test 10 will determine if validation works properly as well as classgen with new attribute structure')
+        print('---- testing 10 begins ----')
+        print('should work...')
+        dClass = namespace()[k]
+        x = dClass(
+            testprop1=t.Number(9),
+            testprop2=[t.Number(8),t.Number(1)],
+        )
+        print(x)
+
+        print('\nshould throw an error...')
+        try:
+            y = dClass(
+                testprop1=t.Number(11),
+                testprop2=[t.Number(8), t.Number(1)],
+            )
+            print(y)
+        except Exception as err:
+            print('...it did')
+            print('got the following error message:', err)
+        print('--- test 10 ends ---')
+
+    f = open('test\\test10.txt', 'r')
+    testString = f.read()
+    config = conf.readConfig(testString)
+    # debug(config)
+    classDict = conf.processConfigAlt(config)
+    for k, v in classDict.items():
+        gen.generateClass(k, v)
+        testCode(k)
+
 def debug(config):
     print('--- conf debug ---')
     conf.debugConfig(config)
     print('--- test ---')
 
 if __name__ == '__main__':
-    test6()
+    test7()
 
 # TODO === FEATURE #1 === read config, parse file and emit dict object containing tree structure/data
 # TODO switch classgen lists to lists of repeating objects

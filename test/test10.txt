@@ -1,0 +1,5 @@
+TESTCLASSTEN::
+    *file = test*
+    *moo = 1
+    @testprop1:: single: Number (max = 9)
+    @testprop2:: multiple: Number (max = 8)

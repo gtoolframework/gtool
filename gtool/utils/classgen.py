@@ -107,19 +107,20 @@ class factory(object):
             # TODO these should be explicity passed in
             # TODO __line_slots__ should be a class to ensure data integrity
             # TODO we're assuming that that attribclass is properly setup... need to check before reading
-            print('\nin createattralt: new loop')
             # print(self.__list_slots__[attribClass])
             base = self.__list_slots__[attribClass]
             classObject = base.attrtype
-            params = base['args']
+            #params = base['args']
 
             if attribClass in kwargs.keys():
                 # if passed in arguments contains initialization data for an attribute, continue...
-                print('in createattralt new routine: matched to kwargs')
                 args = self.kwargs[attribClass]
-                if isinstance(args, classObject):
+                try:
                     # if the init data is actually an object of the correct class
-                    self.__list_slots__[attribClass] = args
+                    base.__load__(args)
+                except TypeError as terr:
+                    raise TypeError('In %s initialization of %s excepted %s but got %s and received: %s' % (type(self),attribClass, classObject, type(args), terr))
+            """
             else:
                 # if passed in arguments do not initialization data for an attribute...
                 # ... then create an empty attribute using init instructions
@@ -132,6 +133,7 @@ class factory(object):
                                  )
                 #_obj = classObject(*_params['posargs'], **_params['kwargs'])
                 self.__list_slots__[attribClass] = _obj
+            """
 
     """
     def __createattrsprime__(self, kwargs):
@@ -195,7 +197,7 @@ class factory(object):
         :return: list
         """
         if attr in self.__list_slots__:
-            return self.__list_slots__[attr].__value__
+            return self.__list_slots__[attr]
         elif attr in self.__dict__:
             return self.__dict__[attr]
         else:
@@ -252,7 +254,6 @@ class factory(object):
 
     def loads(self, loadstring):
 
-        @staticmethod
         def parseLoadstring(loadstring):
             attributeStartMarker = p.LineStart() + p.Literal('@')
             attributeStopMarker = p.Literal(':')
@@ -351,7 +352,7 @@ class factory(object):
         return methodsDict
 
     @staticmethod
-    def attributes(classDict):
+    def attributes(className, classDict):
         attribsDict = {}
         attribsDict['__list_slots__'] = {}
         # TODO this could be computed by a method dynamically by looking for funcs/props that start with X
@@ -385,7 +386,9 @@ class factory(object):
                     typeclass=globals()[attributeValues['type']],
                     singleton=paramDict['singleton'],
                     posargs=attributeValues['args']['posargs'] if 'posargs' in attributeValues['args'] else [],
-                    kwargs=attributeValues['args']['kwargs'] if 'kwargs' in attributeValues['args'] else []
+                    kwargs=attributeValues['args']['kwargs'] if 'kwargs' in attributeValues['args'] else [],
+                    parent=className,
+                    attributename=attributeName
                 )
             attribsDict['__dynamic_properties__'].append(attributeName)
         return attribsDict
@@ -399,21 +402,21 @@ class factory(object):
         return _retDict
 
     @staticmethod
-    def maker(classDict, **kwargs):
+    def maker(className, classDict, **kwargs):
         # TODO kwargs is never used... do we need it?
 
-        return factory.merge_dicts(factory.attributes(classDict),
+        return factory.merge_dicts(factory.attributes(className, classDict),
                                    factory.methodbinder(),
                                    factory.metasmaker(classDict)
                                    )
 
     @staticmethod
-    def generateClassesDict(classDict, **kwargs):
-        return factory.maker(classDict, **kwargs)
+    def generateClassesDict(className, classDict, **kwargs):
+        return factory.maker(className, classDict, **kwargs)
 
     @staticmethod
     def generateClass(className, classDict):
-        return type(className, (), factory.generateClassesDict(classDict))
+        return type(className, (), factory.generateClassesDict(className, classDict))
 
 
 def generateClass(className, classDict):
