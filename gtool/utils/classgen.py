@@ -6,6 +6,7 @@ import pyparsing as p
 from gtool.filewalker import registerFileMatcher
 from gtool.namespace import registerClass
 from copy import copy
+from gtool.types.attributes import attribute
 
 # --- class methods that will be bound by factory ---
 # must be outside of class factory or they get factory's context and not the manufactured objects
@@ -71,10 +72,12 @@ class factory(object):
 
     def init(self, **kwargs):
         self.__list_slots__ = copy(self.__list_slots__)
+        self.__list_slots2__ = copy(self.__list_slots__)
         #self.__register__()
         self.kwargs = kwargs
         #print('init:', id(self.__list_slots__)) #why is this object shared across classes?
         self.__createattrs__(self.kwargs)
+        self.__createattrsalt__(self.kwargs)
 
 
     # TODO __createattrs__ code is similar to setattr code, can probably be shared
@@ -90,8 +93,10 @@ class factory(object):
         else:
             _retDict['kwargs'] = {}
 
+        # parallel implemtation, get rid of the kwargs.singleton once complete
         if 'singleton' in params.keys():
             _retDict['kwargs']['singleton'] = params['singleton']
+            _retDict['singleton'] = params['singleton']
 
         if 'posargs' in params.keys():
             _retDict['posargs'] = [k for k in params['posargs']]
@@ -99,6 +104,42 @@ class factory(object):
         return _retDict
 
     def __createattrs__(self, kwargs):
+        for attribClass in self.__list_slots2__.keys():
+            # TODO these should be explicity passed in
+            # TODO __line_slots__ should be a class to ensure data integrity
+            # TODO we're assuming that that attribclass is properly setup... need to check before reading
+            print('\nin createattralt: new loop')
+            # print(self.__list_slots__[attribClass])
+            base = self.__list_slots2__[attribClass]['init']
+            classObject = base['class']
+            params = base['args']
+
+            if attribClass in kwargs.keys():
+                # if passed in arguments contains initialization data for an attribute, continue...
+                print('in createattralt new routine: matched to kwargs')
+                args = self.kwargs[attribClass]
+                if isinstance(args, classObject):
+                    # if the init data is actually an object of the correct class
+                    print('in createattralt new routine: got an instance')
+                    pass
+                    if args.issingleton() != params['singleton']:
+                        # the object ordinality you attempted to add didn't match what the config required
+                        raise TypeError('singleton state mismatch')
+                    self.__list_slots2__[attribClass] = args
+            else:
+                # if passed in arguments do not initialization data for an attribute...
+                # ... then create an empty attribute using init instructions
+                print('in createattralt new routine: didn\'t matched to kwargs')
+                _params = factory.paramparser(params)
+                _obj = attribute(typeclass=classObject,
+                                 singleton=_params['singleton'],
+                                 posargs=_params['posargs'],
+                                 kwargs=_params['kwargs']
+                                 )
+                #_obj = classObject(*_params['posargs'], **_params['kwargs'])
+                self.__list_slots2__[attribClass] = _obj
+
+    def __createattrsprime__(self, kwargs):
         for attribClass in self.__list_slots__.keys():
             # TODO these should be explicity passed in
             # TODO __line_slots__ should be a class to ensure data integrity
@@ -158,7 +199,7 @@ class factory(object):
         :return: list
         """
         if attr in self.__list_slots__:
-            return self.__list_slots__[attr]
+            return self.__list_slots__[attr].__value__
         elif attr in self.__dict__:
             return self.__dict__[attr]
         else:
@@ -177,26 +218,7 @@ class factory(object):
         # TODO flatten/simplify nested logic
         # TODO this code is partially shared with __createattrs__ code for doing the same thing
         if attr in self.__list_slots__.keys():
-            if 'init' in self.__list_slots__[attr]:
-                classObject = self.__list_slots__[attr]['init']['class']
-                params = self.__list_slots__[attr]['init']['args']
-                if isinstance(item, classObject):
-                    # print(args.issingleton())
-                    if item.issingleton() != params['singleton']:
-                        raise TypeError('singleton state mismatch')
-                    else:
-                        self.__list_slots__[attr] = item
-                else:
-                    raise TypeError('%s.%s must be a %s but a %s was provided' %
-                                    (self.__class__, attr, classObject, type(item)))
-            elif isinstance(item, type(self.__list_slots__[attr])):
-                if item.issingleton() != self.__list_slots__[attr].issingleton():
-                    raise TypeError('singleton state mismatch')
-                else:
-                    self.__list_slots__[attr] = item
-            else:
-                raise Exception('Tried to set %s.%s with %s but an unknown error occurred.' %
-                                (self.__class__, attr, item))
+            self.__list_slots__[attr].__set__(item)
         else:
             # setting a method using dot notation (self.attr) will trigger recursion unless we have this
             # else handler
@@ -315,6 +337,7 @@ class factory(object):
     def methodbinder():
         methodsDict = {}
         methodsDict['__createattrs__'] = factory.__createattrs__
+        methodsDict['__createattrsalt__'] = factory.__createattrsalt__
         methodsDict['__init__'] = factory.init
         # magic methods override = http://www.rafekettler.com/magicmethods.html
         methodsDict['__getattr__'] = factory.getattr
@@ -345,6 +368,7 @@ class factory(object):
                 # TODO all error messages should come from a standard library
                 raise NotImplementedError('a class definition was processed '
                                           'improperly and is missing the list element from its dict')
+            """
             attribsDict['__list_slots__'][attributeName] = \
                 {
                     'init': {
@@ -357,6 +381,14 @@ class factory(object):
                     'store': []
                     }
                 }
+            """
+            attribsDict['__list_slots__'][attributeName] = \
+                attribute(
+                    typeclass=globals()[attributeValues['type']],
+                    singleton=paramDict['singleton'],
+                    posargs=attributeValues['args']['posargs'] if 'posargs' in attributeValues['args'] else [],
+                    kwargs=attributeValues['args']['kwargs'] if 'kwargs' in attributeValues['args'] else []
+                )
             attribsDict['__dynamic_properties__'].append(attributeName)
         return attribsDict
 
@@ -373,9 +405,10 @@ class factory(object):
         # TODO kwargs is never used... do we need it?
 
         return factory.merge_dicts(factory.attributes(classDict),
-                           factory.methodbinder(),
-                           factory.metasmaker(classDict)
-                           )
+                                   factory.attributes2(classDict),
+                                   factory.methodbinder(),
+                                   factory.metasmaker(classDict)
+                                   )
 
     @staticmethod
     def generateClassesDict(classDict, **kwargs):

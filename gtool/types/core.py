@@ -5,40 +5,44 @@ import inspect
 class CoreType(object):
 
     def __init__(self, *args, **kwargs):
-        self.listtype = kwargs.pop('listtype', None)
-        if self.listtype == None:
-            raise NotImplementedError('You need to specify a listtype in keyword args')
+        self.__valuetype__ = kwargs.pop('valuetype', None)
+        if self.__valuetype__ == None:
+            raise NotImplementedError('You need to specify a valuetype in keyword args')
 
         # assume singleton if not overridden
-        self.__singleton = kwargs.pop('singleton', True)
+        # self.__singleton = kwargs.pop('singleton', True)
 
-        initvalues = None
+        initvalue = None
         if len(args) > 0:
-            initvalues = args[0]
+            initvalue = args[0]
 
-        self.__list = []
-        if initvalues != None:
-            _initvalues = list(initvalues)
+        """
+        _initvalues = list(initvalues)
             if len(_initvalues) > 1 and self.issingleton() == True:
                 raise TypeError('cannot add more than one item to a singleton')
             else:
                 for item in _initvalues:
-                    if not isinstance(item, self.listtype):
-                        raise TypeError('item is not of type %s' % self.listtype)
-                    try:
-                        self.__validate__(item)
-                    except ValueError as err:
-                        raise err
-            self.__list = _initvalues
+        """
+        self.__value__ = initvalue #None
+        """
+        if initvalue != None:
+            if not isinstance(initvalue, self.__valuetype__):
+                raise TypeError('item is not of type %s, got %s instead' % (self.__valuetype__, type(initvalue)))
+            try:
+                self.__validate__(initvalue)
+            except ValueError as err:
+                raise err
+            self.__value__ = initvalue
+        """
 
     # TODO valid alternative repr requirements (if any)
     def __repr__(self):
-        return '%s' % self.__list
+        return '%s' % self.__value__
 
     def __str__(self):
-        return '%s' % self.__list
+        return '%s' % self.__value__
 
-    def __validate__(self, arg):
+    def __validate__(self, validatedict):
         """
         Abstract Validation method, must be implemented by sub-classes.
         Must raise a ValueError if the value does not match the criteria
@@ -47,6 +51,10 @@ class CoreType(object):
         raise NotImplementedError('Please implement a __validate__ method for your class %s' % self.__class__)
 
     def prepare(self, value):
+        print('in core: get rid of prepare')
+        return self.__prepare__(value)
+
+    def __prepare__(self, value):
         # TODO try except
         _ret = self.convert(value)
         try:
@@ -60,19 +68,24 @@ class CoreType(object):
     def convert(self):
         return self.listtype
 
+    """
     @property
     def validators(self):
+
         _retDict = {}
         for validator in self.__validators__:
             _retDict[validator] = getattr(self, validator)
         return _retDict
+    """
 
+    """
     def issingleton(self):
         #print(self.__dict__)
         #if '__singleton' in self.__dict__:
         return self.__singleton
         #else:
         #    raise NotImplementedError('%s.__singleton was not specified or altered' % self.__class__)
+    """
 
     @property
     def regex(self):
@@ -83,8 +96,9 @@ class CoreType(object):
             print(self.__identifierRegex)
 
     # ==== MAGIC METHODS OVERRIDE ====
-
+    """
     def append(self, item):
+        print('append should not be a supported operation on types - attribute should handle lists of types')
         if self.issingleton() and len(self) > 0:
             raise TypeError('cannot add another item to a singleton')
         if self.listtype == None:
@@ -98,6 +112,7 @@ class CoreType(object):
         self.__list.append(item)  # append the item to itself (the list)
 
     # TODO implement other magic methods (if needed)
+
 
     def __getitem__(self, index):
         #print('index: ', index)
@@ -167,6 +182,7 @@ class CoreType(object):
                 raise TypeError('item %s in other list is not of type %s' % (i, self.listtype))
         self.__list.extend(other.__list)
         return self
+    """
 
     # TODO implement
     def reader(self):

@@ -1,6 +1,7 @@
 import gtool.utils.config as conf
 import gtool.utils.classgen as gen
 import gtool.types.common as t
+from gtool.types.attributes import attribute
 from gtool.namespace import namespace, registerClass
 from gtool.filewalker import filematch, filematchspace
 
@@ -237,33 +238,7 @@ def test8():
         dClass = namespace()[k]
         x = dClass(
             testprop2=t.Number([8], singleton=True, max=8),
-            testprop1=['test0', 'test1']
         )
-        print('maxlength:', x.testprop1.maxlength)
-        # property already exists
-        x.testprop1.append('test2')
-        try:
-            # this should fail
-            x.testprop1.append(1)
-        except Exception as err:
-            print(err)
-        x.testprop1.append('test3')
-        try:
-            x.testprop1.append('test4aa')
-        except ValueError:
-            print('attempted to add a value that was longer than permitted')
-        print(x.testprop1)
-        print('--- test prop 2 ---')
-        """
-        for k,v in x.testprop2.validators.items():
-            print(k, "matches:", v == getattr(x.testprop2, k))
-        print(x.testprop2.issingleton())
-        print(x.testprop2)
-        """
-        try:
-            x.testprop2.append(2)
-        except Exception as err:
-            print(err)
         print(x.testprop2)
         print('--- test 8 ends ---')
 
@@ -276,13 +251,45 @@ def test8():
         gen.generateClass(k, v)
         testCode8(k)
 
+def test9():
+    print('test 9 checks if basic type creation works with the new attribute structure')
+    x = t.Number(9)
+    y = t.Number(4)
+    print(x)
+    print('attribute object test')
+    a = attribute(typeclass=t.Number,
+                  singleton=True,
+                  parent='Parent1',
+                  attributename='testprop1',
+                  kwargs={'max':8}
+                  )
+    try:
+        a.__load__(x)
+    except Exception as err:
+        print(err)
+    try:
+        a.__load__([y,y])
+    except Exception as err:
+        print(err)
+    a.__load__(y)
+
+    print(a)
+    b = attribute(typeclass=t.Number,
+                  singleton=False,
+                  parent='Parent1',
+                  attributename='testprop1',
+                  kwargs={'max':10}
+                  )
+    b.__load__([x,y])
+    print(b)
+
 def debug(config):
     print('--- conf debug ---')
     conf.debugConfig(config)
     print('--- test ---')
 
 if __name__ == '__main__':
-    test8()
+    test9()
 
 # TODO === FEATURE #1 === read config, parse file and emit dict object containing tree structure/data
 # TODO switch classgen lists to lists of repeating objects
