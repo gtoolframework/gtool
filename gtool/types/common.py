@@ -17,6 +17,10 @@ class Number(CoreType):
                 raise ValueError('Values must not be higher than %s but we got %s' % (max, self.__value__))
         return True
 
+    @classmethod
+    def __converter__(cls):
+        return int
+
     def __init__(self, *args, **kwargs):
         # _min = kwargs.get('min', None)
         # _max = kwargs.get('max', None)
@@ -39,6 +43,10 @@ class String(CoreType):
                                  'but the string had a length of %s' % (maxlength, len(self.__value__)))
         return True
 
+    @classmethod
+    def __converter__(cls):
+        return str
+
     def __init__(self, *args, **kwargs):
         #_maxlength = kwargs.get('maxlength', None)
         #self.maxlength = int(_maxlength) if _maxlength is not None else None
@@ -60,6 +68,10 @@ class Choice(CoreType):
             raise ValueError('Was expecting either one of %s but got a %s' % (choices, self.__value__))
         return True
 
+    @classmethod
+    def __converter__(cls):
+        return str
+
     def __init__(self, *args, **kwargs):
         #_choices = kwargs.get('choices', None)
         #self.choices = _choices[1:-1].split(',') if _choices is not None else None
@@ -67,4 +79,6 @@ class Choice(CoreType):
         super().__init__(*args, valuetype=str, **kwargs)
 
 
+class Node(CoreType):
 
+    pass

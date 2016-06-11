@@ -67,46 +67,46 @@ def testcode4():
     y = t.Number()
     print(y)
 
-def testCode3(k):
-    print('test 3 is an earlier alternative of test 6')
-    print('---- testing 3 begins ----')
-    print('--- test prop 1 ---')
-    dClass = namespace()[k]
-    x = dClass(
-        testprop1=['test0', 'test1'],
-        testprop2=t.Number([9], singleton=True, min=0, max=9)
-    )
-    # property already exists
-    x.testprop1.append('test2')
-    try:
-        # this should file
-        x.testprop1.append(1)
-    except Exception as err:
-        print(err)
-    x.testprop1.append('test3')
-    x.testprop1.append('test4')
-    print(x.testprop1)
-    print('--- test prop 2 ---')
-    print(x.testprop2.issingleton())
-    print(x.testprop2)
-    try:
-        x.testprop2.append(2)
-    except Exception as err:
-        print(err)
-    print(x.testprop2)
-    print('--- test prop 4 ---')
-    print(x.testprop4)
-    try:
-        x.testprop4.append(9)
-    except ValueError:
-        print("tried to add a value greater than %s" % x.testprop4.max)
-    x.testprop4.append(7)
-    print(x.testprop4)
-
-    print(x)
-    print('--- test 3 ends ---')
-
 def test3():
+    def testCode(k):
+        print('test 3 is an earlier alternative of test 6')
+        print('---- testing 3 begins ----')
+        print('--- test prop 1 ---')
+        dClass = namespace()[k]
+        x = dClass(
+            testprop1=['test0', 'test1'],
+            testprop2=t.Number([9], singleton=True, min=0, max=9)
+        )
+        # property already exists
+        x.testprop1.append('test2')
+        try:
+            # this should file
+            x.testprop1.append(1)
+        except Exception as err:
+            print(err)
+        x.testprop1.append('test3')
+        x.testprop1.append('test4')
+        print(x.testprop1)
+        print('--- test prop 2 ---')
+        print(x.testprop2.issingleton())
+        print(x.testprop2)
+        try:
+            x.testprop2.append(2)
+        except Exception as err:
+            print(err)
+        print(x.testprop2)
+        print('--- test prop 4 ---')
+        print(x.testprop4)
+        try:
+            x.testprop4.append(9)
+        except ValueError:
+            print("tried to add a value greater than %s" % x.testprop4.max)
+        x.testprop4.append(7)
+        print(x.testprop4)
+
+        print(x)
+        print('--- test 3 ends ---')
+
     f = open('test\\test3.txt', 'r')
     testString = f.read()
     config = conf.readConfig(testString)
@@ -114,7 +114,7 @@ def test3():
     classDict = conf.processConfigAlt(config)
     for k, v in classDict.items():
         gen.generateClass(k, v)
-        testCode3(k)
+        testCode(k)
 
 def testCode5(k):
     print('test 5 will check if data loading works correctly')
@@ -139,7 +139,7 @@ def test5():
         testCode5(k)
 
 def test6():
-    def testCode6(k):
+    def testCode(k):
         print(
             'test 6 will determine if validation works properly and also includes first introduction of metas in conf')
         print('---- testing 6 begins ----')
@@ -184,7 +184,7 @@ def test6():
     classDict = conf.processConfigAlt(config)
     for k, v in classDict.items():
         gen.generateClass(k, v)
-        testCode6(k)
+        testCode(k)
 
 def test7():
 
@@ -264,14 +264,14 @@ def test9():
                   kwargs={'max':8}
                   )
     try:
-        a.__load__(x)
+        a.__load__(x) # should raise an Error
     except Exception as err:
         print(err)
     try:
-        a.__load__([y,y])
+        a.__load__([y,y]) # should raise an Error
     except Exception as err:
         print(err)
-    a.__load__(y)
+    a.__load__(y) # should work
 
     print(a)
     b = attribute(typeclass=t.Number,
@@ -280,7 +280,7 @@ def test9():
                   attributename='testprop1',
                   kwargs={'max':10}
                   )
-    b.__load__([x,y])
+    b.__load__([x,y]) # should work
     print(b)
 
 def debug(config):
@@ -289,7 +289,7 @@ def debug(config):
     print('--- test ---')
 
 if __name__ == '__main__':
-    test9()
+    test6()
 
 # TODO === FEATURE #1 === read config, parse file and emit dict object containing tree structure/data
 # TODO switch classgen lists to lists of repeating objects

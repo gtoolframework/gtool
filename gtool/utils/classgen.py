@@ -72,12 +72,10 @@ class factory(object):
 
     def init(self, **kwargs):
         self.__list_slots__ = copy(self.__list_slots__)
-        self.__list_slots2__ = copy(self.__list_slots__)
         #self.__register__()
         self.kwargs = kwargs
         #print('init:', id(self.__list_slots__)) #why is this object shared across classes?
         self.__createattrs__(self.kwargs)
-        self.__createattrsalt__(self.kwargs)
 
 
     # TODO __createattrs__ code is similar to setattr code, can probably be shared
@@ -103,15 +101,16 @@ class factory(object):
 
         return _retDict
 
+    # TODO !!!! simplify this - we load into attribs with Core derived types
     def __createattrs__(self, kwargs):
-        for attribClass in self.__list_slots2__.keys():
+        for attribClass in self.__list_slots__.keys():
             # TODO these should be explicity passed in
             # TODO __line_slots__ should be a class to ensure data integrity
             # TODO we're assuming that that attribclass is properly setup... need to check before reading
             print('\nin createattralt: new loop')
             # print(self.__list_slots__[attribClass])
-            base = self.__list_slots2__[attribClass]['init']
-            classObject = base['class']
+            base = self.__list_slots__[attribClass]
+            classObject = base.attrtype
             params = base['args']
 
             if attribClass in kwargs.keys():
@@ -120,12 +119,7 @@ class factory(object):
                 args = self.kwargs[attribClass]
                 if isinstance(args, classObject):
                     # if the init data is actually an object of the correct class
-                    print('in createattralt new routine: got an instance')
-                    pass
-                    if args.issingleton() != params['singleton']:
-                        # the object ordinality you attempted to add didn't match what the config required
-                        raise TypeError('singleton state mismatch')
-                    self.__list_slots2__[attribClass] = args
+                    self.__list_slots__[attribClass] = args
             else:
                 # if passed in arguments do not initialization data for an attribute...
                 # ... then create an empty attribute using init instructions
@@ -137,8 +131,9 @@ class factory(object):
                                  kwargs=_params['kwargs']
                                  )
                 #_obj = classObject(*_params['posargs'], **_params['kwargs'])
-                self.__list_slots2__[attribClass] = _obj
+                self.__list_slots__[attribClass] = _obj
 
+    """
     def __createattrsprime__(self, kwargs):
         for attribClass in self.__list_slots__.keys():
             # TODO these should be explicity passed in
@@ -177,6 +172,7 @@ class factory(object):
                 _params = factory.paramparser(params)
                 _obj = classObject(*_params['posargs'], **_params['kwargs'])
                 self.__list_slots__[attribClass] = _obj
+    """
 
     # TODO return some info about attribs
     def repr(self):
@@ -255,32 +251,37 @@ class factory(object):
     """
 
     def loads(self, loadstring):
-        attributeStartMarker = p.LineStart() + p.Literal('@')
-        attributeStopMarker = p.Literal(':')
-        exp = attributeStartMarker.suppress() + p.Word(p.alphanums + '_') + attributeStopMarker.suppress()
 
-        ret = {}
+        @staticmethod
+        def parseLoadstring(loadstring):
+            attributeStartMarker = p.LineStart() + p.Literal('@')
+            attributeStopMarker = p.Literal(':')
+            exp = attributeStartMarker.suppress() + p.Word(p.alphanums + '_') + attributeStopMarker.suppress()
 
-        for index, line in enumerate(loadstring.splitlines()):
-            # print(line)
-            result = list(exp.scanString(line))
-            if len(result) > 0:
-                attribname = result[0][0][0]
-                matchstart = result[0][1]
-                matchend = result[0][2] + 1
-                if matchstart == 0:
-                    # print('matched on line %s' % index)
-                    # print('%s: %s' % (attribname, line[matchend:]))
-                    ret[attribname] = line[matchend:]
+            ret = {}
+
+            for index, line in enumerate(loadstring.splitlines()):
+                # print(line)
+                result = list(exp.scanString(line))
+                if len(result) > 0:
+                    attribname = result[0][0][0]
+                    matchstart = result[0][1]
+                    matchend = result[0][2] + 1
+                    if matchstart == 0:
+                        # print('matched on line %s' % index)
+                        # print('%s: %s' % (attribname, line[matchend:]))
+                        ret[attribname] = line[matchend:]
+                    else:
+                        raise Exception('attrib not at the start of the line')
                 else:
-                    raise Exception('attrib not at the start of the line')
-            else:
-                # print('no match on line %s' % index)
-                last = len(ret) - 1
-                ret[attribname] += " " + line.strip()
+                    # print('no match on line %s' % index)
+                    last = len(ret) - 1
+                    ret[attribname] += " " + line.strip()
 
+            return ret
+
+        ret = parseLoadstring(loadstring)
         attriblist = [k for k in ret.keys()]
-
 
         # print('--- mandatory attribute check ---')
         # check if all attribs required by class definition are in the data file
@@ -298,13 +299,11 @@ class factory(object):
                                      (attrname, self.__class__))
             else:
                 # TODO load into object attribs
-                # print('%s: %s' % (attrname, attrval))
                 # TODO pass in args (also refactor load so dict args are correct)
                 try:
-                    #self.__createattrs__(ret)
-                    # TODO why is is this an instance already and not the class?
-                    _validated = self.__list_slots__[attrname].prepare(attrval)
-                    self.__list_slots__[attrname].append(_validated)
+                    _converted = self.__list_slots__[attrname].__convert__(attrval) #prepare(attrval) # <-- refactor
+                    _attrobj = self.__list_slots__[attrname].attrtype(_converted)
+                    self.__list_slots__[attrname].__load__(_attrobj)
                 except Exception as err:
                     #print(tb.print_exc())
                     print('got an error when trying to load data for %s: %s' % (self.__class__, err))
@@ -337,7 +336,6 @@ class factory(object):
     def methodbinder():
         methodsDict = {}
         methodsDict['__createattrs__'] = factory.__createattrs__
-        methodsDict['__createattrsalt__'] = factory.__createattrsalt__
         methodsDict['__init__'] = factory.init
         # magic methods override = http://www.rafekettler.com/magicmethods.html
         methodsDict['__getattr__'] = factory.getattr
@@ -405,7 +403,6 @@ class factory(object):
         # TODO kwargs is never used... do we need it?
 
         return factory.merge_dicts(factory.attributes(classDict),
-                                   factory.attributes2(classDict),
                                    factory.methodbinder(),
                                    factory.metasmaker(classDict)
                                    )

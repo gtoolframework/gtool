@@ -21,6 +21,13 @@ class attribute(object):
 
         print('attrib init: end')
 
+    @property
+    def attrtype(self):
+        return self.__init__['class']
+
+    def __convert__(self, value):
+        return self.__init__['class'].__converter__()
+
     def __validators__(self, item):
         validatorDict = {}
         for validator in item.__validators__:
@@ -39,15 +46,18 @@ class attribute(object):
             try:
                 item.__validate__(self.__validators__(item))
             except ValueError as verror:
-                print('In {0}: {1}'.format(self.__context__(), verror))
+                errormsg = ('For {0}: {1}'.format(self.__context__(), verror))
+                raise ValueError(errormsg)
         return True
 
     def __load__(self, item):
         # should be called by load from dynamically generated class
+        # __load__ overwrites the storage while append adds to it
+        # TODO merge/refactor __load__ and append
         _storage = []
         if isinstance(item, list):
             if self.issingleton():
-                raise ValueError('In %s: Cannot add multiple items to a singleton attribute' % self.__context__())
+                raise ValueError('For %s: Cannot add multiple items to a singleton attribute' % self.__context__())
             for itemiter in item:
                 self.__validate__(itemiter)
                 _storage.append(itemiter)
@@ -57,6 +67,9 @@ class attribute(object):
 
         self.__storage__ = _storage
         return True
+
+    def load(self, item):
+        return self.__load__()
 
     def __set__(self, item):
         self.__validate__(item)

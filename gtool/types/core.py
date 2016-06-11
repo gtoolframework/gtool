@@ -50,42 +50,13 @@ class CoreType(object):
         """
         raise NotImplementedError('Please implement a __validate__ method for your class %s' % self.__class__)
 
-    def prepare(self, value):
-        print('in core: get rid of prepare')
-        return self.__prepare__(value)
-
-    def __prepare__(self, value):
-        # TODO try except
-        _ret = self.convert(value)
+    @classmethod
+    def __convert__(cls, item):
         try:
-            self.__validate__(_ret)
-        except ValueError as err:
-            raise err
-        else:
-            return _ret
+            return cls.__convertor__()(item)
+        except ValueError:
+            raise ValueError('cannot convert %s to type %s' %(item, cls.__convertor__()))
 
-    @property
-    def convert(self):
-        return self.listtype
-
-    """
-    @property
-    def validators(self):
-
-        _retDict = {}
-        for validator in self.__validators__:
-            _retDict[validator] = getattr(self, validator)
-        return _retDict
-    """
-
-    """
-    def issingleton(self):
-        #print(self.__dict__)
-        #if '__singleton' in self.__dict__:
-        return self.__singleton
-        #else:
-        #    raise NotImplementedError('%s.__singleton was not specified or altered' % self.__class__)
-    """
 
     @property
     def regex(self):
@@ -183,17 +154,3 @@ class CoreType(object):
         self.__list.extend(other.__list)
         return self
     """
-
-    # TODO implement
-    def reader(self):
-        raise NotImplementedError('write this code')
-
-
-# TODO make this useful
-class NodeType(object):
-
-    def __init__(self, name=None, parent=None, children=[]):
-        #super.__init__()
-        self.name = name #unique name for the instance <-- need a singleton global directory pattern which is URN aware
-        self.parent = parent
-        self.children = children
