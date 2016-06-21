@@ -69,7 +69,8 @@ class attribute(object):
         return True
 
     def load(self, item):
-        return self.__load__()
+        # wrapper method for loading directly into the attribute
+        return self.__load__(item)
 
     def __set__(self, item):
         self.__validate__(item)
@@ -104,11 +105,10 @@ class attribute(object):
             raise ValueError('comparison items are not the same length')
         retBool = True
         for i, item in enumerate(self.__storage__):
-            if item != other.store[i]:
+            if item != other.__store__[i]:
                 retBool = False
                 break
         return retBool
-
 
     def issingleton(self):
         return self.__init__['singleton']

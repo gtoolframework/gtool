@@ -1,0 +1,11 @@
+TESTCLASSSEVEN::
+    *file = cr
+    *moo = 1
+    @testprop1:: single: String
+    @testprop2:: multiple: String
+
+TESTCLASSSEVENB::
+    *file = cri
+    *moo = 1
+    @testprop1:: single: Number
+    @testprop2:: multiple: Number

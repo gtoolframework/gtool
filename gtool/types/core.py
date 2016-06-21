@@ -57,15 +57,6 @@ class CoreType(object):
         except ValueError:
             raise ValueError('cannot convert %s to type %s' %(item, cls.__convertor__()))
 
-
-    @property
-    def regex(self):
-        # TODO implement the ability to override the regex as a param (perhaps from the config file
-        if hasattr(self, '__identifierRegex'):
-            raise NotImplementedError('You need to specify a regex for file matching in descendant class %s' % self.__class__)
-        else:
-            print(self.__identifierRegex)
-
     # ==== MAGIC METHODS OVERRIDE ====
     """
     def append(self, item):

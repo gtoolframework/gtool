@@ -2,8 +2,6 @@ from .core import CoreType
 
 class Number(CoreType):
 
-    identifierRegex = "number regex"
-
     def __validate__(self, valuedict):
         _min = valuedict.get('min', None)
         _max = valuedict.get('max', None)
@@ -22,17 +20,11 @@ class Number(CoreType):
         return int
 
     def __init__(self, *args, **kwargs):
-        # _min = kwargs.get('min', None)
-        # _max = kwargs.get('max', None)
-        # self.min = int(_min) if _min is not None else None
-        # self.max = int(_max) if _max is not None else None
         self.__validators__ = ['min', 'max']
         super().__init__(*args, valuetype=int, **kwargs)
 
 
 class String(CoreType):
-
-    identifierRegex = "string regex"
 
     def __validate__(self, valuedict):
         _maxlength = valuedict.get('maxlength', None)
@@ -48,20 +40,13 @@ class String(CoreType):
         return str
 
     def __init__(self, *args, **kwargs):
-        #_maxlength = kwargs.get('maxlength', None)
-        #self.maxlength = int(_maxlength) if _maxlength is not None else None
         self.__validators__ = ['maxlength']
         super().__init__(*args, valuetype=str, **kwargs)
 
 
 class Choice(CoreType):
 
-    identifierRegex = "choice regex"
-
     def __validate__(self, valuedict):
-        # TODO validate for choice
-        # print('validate choice')
-        # print(value)
         _choices = valuedict.get('choices', None)
         choices = _choices[1:-1].split(',') if _choices is not None else None
         if self.__value__ not in choices:
@@ -73,8 +58,6 @@ class Choice(CoreType):
         return str
 
     def __init__(self, *args, **kwargs):
-        #_choices = kwargs.get('choices', None)
-        #self.choices = _choices[1:-1].split(',') if _choices is not None else None
         self.__validators__ = ['choices']
         super().__init__(*args, valuetype=str, **kwargs)
 

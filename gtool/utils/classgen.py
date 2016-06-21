@@ -1,7 +1,6 @@
 from gtool.types.common import Number, String, Choice
 # TODO replace with plugin importer
 import pyparsing as p
-# import traceback as tb
 # from gtool.namespace import namespace
 from gtool.filewalker import registerFileMatcher
 from gtool.namespace import registerClass
@@ -20,7 +19,6 @@ def metas(cls):
         print('has no metas')
         return None
 
-
 @classmethod
 def classfile(cls):
     if 'file' in cls.metas():
@@ -28,10 +26,8 @@ def classfile(cls):
     else:
         return None
 
-
 @classmethod
 def register(cls, classname):
-    # print('in register: classname is', self.__class__, 'and classfile is', self.classfile)
     # only register if a file prefix is provided
     if cls.classfile() is not None:
         registerFileMatcher(cls.classfile(), classname)
@@ -72,9 +68,7 @@ class factory(object):
 
     def init(self, **kwargs):
         self.__list_slots__ = copy(self.__list_slots__)
-        #self.__register__()
         self.kwargs = kwargs
-        #print('init:', id(self.__list_slots__)) #why is this object shared across classes?
         self.__createattrs__(self.kwargs)
 
 
@@ -101,16 +95,13 @@ class factory(object):
 
         return _retDict
 
-    # TODO !!!! simplify this - we load into attribs with Core derived types
     def __createattrs__(self, kwargs):
         for attribClass in self.__list_slots__.keys():
             # TODO these should be explicity passed in
             # TODO __line_slots__ should be a class to ensure data integrity
             # TODO we're assuming that that attribclass is properly setup... need to check before reading
-            # print(self.__list_slots__[attribClass])
             base = self.__list_slots__[attribClass]
             classObject = base.attrtype
-            #params = base['args']
 
             if attribClass in kwargs.keys():
                 # if passed in arguments contains initialization data for an attribute, continue...
@@ -120,61 +111,6 @@ class factory(object):
                     base.__load__(args)
                 except TypeError as terr:
                     raise TypeError('In %s initialization of %s excepted %s but got %s and received: %s' % (type(self),attribClass, classObject, type(args), terr))
-            """
-            else:
-                # if passed in arguments do not initialization data for an attribute...
-                # ... then create an empty attribute using init instructions
-                print('in createattralt new routine: didn\'t matched to kwargs')
-                _params = factory.paramparser(params)
-                _obj = attribute(typeclass=classObject,
-                                 singleton=_params['singleton'],
-                                 posargs=_params['posargs'],
-                                 kwargs=_params['kwargs']
-                                 )
-                #_obj = classObject(*_params['posargs'], **_params['kwargs'])
-                self.__list_slots__[attribClass] = _obj
-            """
-
-    """
-    def __createattrsprime__(self, kwargs):
-        for attribClass in self.__list_slots__.keys():
-            # TODO these should be explicity passed in
-            # TODO __line_slots__ should be a class to ensure data integrity
-            # TODO we're assuming that that attribclass is properly setup... need to check before reading
-
-            #print(self.__list_slots__[attribClass])
-            base = self.__list_slots__[attribClass]['init']
-            classObject = base['class']
-            params = base['args']
-
-            # check if objects are being passed into the attribs
-            # check if passed kwarg matches the name of an attribute
-            if attribClass in kwargs.keys():
-                args = self.kwargs[attribClass]
-                # check if passed object is correct type
-                if isinstance(args, classObject):
-                    # check if passed object has correct constraints and ordinality
-                    _params = factory.paramparser(params)['kwargs']
-                    for validator in [k for k in args.validators.keys()]:
-                        validatorvalue = _params.get(validator, None)
-                        if validatorvalue is not None:
-                            validatorvalue = args.convert(validatorvalue)
-                        if validatorvalue != args.validators[validator]:
-                            raise TypeError('The %s constraint was expected to %s but we got %s' % (validator, validatorvalue, args.validators[validator]))
-                    # TODO --- call validate but with the metas
-                    if args.issingleton() != params['singleton']:
-                        raise TypeError('singleton state mismatch')
-                    self.__list_slots__[attribClass] = args
-                else:
-                    # initialize the object and replace the dict containing build instructions
-                    _params = factory.paramparser(params)
-                    self.__list_slots__[attribClass] = classObject(args, **_params['kwargs'])
-            else:
-                # initialize the object and replace the dict containing build instructions
-                _params = factory.paramparser(params)
-                _obj = classObject(*_params['posargs'], **_params['kwargs'])
-                self.__list_slots__[attribClass] = _obj
-    """
 
     # TODO return some info about attribs
     def repr(self):
@@ -226,32 +162,6 @@ class factory(object):
     def dynamicproperties(self):
         return self.__dynamic_properties__
 
-    """
-    @classmethod
-    def metas(cls):
-        #print(dir(cls))
-        if hasattr(cls, '__metas__'):
-            print('has metas')
-            return cls.__metas__
-        else:
-            print('has no metas')
-            return None
-
-    @classmethod
-    def classfile(cls):
-        print('in classfile:', cls.metas())
-        if 'file' in cls.metas():
-            return cls.__metas__.get('file')
-        else:
-            return None
-
-
-    @classmethod
-    def register(cls, classname):
-        #print('in register: classname is', self.__class__, 'and classfile is', self.classfile)
-        registerFileMatcher(cls.classfile(), classname)
-    """
-
     def loads(self, loadstring):
 
         def parseLoadstring(loadstring):
@@ -283,16 +193,12 @@ class factory(object):
 
         ret = parseLoadstring(loadstring)
         attriblist = [k for k in ret.keys()]
-
-        # print('--- mandatory attribute check ---')
         # check if all attribs required by class definition are in the data file
         for prop in self.__dynamic_properties__:
             # TODO don't raise for non-mandatory attribs
             if prop not in attriblist:
                 raise AttributeError('attribute %s required by %s class definition file but not found' %
                                      (prop, self.__class__))
-
-        # print('--- attribute load ---')
         # reverse check of above and to ensure only attributes required by class file are present in data file
         for attrname, attrval in ret.items():
             if attrname not in self.__dynamic_properties__:
@@ -306,7 +212,6 @@ class factory(object):
                     _attrobj = self.__list_slots__[attrname].attrtype(_converted)
                     self.__list_slots__[attrname].__load__(_attrobj)
                 except Exception as err:
-                    #print(tb.print_exc())
                     print('got an error when trying to load data for %s: %s' % (self.__class__, err))
         return True if len(ret) > 0 else False
 
@@ -367,20 +272,6 @@ class factory(object):
                 # TODO all error messages should come from a standard library
                 raise NotImplementedError('a class definition was processed '
                                           'improperly and is missing the list element from its dict')
-            """
-            attribsDict['__list_slots__'][attributeName] = \
-                {
-                    'init': {
-                        'class': globals()[attributeValues['type']],
-                        'args': {
-                            'singleton': paramDict['singleton'],
-                            'posargs': attributeValues['args']['posargs'] if 'posargs' in attributeValues['args'] else [],
-                            'kwargs': attributeValues['args']['kwargs'] if 'kwargs' in attributeValues['args'] else [],
-                        },
-                    'store': []
-                    }
-                }
-            """
             attribsDict['__list_slots__'][attributeName] = \
                 attribute(
                     typeclass=globals()[attributeValues['type']],
@@ -420,9 +311,6 @@ class factory(object):
 
 
 def generateClass(className, classDict):
-    #print(type(factory(className, classDict)()))
-    #_newclass = factory.generateClass(className, classDict)
     _newclass = factory(className, classDict)
     registerClass(className, _newclass)
-    #_newclass.register(className)
     return _newclass
