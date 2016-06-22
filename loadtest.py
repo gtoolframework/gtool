@@ -353,13 +353,47 @@ def test11():
             print(d)
     print('--- test 11 ends ---')
 
+def test12():
+
+    print('test 12 loads data from a folder structure')
+    print('---- testing 12 begins ----')
+    f = open('test\\test12.txt', 'r')
+    testString = f.read()
+    config = conf.readConfig(testString)
+    # debug(config)
+    classDict = conf.processConfigAlt(config)
+    for k, v in classDict.items():
+        gen.generateClass(k, v)
+        #registerClass(k, classObject)
+        # testCode7(k)
+    #print('given \'criteria\' I match for:', filematch('criteria'))
+    #print('given \'cr1\' I match for:', filematch('cr1'))
+
+    #print('namespace:', namespace())
+    print('--- walk file system ---')
+    mypath = 'test\\test12data'
+    from os import listdir
+    from os.path import isfile, join
+    print('filematch space:', filematchspace())
+    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+    for filename in onlyfiles:
+        print('\n*** file: ', filename, ' processing start ***')
+        fname = filename.split('.')[0]
+        #print('inside for loop:', namespace())
+        _class = filematch(fname)
+        if _class is not None:
+            d = _class()
+            d.load(mypath + '\\' + filename)
+            print(d)
+    print('--- test 12 ends ---')
+
 def debug(config):
     print('--- conf debug ---')
     conf.debugConfig(config)
     print('--- test ---')
 
 if __name__ == '__main__':
-    test11()
+    test12()
 
 # TODO === FEATURE #1 === read config, parse file and emit dict object containing tree structure/data
 # TODO class metas to set/override key functions during class gen
