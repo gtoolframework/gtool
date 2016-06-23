@@ -25,12 +25,13 @@ def filematchspace():
 def filematch(exp):
     T = globals()[filematcher()]
     try:
-        print('file match:', T.key(exp), 'has a value of', T[T.key(exp)])
+        #print('file match:', T.key(exp), 'has a value of', T[T.key(exp)])
         return gtool.namespace.namespace()[T[T.key(exp)]]
     except KeyError:
         return None
 
 #--- classes ---
+
 
 class StructureFactory(object):
 
@@ -77,8 +78,10 @@ class StructureFactory(object):
             if self.path is None:
                 raise AttributeError('The file path was not provided when the File object was created')
             with open(self.path, mode='r') as f:
-                print(f.read())
+                _ret = f.readlines()
                 f.close()
+            return _ret
+
 
     class Directory(Inode):
 
@@ -110,11 +113,12 @@ class StructureFactory(object):
                 if isinstance(child, StructureFactory.Directory):
                     child.tree()
 
-    class Node2(object):
+    class Node(object):
 
-        def __init__(self, name=None, fileobjects=None, parent=None):
+        def __init__(self, name=None, fileobject=None, parent=None):
+            # TODO consolidate fileobjects and children
             self.__name__ = name
-            self.__inodes__ = fileobjects
+            self.__inode__ = fileobject
             self.__parent__ = parent
             self.__children__ = []
 
@@ -128,8 +132,15 @@ class StructureFactory(object):
                 node.__parent__ = self
 
         @property
-        def fileobjects(self):
-            return self.__inodes__
+        def fileobject(self):
+            return self.__inode__
+
+        @property
+        def path(self):
+            if self.__inode__ is not None:
+                return self.__inode__.path
+            else:
+                return None
 
         @property
         def children(self):
@@ -140,10 +151,63 @@ class StructureFactory(object):
             return self.__name__
 
         def __str__(self):
+            # TODO return number of children and type (file or dir)
             return self.__name__
 
         def __repr__(self):
             return '%s: %s' % (type(self), self.__name__)
+
+        @property
+        def uri(self):
+            if self.__parent__ is not None:
+                return  "%s\%s" % (self.__parent__.uri, self.__name__)
+            else:
+                return "%s" % self.__name__
+
+        @property
+        def __objectmatch__(self):
+            _ret = filematch(self.name)
+            if _ret is None:
+                raise KeyError('%s does not match any known class definition' % self.name)
+            return _ret
+
+        @property
+        def data(self):
+            if isinstance(self.__inode__, StructureFactory.File):
+                return ''.join(self.__inode__.read())
+            else:
+                raise TypeError('%s is not a file' % self.__inode__.path)
+
+        @property
+        def dataasobject(self):
+            _retobject = self.__objectmatch__()
+            #print(_retobject)
+            if _retobject.loads(self.data): # True if loadstring works
+                return _retobject
+            else:
+                raise TypeError('Could not parse the data from %s into a %s class' % (self.path, type(_retobject)))
+
+
+    class Container(Node):
+
+        """
+        An inherited class for the purposes of type differentiaton and overriding the data methods
+        """
+
+        @property
+        def data(self):
+            return '%s' % self.__name__
+
+    class CNode(Node):
+
+        """
+        An inherited class for the purposes of type differentiaton and overriding the data methods
+        """
+
+        @property
+        def data(self):
+            return 'blargh'
+
 
     @staticmethod
     def __treewalk__(root):
@@ -159,37 +223,41 @@ class StructureFactory(object):
                 StructureFactory.__treewalk__(_d)
 
     @staticmethod
-    def __walk__(root):
+    def __walk__(location=None):
 
-        def recursivewalk(root):
+        def recursivewalk(location=None, isroot=False):
             #TODO deal with multiple files in a dir and multiple dirs at the root
-            if isinstance(root, StructureFactory.Directory):
-                if '_.txt' in [f.name for f in root.children]:
-                    print('Node Container:', root.name)
-                    return StructureFactory.Node2(fileobjects=root.children, name=root.name)
+            if isinstance(location, StructureFactory.Directory):
+                if '_.txt' in [f.name for f in location.children]:
+                    print('Node Container:', location.name)
+                    return StructureFactory.CNode(fileobject=location, name=location.name)
                 else:
-                    print('Container:', root.name)
-                    _ret = StructureFactory.Node2(name=root.name)
-                    for child in root.children:
+                    # special handler for root of structure
+                    _locationname = location.name if isroot is False else '*'
+                    print('Container:', _locationname)
+                    _ret = StructureFactory.Container(name=_locationname, fileobject=location)
+                    for child in location.children:
                         _ret.addchildren(recursivewalk(child))
                     return _ret
-            elif isinstance(root, StructureFactory.File):
-                print('Node:', root.name)
-                return StructureFactory.Node2(fileobjects=root, name=root.name)
+            elif isinstance(location, StructureFactory.File):
+                _rootname = location.name.split('.')[0]
+                print('Node:', _rootname)
+                return StructureFactory.Node(fileobject=location, name=_rootname)
 
-        if not isinstance(root, StructureFactory.Directory):
+        if not isinstance(location, StructureFactory.Directory):
             raise TypeError('start of file system must be a directory')
-        ret = StructureFactory.Node2(name='*')
-        ret.addchildren(recursivewalk(root))
-        return ret
+        #ret = StructureFactory.Node2(name='*')
+        #ret.addchildren(recursivewalk(location=location, isroot=True))
+        return recursivewalk(location=location, isroot=True)
 
     # TODO make this the init call for the class so it can return a new node object with all data (more pythonic)
     @staticmethod
-    def treewalk(rootdir, rootpath):
-        _rootpath = rootpath.rstrip(os.sep)
-        rootobj = StructureFactory.Directory(nodename=rootdir, nodepath=_rootpath)
+    def treewalk(rootpath):
+        # TODO check this is a valid directory before proceeding
+        rootdir = rootpath.rstrip(os.sep)
+        rootobj = StructureFactory.Directory(nodename=rootdir, nodepath=rootpath)
         StructureFactory.__treewalk__(rootobj) # TODO make this return an actual object
-        return StructureFactory.__walk__(rootobj)
+        return StructureFactory.__walk__(location=rootobj)
 
 #--- initialize namespace
 globals()[filematcher()] = pt.trie('_')

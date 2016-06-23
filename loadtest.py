@@ -3,7 +3,8 @@ import gtool.utils.classgen as gen
 import gtool.types.common as t
 from gtool.types.attributes import attribute
 from gtool.namespace import namespace, registerClass
-from gtool.filewalker import filematch, filematchspace
+from gtool.filewalker import filematch, filematchspace, StructureFactory
+from gtool.utils import loadconfig
 
 def testCode1(k):
     print('test 1 checks it object magic methods works')
@@ -355,36 +356,18 @@ def test11():
 
 def test12():
 
-    print('test 12 loads data from a folder structure')
+    print('test 12 validates auto loading from simple files')
     print('---- testing 12 begins ----')
-    f = open('test\\test12.txt', 'r')
-    testString = f.read()
-    config = conf.readConfig(testString)
-    # debug(config)
-    classDict = conf.processConfigAlt(config)
-    for k, v in classDict.items():
-        gen.generateClass(k, v)
-        #registerClass(k, classObject)
-        # testCode7(k)
-    #print('given \'criteria\' I match for:', filematch('criteria'))
-    #print('given \'cr1\' I match for:', filematch('cr1'))
+    loadconfig('test\\test12.txt')
 
-    #print('namespace:', namespace())
     print('--- walk file system ---')
     mypath = 'test\\test12data'
-    from os import listdir
-    from os.path import isfile, join
-    print('filematch space:', filematchspace())
-    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-    for filename in onlyfiles:
-        print('\n*** file: ', filename, ' processing start ***')
-        fname = filename.split('.')[0]
-        #print('inside for loop:', namespace())
-        _class = filematch(fname)
-        if _class is not None:
-            d = _class()
-            d.load(mypath + '\\' + filename)
-            print(d)
+    sf3 = StructureFactory.treewalk(mypath)
+
+    print('--- explore results ---')
+    for child in sf3.children:
+        print(child.dataasobject)
+
     print('--- test 12 ends ---')
 
 def debug(config):

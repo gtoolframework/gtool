@@ -1,0 +1,2 @@
+@testprop1: 2
+@testprop2: 90
