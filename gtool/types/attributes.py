@@ -57,12 +57,13 @@ class attribute(object):
         # TODO merge/refactor __load__ and append
         _storage = []
         if isinstance(item, list):
-            if self.issingleton():
+            if self.issingleton() and len(item) > 1:
                 raise ValueError('For %s: Cannot add multiple items to a singleton attribute' % self.__context__())
             for itemiter in item:
                 self.__validate__(itemiter)
                 _storage.append(itemiter)
         else:
+            # TODO check if we still need this else block given the issingleton + len > 1 check
             self.__validate__(item)
             _storage.append(item)
         self.__storage__ = _storage

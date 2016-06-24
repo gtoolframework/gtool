@@ -356,7 +356,7 @@ def test11():
 
 def test12():
 
-    print('test 12 validates auto loading from simple files, multi item separators and new required arg')
+    print('test 12 validates auto loading from simple files, multi item data loads and new required arg')
     print('---- testing 12 begins ----')
     loadconfig('test\\test12.txt', dbg=False)
 
@@ -380,7 +380,7 @@ if __name__ == '__main__':
 
 # TODO === FEATURE #1 === read config, parse file and emit dict object containing tree structure/data
 # DONE multiple args in data file
-# TODO switch multiple values from separated to repeats of the same @attribute
+# DONE switch multiple values from separated to repeats of the same @attribute
 # TODO class metas to set/override key functions during class gen
 # TODO read multiple args from child data files
 # DONE regex for class to recognize files that match. Criteria Class --> criteria.txt, Control Class --> c#.txt

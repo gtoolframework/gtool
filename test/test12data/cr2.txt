@@ -1,2 +1,4 @@
-@testprop1: ipsum lorum horus
-@testprop2: ipsum lorum horus rictum || bolder holder
+@testprop1: zion elder
+@testprop2: ipsum lorum
+horus rictum
+@testprop2: bolder holder

@@ -7,6 +7,7 @@ from gtool.namespace import registerClass
 from copy import copy
 from gtool.types.attributes import attribute
 from distutils.util import strtobool
+from collections import defaultdict
 
 # --- class methods that will be bound by factory ---
 # must be outside of class factory or they get factory's context and not the manufactured objects
@@ -179,7 +180,8 @@ class factory(object):
             attributeStopMarker = p.Literal(':')
             exp = attributeStartMarker.suppress() + p.Word(p.alphanums + '_') + attributeStopMarker.suppress()
 
-            ret = {}
+            #ret = {}
+            ret = defaultdict(list)
 
             for index, line in enumerate(loadstring.splitlines()):
                 # print(line)
@@ -193,13 +195,13 @@ class factory(object):
                     if matchstart == 0:
                         # print('matched on line %s' % index)
                         # print('%s: %s' % (attribname, line[matchend:]))
-                        ret[attribname] = line[matchend:]
+                        ret[attribname].append(line[matchend:])
                     else:
                         raise Exception('attrib not at the start of the line')
                 else:
                     # print('no match on line %s' % index)
                     # last = len(ret) - 1
-                    ret[attribname] += " " + line.strip()
+                    ret[attribname][-1:] = [ret[attribname][-1:][0] + "" + line.strip()]
 
             return ret
 
@@ -207,11 +209,21 @@ class factory(object):
             cfunc = _self.__list_slots__[attrname].__convert__
             attrfunc = _self.__list_slots__[attrname].attrtype
 
+            """
+            if len(attrval) > 1:
+                return [attrfunc(cfunc(s.strip())) for s in attrval]
+            else:
+                return attrfunc(cfunc(attrval))
+            """
+            return [attrfunc(cfunc(s.strip())) for s in attrval]
+
+            """
             # TODO use pyparsing
             if '||' in attrval:
                return [attrfunc(cfunc(s.strip())) for s in attrval.split('||')]
             else:
                 return attrfunc(cfunc(attrval))
+            """
 
         ret = parseLoadstring(loadstring)
         attriblist = [k for k in ret.keys()]
@@ -229,10 +241,10 @@ class factory(object):
             else:
                 # TODO load into object attribs
                 # TODO pass in args (also refactor load so dict args are correct)
-                try:
-                    self.__list_slots__[attrname].__load__(__convertandload__(self, attrname, attrval))
-                except Exception as err:
-                    print('got an error when trying to load data for %s: %s' % (self.__class__, err))
+                #try:
+                self.__list_slots__[attrname].__load__(__convertandload__(self, attrname, attrval))
+                #except Exception as err:
+                #    print('got an error when trying to load data for %s: %s' % (self.__class__, err))
         return True if len(ret) > 0 else False
 
     def load(self, loadfile):
