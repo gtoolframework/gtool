@@ -356,7 +356,7 @@ def test11():
 
 def test12():
 
-    print('test 12 validates auto loading from simple files')
+    print('test 12 validates auto loading from simple files, multi item separators')
     print('---- testing 12 begins ----')
     loadconfig('test\\test12.txt')
 
@@ -379,7 +379,7 @@ if __name__ == '__main__':
     test12()
 
 # TODO === FEATURE #1 === read config, parse file and emit dict object containing tree structure/data
-# TODO multiple args in data file
+# DONE multiple args in data file
 # TODO class metas to set/override key functions during class gen
 # TODO read multiple args from child data files
 # DONE regex for class to recognize files that match. Criteria Class --> criteria.txt, Control Class --> c#.txt
@@ -393,6 +393,7 @@ if __name__ == '__main__':
 # TODO dynamic class imports
 # TODO method/plugin imports
 # TODO optional/required for class models
+# TODO simply loading of config that generates and registers classes
 
 
 # TODO === FEATURE #1.1 === cleanup

@@ -200,14 +200,13 @@ class factory(object):
 
         def __convertandload__(_self, attrname, attrval):
             cfunc = _self.__list_slots__[attrname].__convert__
-            attrfunc = _attrobj = _self.__list_slots__[attrname].attrtype
+            attrfunc = _self.__list_slots__[attrname].attrtype
+
+            # TODO use pyparsing
             if '||' in attrval:
                return [attrfunc(cfunc(s.strip())) for s in attrval.split('||')]
             else:
                 return attrfunc(cfunc(attrval))
-            #_converted = _self.__list_slots__[attrname].__convert__(attrval)  # prepare(attrval) # <-- refactor
-            #_attrobj = _self.__list_slots__[attrname].attrtype(_converted)
-            #return _attrobj
 
         ret = parseLoadstring(loadstring)
         attriblist = [k for k in ret.keys()]
@@ -226,10 +225,6 @@ class factory(object):
                 # TODO load into object attribs
                 # TODO pass in args (also refactor load so dict args are correct)
                 try:
-                    """
-                    _converted = self.__list_slots__[attrname].__convert__(attrval) #prepare(attrval) # <-- refactor
-                    _attrobj = self.__list_slots__[attrname].attrtype(_converted)
-                    """
                     self.__list_slots__[attrname].__load__(__convertandload__(self, attrname, attrval))
                 except Exception as err:
                     print('got an error when trying to load data for %s: %s' % (self.__class__, err))
