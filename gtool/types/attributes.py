@@ -64,7 +64,6 @@ class attribute(object):
         else:
             self.__validate__(item)
             _storage.append(item)
-
         self.__storage__ = _storage
         return True
 

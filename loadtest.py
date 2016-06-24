@@ -379,16 +379,17 @@ if __name__ == '__main__':
     test12()
 
 # TODO === FEATURE #1 === read config, parse file and emit dict object containing tree structure/data
+# TODO multiple args in data file
 # TODO class metas to set/override key functions during class gen
 # TODO read multiple args from child data files
-# TODO multiple args in data file
-# TODO regex for class to recognize files that match. Criteria Class --> criteria.txt, Control Class --> c#.txt
+# DONE regex for class to recognize files that match. Criteria Class --> criteria.txt, Control Class --> c#.txt
 # TODO mandatory/optional flag for attributes (in keyword args)
-# TODO automated reader from file
-# TODO decide when related files should be in same directory and when in subdir
+# DONE automated reader from file
+# DONE decide when related files should be in same directory and when in subdir
 # TODO should first line of data file be class type? or is that extra work?
-# TODO special keyword to identify subfile (or behaviour to go looking for subfiles/subdirs
-# TODO chained file reader
+# DONE special keyword to identify subfile (or behaviour to go looking for subfiles/subdirs
+# TODO chained data file reader
+# TODO chained config file reader
 # TODO dynamic class imports
 # TODO method/plugin imports
 # TODO optional/required for class models

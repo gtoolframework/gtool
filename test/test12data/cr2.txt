@@ -1,2 +1,2 @@
 @testprop1: ipsum lorum horus
-@testprop2: ipsum lorum horus rictum
+@testprop2: ipsum lorum horus rictum || bolder holder

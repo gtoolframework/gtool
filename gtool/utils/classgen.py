@@ -163,6 +163,11 @@ class factory(object):
         return self.__dynamic_properties__
 
     def loads(self, loadstring):
+        """
+        Method to read in a correctly structured string and load it into the object attributes
+        :param loadstring:
+        :return: True if data loaded
+        """
 
         def parseLoadstring(loadstring):
             attributeStartMarker = p.LineStart() + p.Literal('@')
@@ -173,8 +178,10 @@ class factory(object):
 
             for index, line in enumerate(loadstring.splitlines()):
                 # print(line)
+                # TODO switch from scanString to full parsing
                 result = list(exp.scanString(line))
                 if len(result) > 0:
+                    # TODO this is kludgy
                     attribname = result[0][0][0]
                     matchstart = result[0][1]
                     matchend = result[0][2] + 1
@@ -186,10 +193,21 @@ class factory(object):
                         raise Exception('attrib not at the start of the line')
                 else:
                     # print('no match on line %s' % index)
-                    last = len(ret) - 1
+                    # last = len(ret) - 1
                     ret[attribname] += " " + line.strip()
 
             return ret
+
+        def __convertandload__(_self, attrname, attrval):
+            cfunc = _self.__list_slots__[attrname].__convert__
+            attrfunc = _attrobj = _self.__list_slots__[attrname].attrtype
+            if '||' in attrval:
+               return [attrfunc(cfunc(s.strip())) for s in attrval.split('||')]
+            else:
+                return attrfunc(cfunc(attrval))
+            #_converted = _self.__list_slots__[attrname].__convert__(attrval)  # prepare(attrval) # <-- refactor
+            #_attrobj = _self.__list_slots__[attrname].attrtype(_converted)
+            #return _attrobj
 
         ret = parseLoadstring(loadstring)
         attriblist = [k for k in ret.keys()]
@@ -208,9 +226,11 @@ class factory(object):
                 # TODO load into object attribs
                 # TODO pass in args (also refactor load so dict args are correct)
                 try:
+                    """
                     _converted = self.__list_slots__[attrname].__convert__(attrval) #prepare(attrval) # <-- refactor
                     _attrobj = self.__list_slots__[attrname].attrtype(_converted)
-                    self.__list_slots__[attrname].__load__(_attrobj)
+                    """
+                    self.__list_slots__[attrname].__load__(__convertandload__(self, attrname, attrval))
                 except Exception as err:
                     print('got an error when trying to load data for %s: %s' % (self.__class__, err))
         return True if len(ret) > 0 else False
