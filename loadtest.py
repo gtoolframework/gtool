@@ -356,9 +356,9 @@ def test11():
 
 def test12():
 
-    print('test 12 validates auto loading from simple files, multi item separators')
+    print('test 12 validates auto loading from simple files, multi item separators and new required arg')
     print('---- testing 12 begins ----')
-    loadconfig('test\\test12.txt')
+    loadconfig('test\\test12.txt', dbg=False)
 
     print('--- walk file system ---')
     mypath = 'test\\test12data'
@@ -380,10 +380,11 @@ if __name__ == '__main__':
 
 # TODO === FEATURE #1 === read config, parse file and emit dict object containing tree structure/data
 # DONE multiple args in data file
+# TODO switch multiple values from separated to repeats of the same @attribute
 # TODO class metas to set/override key functions during class gen
 # TODO read multiple args from child data files
 # DONE regex for class to recognize files that match. Criteria Class --> criteria.txt, Control Class --> c#.txt
-# TODO mandatory/optional flag for attributes (in keyword args)
+# DONE mandatory/optional flag for attributes (in keyword args)
 # DONE automated reader from file
 # DONE decide when related files should be in same directory and when in subdir
 # TODO should first line of data file be class type? or is that extra work?
@@ -393,7 +394,7 @@ if __name__ == '__main__':
 # TODO dynamic class imports
 # TODO method/plugin imports
 # TODO optional/required for class models
-# TODO simply loading of config that generates and registers classes
+# DONE simply loading of config that generates and registers classes
 
 
 # TODO === FEATURE #1.1 === cleanup

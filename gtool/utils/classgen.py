@@ -6,6 +6,7 @@ from gtool.filewalker import registerFileMatcher
 from gtool.namespace import registerClass
 from copy import copy
 from gtool.types.attributes import attribute
+from distutils.util import strtobool
 
 # --- class methods that will be bound by factory ---
 # must be outside of class factory or they get factory's context and not the manufactured objects
@@ -162,6 +163,10 @@ class factory(object):
     def dynamicproperties(self):
         return self.__dynamic_properties__
 
+    @property
+    def mandatoryproperties(self):
+        return self.__mandatory_properties__
+
     def loads(self, loadstring):
         """
         Method to read in a correctly structured string and load it into the object attributes
@@ -213,7 +218,7 @@ class factory(object):
         # check if all attribs required by class definition are in the data file
         for prop in self.__dynamic_properties__:
             # TODO don't raise for non-mandatory attribs
-            if prop not in attriblist:
+            if prop not in attriblist and prop in self.__mandatory_properties__:
                 raise AttributeError('attribute %s required by %s class definition file but not found' %
                                      (prop, self.__class__))
         # reverse check of above and to ensure only attributes required by class file are present in data file
@@ -262,6 +267,7 @@ class factory(object):
         methodsDict['__getattr__'] = factory.getattr
         methodsDict['__setattr__'] = factory.setattr
         methodsDict['dynamicproperties'] = factory.dynamicproperties
+        methodsDict['mandatoryproperties'] = factory.mandatoryproperties
         methodsDict['classfile'] = classfile
         methodsDict['metas'] = metas
         methodsDict['register'] = register
@@ -277,6 +283,7 @@ class factory(object):
         attribsDict['__list_slots__'] = {}
         # TODO this could be computed by a method dynamically by looking for funcs/props that start with X
         attribsDict['__dynamic_properties__'] = []
+        attribsDict['__mandatory_properties__'] = []
         for attributeName, attributeValues in classDict['attributes'].items():
             paramDict = {}
             if attributeValues['list']:
@@ -287,6 +294,14 @@ class factory(object):
                 # TODO all error messages should come from a standard library
                 raise NotImplementedError('a class definition was processed '
                                           'improperly and is missing the list element from its dict')
+
+            _kwargsdict = {i[0]:i[1] for i in attributeValues['args']['kwargs']}
+            #print('kwargdict', _kwargsdict)
+            try:
+                paramDict['required'] = strtobool(_kwargsdict['required']) if 'required' in _kwargsdict else True
+            except ValueError:
+                raise ValueError('When parsing the required option for %s::%s got a value that could not be converted to a boolean' % (className, attributeName))
+
             attribsDict['__list_slots__'][attributeName] = \
                 attribute(
                     typeclass=globals()[attributeValues['type']],
@@ -294,9 +309,14 @@ class factory(object):
                     posargs=attributeValues['args']['posargs'] if 'posargs' in attributeValues['args'] else [],
                     kwargs=attributeValues['args']['kwargs'] if 'kwargs' in attributeValues['args'] else [],
                     parent=className,
-                    attributename=attributeName
+                    attributename=attributeName,
+                    required = paramDict['required']
                 )
             attribsDict['__dynamic_properties__'].append(attributeName)
+
+            # TODO make a method that dynamically queries dynamic prop list to determine in attribute is required
+            if paramDict['required'] == True:
+                attribsDict['__mandatory_properties__'].append(attributeName)
         return attribsDict
 
     @staticmethod
@@ -304,7 +324,6 @@ class factory(object):
         _retDict = {}
         if 'metas' in classDict:
             _retDict['__metas__'] = classDict['metas']
-        #print('in metamaker:', _retDict)
         return _retDict
 
     @staticmethod

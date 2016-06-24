@@ -1,6 +1,6 @@
 class attribute(object):
 
-    def __init__(self, *pargs, typeclass=None, singleton=True,
+    def __init__(self, *pargs, typeclass=None, singleton=True, required=True,
                  posargs=None, kwargs=None, parent=None,
                  attributename=None, **keywordargs):
 
@@ -17,6 +17,7 @@ class attribute(object):
         self.__storage__ = [] # prevents weakly referenced shared list problem
         self.__parent__ = parent
         self.__attributename__ = attributename
+        self.__required__ = required # TODO do something with this (in classgen have mandatoryproperties query this)
 
     @property
     def attrtype(self):

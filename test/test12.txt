@@ -1,8 +1,8 @@
 TESTCLASSSTWELVE::
     *file = cr
     *moo = 1
-    @testprop1:: single: String
-    @testprop2:: multiple: String
+    @testprop1:: single: String (required = False)
+    @testprop2:: multiple: String (required = True)
 
 TESTCLASSSTWELVEB::
     *file = cri
