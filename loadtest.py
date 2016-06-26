@@ -370,6 +370,22 @@ def test12():
 
     print('--- test 12 ends ---')
 
+def test13():
+
+    print('test 13 validates auto loading from complex folder structures')
+    print('---- testing 13 begins ----')
+    loadconfig('test\\test13.txt', dbg=False)
+
+    print('--- walk file system ---')
+    mypath = 'test\\test13data'
+    sf3 = StructureFactory.treewalk(mypath)
+
+    print('--- explore results ---')
+    for child in sf3.children:
+        print(child.dataasobject)
+
+    print('--- test 13 ends ---')
+
 def debug(config):
     print('--- conf debug ---')
     conf.debugConfig(config)
@@ -393,7 +409,7 @@ if __name__ == '__main__':
 # TODO chained config file reader
 # TODO dynamic class imports
 # TODO method/plugin imports
-# TODO optional/required for class models
+# DONE optional/required for class models
 # DONE simply loading of config that generates and registers classes
 
 

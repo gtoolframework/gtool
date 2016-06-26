@@ -125,7 +125,7 @@ class StructureFactory(object):
         def addchildren(self, node):
             if isinstance(node, list):
                 for _node in node:
-                    self.__children.append(_node)
+                    self.__children__.append(_node)
                     _node.__parent__ = self
             else:
                 self.__children__.append(node)
@@ -168,11 +168,11 @@ class StructureFactory(object):
         def __objectmatch__(self):
             _ret = filematch(self.name)
             if _ret is None:
-                raise KeyError('%s does not match any known class definition' % self.name)
+                raise KeyError('%s at %s does not match any known class definition' % (self.name, self.path))
             return _ret
 
         @property
-        def data(self):
+        def __data__(self):
             if isinstance(self.__inode__, StructureFactory.File):
                 return ''.join(self.__inode__.read())
             else:
@@ -182,7 +182,7 @@ class StructureFactory(object):
         def dataasobject(self):
             _retobject = self.__objectmatch__()
             #print(_retobject)
-            if _retobject.loads(self.data): # True if loadstring works
+            if _retobject.loads(self.__data__): # True if loadstring works
                 return _retobject
             else:
                 raise TypeError('Could not parse the data from %s into a %s class' % (self.path, type(_retobject)))
@@ -195,7 +195,7 @@ class StructureFactory(object):
         """
 
         @property
-        def data(self):
+        def __data__(self):
             return '%s' % self.__name__
 
     class CNode(Node):
@@ -205,8 +205,74 @@ class StructureFactory(object):
         """
 
         @property
-        def data(self):
-            return 'blargh'
+        def __data__(self):
+            """
+            returns a string of the root node data but not of any attributes that are dynamic classes
+            :return: str
+            """
+            _ret = str()
+            _filelist = [f for f in self.fileobject.children if isinstance(f, StructureFactory.File)]
+            _coredata = [f.data for f in _filelist if f.name is "_.txt"]
+            if len(_coredata) == 1:
+                _ret += ''.join(_coredata[0].read())
+            else:
+                raise FileNotFoundError('In %s the _.txt file was expected' % self.fileobject.path)
+
+            for _file in (f for f in _filelist if f.name is not "_.txt"):
+                _data = ''.join(_file.read())
+                if '@' not in _data[0]:
+                    _ret += '@%s' % _file.name
+                    _ret += _data
+
+            for subdir in (f for f in self.fileobject.children if isinstance(f, StructureFactory.Directory)):
+                subfilelist = [subfile for subfile in subdir.children]
+                if '_.txt' not in (subfile.name for subfile in subfilelist):
+                    for subfile in subfilelist:
+                        _ret += '@%s' % subfile.name
+                        _ret += subfile.read()
+
+            print('return data:', _ret)
+            return _ret
+
+        @property
+        def dataasobject(self):
+            _retobject = self.__objectmatch__()
+            # print(_retobject)
+            _softload = True
+            if not _retobject.loads(self.__data__, softload=_softload):  # True if loadstring works
+                raise TypeError('Could not parse the data from %s into a %s class' % (self.path, type(_retobject)))
+            if len(_retobject.missingproperties) == 0:
+                return _retobject
+
+            _filelist = [f for f in self.fileobject.children if isinstance(f, StructureFactory.File)]
+            for _file in (f for f in _filelist if f.name is not "_.txt"):
+                _data = ''.join(_file.read())
+                if '@' in _data[0]:
+                    _attrobj = StructureFactory.Node(name=_file.name, fileobject=_file)
+                    _retobject[_file.name] = _attrobj.dataasobject
+                    if _file.name in _retobject.missingproperties:
+                        _retobject.__missing_dynamic_properties__.remove(_file.name)
+                    else:
+                        raise TypeError('Got an attribute file %s that is not part of the %s class at %s' %
+                                         (_file.name, self.name, self.path))
+
+            for subdir in (f for f in self.fileobject.children if isinstance(f, StructureFactory.Directory)):
+                subfilelist = [subfile for subfile in subdir.children]
+                if '_.txt' in (subfile.name for subfile in subfilelist):
+                    for subfile in subfilelist:
+                        _attrobj = StructureFactory.CNode(name=subfile.name, fileobject=subfile)
+                        _retobject[subfile.name] = _attrobj.dataasobject
+                    if subfile.name in _retobject.missingproperties:
+                        _retobject.__missing_dynamic_properties__.remove(subfile.name)
+                    else:
+                        raise TypeError('Got an attribute directory %s that is not part of the %s class at %s' %
+                                        (subfile.name, type(_retobject), self.path))
+
+            if len(_retobject.missingproperties) > 0:
+                raise TypeError('The following mandatory attributes are missing %s for the %s class at %s' %
+                                (_retobject.missingproperties, type(_retobject), self.path))
+
+            return _retobject
 
 
     @staticmethod

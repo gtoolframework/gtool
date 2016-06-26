@@ -168,7 +168,11 @@ class factory(object):
     def mandatoryproperties(self):
         return self.__mandatory_properties__
 
-    def loads(self, loadstring):
+    @property
+    def missingproperties(self):
+        return self.__missing_mandatory_properties__
+
+    def loads(self, loadstring, softload=False):
         """
         Method to read in a correctly structured string and load it into the object attributes
         :param loadstring:
@@ -231,8 +235,11 @@ class factory(object):
         for prop in self.__dynamic_properties__:
             # TODO don't raise for non-mandatory attribs
             if prop not in attriblist and prop in self.__mandatory_properties__:
-                raise AttributeError('attribute %s required by %s class definition file but not found' %
+                if softload is False:
+                    raise AttributeError('attribute %s required by %s class definition file but not found' %
                                      (prop, self.__class__))
+                if softload is True:
+                    self.__missing_mandatory_properties__.append(prop)
         # reverse check of above and to ensure only attributes required by class file are present in data file
         for attrname, attrval in ret.items():
             if attrname not in self.__dynamic_properties__:
@@ -241,13 +248,13 @@ class factory(object):
             else:
                 # TODO load into object attribs
                 # TODO pass in args (also refactor load so dict args are correct)
-                #try:
-                self.__list_slots__[attrname].__load__(__convertandload__(self, attrname, attrval))
-                #except Exception as err:
-                #    print('got an error when trying to load data for %s: %s' % (self.__class__, err))
+                try:
+                    self.__list_slots__[attrname].__load__(__convertandload__(self, attrname, attrval))
+                except Exception as err:
+                    print('got an error when trying to load data for %s: %s' % (self.__class__, err))
         return True if len(ret) > 0 else False
 
-    def load(self, loadfile):
+    def load(self, loadfile, softload=False):
 
         _ret = False
 
@@ -262,7 +269,7 @@ class factory(object):
             raise Exception('attempted to to read %s and got an exception' % loadfile)
         else:
             try:
-                _ret = self.loads(f.read())
+                _ret = self.loads(f.read(), softload=softload)
             except AttributeError as err:
                 raise Exception('Reading %s: %s' % (loadfile, err))
             f.close()
@@ -280,6 +287,7 @@ class factory(object):
         methodsDict['__setattr__'] = factory.setattr
         methodsDict['dynamicproperties'] = factory.dynamicproperties
         methodsDict['mandatoryproperties'] = factory.mandatoryproperties
+        methodsDict['missingproperties'] = factory.missingproperties
         methodsDict['classfile'] = classfile
         methodsDict['metas'] = metas
         methodsDict['register'] = register
@@ -296,6 +304,7 @@ class factory(object):
         # TODO this could be computed by a method dynamically by looking for funcs/props that start with X
         attribsDict['__dynamic_properties__'] = []
         attribsDict['__mandatory_properties__'] = []
+        attribsDict['__missing_mandatory_properties__'] = []
         for attributeName, attributeValues in classDict['attributes'].items():
             paramDict = {}
             if attributeValues['list']:
