@@ -1,2 +1,3 @@
 @testprop1: 2
 @testprop2: 90
+@testprop2: 30

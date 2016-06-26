@@ -392,7 +392,7 @@ def debug(config):
     print('--- test ---')
 
 if __name__ == '__main__':
-    test12()
+    test13()
 
 # TODO === FEATURE #1 === read config, parse file and emit dict object containing tree structure/data
 # DONE multiple args in data file

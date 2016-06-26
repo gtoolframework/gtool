@@ -212,7 +212,7 @@ class StructureFactory(object):
             """
             _ret = str()
             _filelist = [f for f in self.fileobject.children if isinstance(f, StructureFactory.File)]
-            _coredata = [f.data for f in _filelist if f.name is "_.txt"]
+            _coredata = [f for f in _filelist if f.name == "_.txt"]
             if len(_coredata) == 1:
                 _ret += ''.join(_coredata[0].read())
             else:
@@ -221,23 +221,24 @@ class StructureFactory(object):
             for _file in (f for f in _filelist if f.name is not "_.txt"):
                 _data = ''.join(_file.read())
                 if '@' not in _data[0]:
-                    _ret += '@%s' % _file.name
+                    _ret += '\n@%s: ' % _file.name
                     _ret += _data
 
             for subdir in (f for f in self.fileobject.children if isinstance(f, StructureFactory.Directory)):
                 subfilelist = [subfile for subfile in subdir.children]
                 if '_.txt' not in (subfile.name for subfile in subfilelist):
                     for subfile in subfilelist:
-                        _ret += '@%s' % subfile.name
-                        _ret += subfile.read()
+                        _ret += '\n@%s: ' % subdir.name
+                        _data = ''.join(subfile.read())
+                        if not len(_data) > 0:
+                            raise TypeError('The file %s has no data in it' % subfile.path)
+                        _ret += _data
 
-            print('return data:', _ret)
             return _ret
 
         @property
         def dataasobject(self):
             _retobject = self.__objectmatch__()
-            # print(_retobject)
             _softload = True
             if not _retobject.loads(self.__data__, softload=_softload):  # True if loadstring works
                 raise TypeError('Could not parse the data from %s into a %s class' % (self.path, type(_retobject)))
