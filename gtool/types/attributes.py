@@ -28,9 +28,26 @@ class attribute(object):
         _class = self.__init__['__class__']
         return namespace()[_class.upper()].classfile()
 
-    def lazyloadclass(self):
+    @property
+    def __validationrequired__(self):
         _class = self.__init__['__class__']
-        print(_class)
+        if _class in globals():
+            # print('in lazyload loading from globals')
+            return True
+        elif _class.upper() in namespace():
+            # print('in lazyload loading from namespace')
+            return False
+        else:
+            raise TypeError('I cannot find %s in either the globals or namspace dicts' % _class)
+
+
+    def lazyloadclass(self):
+        """
+        defers evaluation of the attribute class. If it occured during init there would be unresolved dependencies
+        :return: object
+        """
+        _class = self.__init__['__class__']
+        #print(_class)
         if _class in globals():
             #print('in lazyload loading from globals')
             return globals()[_class]
@@ -56,7 +73,7 @@ class attribute(object):
 
     def __validate__(self, item):
         _class = self.lazyloadclass()
-        print(_class)
+        #print(_class)
         if not isinstance(item, _class):
             raise TypeError('%s can only hold %s but got %s' % (
                 self.__context__(),
@@ -64,10 +81,11 @@ class attribute(object):
                 type(item)
             )
                             )
-        if self.__init__['kwargs'] is not None:
+        if self.__init__['kwargs'] is not None and  self.__validationrequired__ is True:
             try:
                 item.__validate__(self.__validators__(item))
             except ValueError as verror:
+                # TODO fix this error message generation, it doesn't look like the others
                 errormsg = ('For {0}: {1}'.format(self.__context__(), verror))
                 raise ValueError(errormsg)
         return True

@@ -419,10 +419,10 @@ if __name__ == '__main__':
 # DONE mandatory/optional flag for attributes (in keyword args)
 # DONE automated reader from file
 # DONE decide when related files should be in same directory and when in subdir
-# TODO should first line of data file be class type? or is that extra work?
+# BURN should first line of data file be class type? or is that extra work?
 # DONE special keyword to identify subfile (or behaviour to go looking for subfiles/subdirs
-# TODO chained data file reader
-# TODO chained config file reader
+# DONE chained data file reader
+# DONE chained config file reader
 # TODO dynamic class imports
 # TODO method/plugin imports
 # DONE optional/required for class models
