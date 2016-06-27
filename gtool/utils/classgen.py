@@ -172,6 +172,10 @@ class factory(object):
     def missingproperties(self):
         return self.__missing_mandatory_properties__
 
+    @property
+    def missingoptionalproperties(self):
+        return self.__missing_optional_properties__
+
     def loads(self, loadstring, softload=False):
         """
         Method to read in a correctly structured string and load it into the object attributes
@@ -234,12 +238,14 @@ class factory(object):
         # check if all attribs required by class definition are in the data file
         for prop in self.__dynamic_properties__:
             # TODO don't raise for non-mandatory attribs
-            if prop not in attriblist and prop in self.__mandatory_properties__:
-                if softload is False:
+            if prop not in attriblist:
+                if prop in self.__mandatory_properties__ and softload is False:
                     raise AttributeError('attribute %s required by %s class definition file but not found' %
                                      (prop, self.__class__))
-                if softload is True:
+                if prop in self.__mandatory_properties__ and softload is True:
                     self.__missing_mandatory_properties__.append(prop)
+                if prop not in self.__mandatory_properties__:
+                    self.__missing_optional_properties__.append(prop)
         # reverse check of above and to ensure only attributes required by class file are present in data file
         for attrname, attrval in ret.items():
             if attrname not in self.__dynamic_properties__:
@@ -251,7 +257,8 @@ class factory(object):
                 try:
                     self.__list_slots__[attrname].__load__(__convertandload__(self, attrname, attrval))
                 except Exception as err:
-                    print('got an error when trying to load data for %s: %s' % (self.__class__, err))
+                    raise TypeError('got an error when trying to load data for %s: %s' % (self.__class__, err))
+
         return True if len(ret) > 0 else False
 
     def load(self, loadfile, softload=False):
@@ -288,6 +295,7 @@ class factory(object):
         methodsDict['dynamicproperties'] = factory.dynamicproperties
         methodsDict['mandatoryproperties'] = factory.mandatoryproperties
         methodsDict['missingproperties'] = factory.missingproperties
+        methodsDict['missingoptionalproperties'] = factory.missingoptionalproperties
         methodsDict['classfile'] = classfile
         methodsDict['metas'] = metas
         methodsDict['register'] = register
@@ -305,6 +313,7 @@ class factory(object):
         attribsDict['__dynamic_properties__'] = []
         attribsDict['__mandatory_properties__'] = []
         attribsDict['__missing_mandatory_properties__'] = []
+        attribsDict['__missing_optional_properties__'] = []
         for attributeName, attributeValues in classDict['attributes'].items():
             paramDict = {}
             if attributeValues['list']:
@@ -325,7 +334,8 @@ class factory(object):
 
             attribsDict['__list_slots__'][attributeName] = \
                 attribute(
-                    typeclass=globals()[attributeValues['type']],
+                    #typeclass=globals()[attributeValues['type']],
+                    typeclass=attributeValues['type'], # send over the name without accessing globals, let attribute handle that
                     singleton=paramDict['singleton'],
                     posargs=attributeValues['args']['posargs'] if 'posargs' in attributeValues['args'] else [],
                     kwargs=attributeValues['args']['kwargs'] if 'kwargs' in attributeValues['args'] else [],
@@ -368,4 +378,5 @@ class factory(object):
 def generateClass(className, classDict):
     _newclass = factory(className, classDict)
     registerClass(className, _newclass)
+    # TODO no need to return the new class ist if registers correctly
     return _newclass

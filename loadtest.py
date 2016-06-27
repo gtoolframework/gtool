@@ -386,19 +386,35 @@ def test13():
 
     print('--- test 13 ends ---')
 
+def test14():
+
+    print('test 14 validates chained config and chained data reading')
+    print('---- testing 14 begins ----')
+    loadconfig('test\\test14.txt', dbg=False)
+
+    print('--- walk file system ---')
+    mypath = 'test\\test14data'
+    sf = StructureFactory.treewalk(mypath)
+
+    print('--- explore results ---')
+    for child in sf.children:
+        print(child.dataasobject)
+
+    print('--- test 14 ends ---')
+
 def debug(config):
     print('--- conf debug ---')
     conf.debugConfig(config)
     print('--- test ---')
 
 if __name__ == '__main__':
-    test13()
+    test14()
 
 # TODO === FEATURE #1 === read config, parse file and emit dict object containing tree structure/data
 # DONE multiple args in data file
 # DONE switch multiple values from separated to repeats of the same @attribute
 # TODO class metas to set/override key functions during class gen
-# TODO read multiple args from child data files
+# DONE read multiple args from child data files
 # DONE regex for class to recognize files that match. Criteria Class --> criteria.txt, Control Class --> c#.txt
 # DONE mandatory/optional flag for attributes (in keyword args)
 # DONE automated reader from file

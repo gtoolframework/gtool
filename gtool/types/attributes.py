@@ -1,3 +1,6 @@
+from gtool.types.common import Number, String, Choice
+from gtool.namespace import namespace
+
 class attribute(object):
 
     def __init__(self, *pargs, typeclass=None, singleton=True, required=True,
@@ -10,7 +13,8 @@ class attribute(object):
         initdict = self.__init__
         initdict['singleton'] = singleton
         initdict['validatedict'] = None
-        initdict['class'] = typeclass
+        initdict['__class__'] = typeclass
+        initdict['class'] = self.lazyloadclass
         initdict['posargs'] = posargs
         initdict['kwargs'] = kwargs # TODO should preprocess into dict
         # make each storage list unique, do not load with values on init
@@ -20,11 +24,26 @@ class attribute(object):
         self.__required__ = required # TODO do something with this (in classgen have mandatoryproperties query this)
 
     @property
+    def attrfilematch(self):
+        _class = self.__init__['__class__']
+        return namespace()[_class.upper()].classfile()
+
+    def lazyloadclass(self):
+        _class = self.__init__['__class__']
+        print(_class)
+        if _class in globals():
+            #print('in lazyload loading from globals')
+            return globals()[_class]
+        elif _class.upper() in namespace():
+            #print('in lazyload loading from namespace')
+            return namespace()[_class.upper()]
+
+    @property
     def attrtype(self):
-        return self.__init__['class']
+        return self.__init__['class']()
 
     def __convert__(self, value):
-        return self.__init__['class'].__converter__()(value) # return a type from type definition (such at gtool.types.common)
+        return self.__init__['class']().__converter__()(value) # return a type from type definition (such at gtool.types.common)
 
     def __validators__(self, item):
         # need to extract the provided validators but only return those that the type uses
@@ -36,10 +55,12 @@ class attribute(object):
         return validatorDict
 
     def __validate__(self, item):
-        if not isinstance(item, self.__init__['class']):
+        _class = self.lazyloadclass()
+        print(_class)
+        if not isinstance(item, _class):
             raise TypeError('%s can only hold %s but got %s' % (
                 self.__context__(),
-                self.__init__['class'],
+                self.__init__['class'](),
                 type(item)
             )
                             )

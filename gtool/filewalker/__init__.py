@@ -221,7 +221,7 @@ class StructureFactory(object):
             for _file in (f for f in _filelist if f.name is not "_.txt"):
                 _data = ''.join(_file.read())
                 if '@' not in _data[0]:
-                    _ret += '\n@%s: ' % _file.name
+                    _ret += '\n@%s: ' % _file.name.split('.')[:-1][0]
                     _ret += _data
 
             for subdir in (f for f in self.fileobject.children if isinstance(f, StructureFactory.Directory)):
@@ -242,17 +242,33 @@ class StructureFactory(object):
             _softload = True
             if not _retobject.loads(self.__data__, softload=_softload):  # True if loadstring works
                 raise TypeError('Could not parse the data from %s into a %s class' % (self.path, type(_retobject)))
-            if len(_retobject.missingproperties) == 0:
+            if len(_retobject.missingproperties) == 0 and len(_retobject.missingoptionalproperties) == 0:
+                #print('no missing properties')
                 return _retobject
 
             _filelist = [f for f in self.fileobject.children if isinstance(f, StructureFactory.File)]
+            #print('filelist:', _filelist)
             for _file in (f for f in _filelist if f.name != "_.txt"):
                 _data = ''.join(_file.read())
+                #print('in dataasobject --> _data:', _data)
                 if '@' in _data[0]:
-                    _attrobj = StructureFactory.Node(name=_file.name, fileobject=_file)
-                    _retobject[_file.name] = _attrobj.dataasobject
-                    if _file.name in _retobject.missingproperties:
-                        _retobject.__missing_dynamic_properties__.remove(_file.name)
+                    # this is an attribute class object (not a common object)
+                    _filenamewithoutext = _file.name.split('.')[:-1][0]
+                    #print(_filenamewithoutext)
+                    #print(getattr(_retobject, _filenamewithoutext))
+                    _attrclassobj = getattr(_retobject, _filenamewithoutext)
+                    #print(type(_attrclassobj))
+
+                    _attrclassname = _attrclassobj.attrfilematch
+                    #print(_attrclassname)
+                    _attrobj = StructureFactory.Node(name=_attrclassname, fileobject=_file)
+                    #print(dir(_retobject[_filenamewithoutext]))
+                    setattr(_retobject, _filenamewithoutext, _attrobj.dataasobject)
+
+                    if _filenamewithoutext in _retobject.missingproperties:
+                        _retobject.__missing_mandatory_properties__.remove(_filenamewithoutext)
+                    elif _filenamewithoutext in _retobject.missingoptionalproperties:
+                        _retobject.__missing_optional_properties__.remove(_filenamewithoutext)
                     else:
                         raise TypeError('Got an attribute file %s that is not part of the %s class at %s' %
                                          (_file.name, self.name, self.path))
