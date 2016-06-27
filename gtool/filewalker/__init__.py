@@ -246,7 +246,7 @@ class StructureFactory(object):
                 return _retobject
 
             _filelist = [f for f in self.fileobject.children if isinstance(f, StructureFactory.File)]
-            for _file in (f for f in _filelist if f.name is not "_.txt"):
+            for _file in (f for f in _filelist if f.name != "_.txt"):
                 _data = ''.join(_file.read())
                 if '@' in _data[0]:
                     _attrobj = StructureFactory.Node(name=_file.name, fileobject=_file)

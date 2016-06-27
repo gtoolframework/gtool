@@ -1,2 +1,1 @@
 @testprop1: ipsum lorum
-@testprop2: ipsum lorum polis
