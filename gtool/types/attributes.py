@@ -14,7 +14,7 @@ class attribute(object):
         initdict['singleton'] = singleton
         initdict['validatedict'] = None
         initdict['__class__'] = typeclass
-        initdict['class'] = self.lazyloadclass
+        initdict['class'] = self.__lazyloadclass__
         initdict['posargs'] = posargs
         initdict['kwargs'] = kwargs # TODO should preprocess into dict
         # make each storage list unique, do not load with values on init
@@ -41,7 +41,7 @@ class attribute(object):
             raise TypeError('I cannot find %s in either the globals or namspace dicts' % _class)
 
 
-    def lazyloadclass(self):
+    def __lazyloadclass__(self):
         """
         defers evaluation of the attribute class. If it occured during init there would be unresolved dependencies
         :return: object
@@ -72,7 +72,7 @@ class attribute(object):
         return validatorDict
 
     def __validate__(self, item):
-        _class = self.lazyloadclass()
+        _class = self.__init__['class']()
         #print(_class)
         if not isinstance(item, _class):
             raise TypeError('%s can only hold %s but got %s' % (

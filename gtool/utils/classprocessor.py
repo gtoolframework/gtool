@@ -7,7 +7,7 @@ MODE_KEYWORD_MULTIPLE = 'multiple'
 MODE_KEYWORD_SINGLE = 'single'
 
 
-def readConfig(configString):
+def readClass(configString):
 
     def caps(string, location, tokens):
         return str.capitalize(tokens[0])
@@ -112,7 +112,7 @@ def readConfig(configString):
 # read https://blog.ionelmc.ro/2015/02/09/understanding-python-metaclasses/
 
 
-def debugConfig(config):
+def debugClass(config):
     for classDef in config:
         print(list(classDef.keys()))
         print(classDef.classname)
@@ -131,7 +131,7 @@ def debugConfig(config):
     return None
 
 
-def processConfigAlt(config):
+def processClass(config):
 
     def generateMetas(element):
         _metaDict = {}

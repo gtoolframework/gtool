@@ -1,0 +1,5 @@
+TESTCLASSSFOURTEEN::
+    *file = cr
+    *moo = 1
+    @testprop1:: single: String (required = False)
+    @testprop2:: multiple: String (required = True)
