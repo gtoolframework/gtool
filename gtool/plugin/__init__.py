@@ -2,12 +2,15 @@ from pluginbase import PluginBase
 
 def loadplugins(pluginbasepath):
     plugin_base = PluginBase(package='gtool.plugins')
-    plugin_source = plugin_base.make_plugin_source(
-        searchpath=['./path/to/plugins', './path/to/more/plugins'])
-    my_plugin = plugin_source.load_plugin('my_plugin')
+    plugin_source = plugin_base.make_plugin_source(searchpath=__enumerateplugins(pluginbasepath), identifier='gtool', persist=True)
+    for plugin_name in plugin_source.list_plugins():
+        print('plugin_name:', plugin_name)
+        _plugin = plugin_source.load_plugin(plugin_name)
+        registerPlugin(plugin_name, _plugin)
 
 def __enumerateplugins(pluginbasepath):
-    return []
+    # TODO enumerate subdirs
+    return [pluginbasepath]
 
 
 def __loadplugins(pluginpath):
@@ -31,7 +34,7 @@ def registerPlugin(pluginName, pluginObj):
         globals()[pluginnamespace()][pluginName] = pluginObj
         return True
 
-def namespace():
+def pluginspace():
     return globals()[pluginnamespace()]
 
 

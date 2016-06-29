@@ -404,7 +404,7 @@ def test14():
 
 def test15():
 
-    print('test 15 validates loading multiple class files from a predefined directory')
+    print('test 15 validates loading multiple class files from a predefined directory and the new plugin loader')
     print('---- testing 15 begins ----')
     sf = projectloader('test\\test15', dbg=False)
 

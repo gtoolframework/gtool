@@ -1,6 +1,7 @@
 from .classgen import generateClass
 from .classprocessor import readClass, processClass, debugClass
 from gtool.filewalker import StructureFactory
+from gtool.plugin import loadplugins, pluginspace
 import os
 
 def load():
@@ -15,6 +16,15 @@ def projectloader(projectroot, dbg=False):
 
     projectclassroot = os.path.join(projectroot, PROJECTCLASS)
     projectdataroot = os.path.join(projectroot, PROJECTDATA)
+    projectconfigroot = os.path.join(projectroot, PROJECTCONFIG)
+    projectpluginroot = os.path.join(projectroot, PROJECTPLUGINS)
+
+    loadplugins(projectpluginroot)
+
+    print('plugins:', pluginspace())
+    for pluginname, pluginobj in pluginspace().items():
+        print('executing plugin: ', pluginname)
+        pluginobj.do_something_else()
 
     loadclasses(projectclassroot, dbg=dbg)
     return StructureFactory.treewalk(projectdataroot)

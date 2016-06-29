@@ -1,7 +1,17 @@
+from gtool.plugin import registerPlugin
 
-def do_something():
-    pass
+def do_something_else():
+    print('I am helping one')
 
-def setup():
-    # register into some namespace
-    pass
+class test1class():
+
+    def do(self):
+        print('I am helping one')
+
+def register():
+    registerPlugin('test1', test1class)
+
+class plugin():
+
+    def do(self):
+        print('I am helping one')
