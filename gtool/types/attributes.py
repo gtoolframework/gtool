@@ -1,5 +1,7 @@
 from gtool.types.common import Number, String, Choice
 from gtool.namespace import namespace
+from gtool.plugin import pluginnamespace
+from copy import copy
 
 class attribute(object):
 
@@ -30,15 +32,23 @@ class attribute(object):
 
     @property
     def __validationrequired__(self):
+        """
+        Checks if validation is required during data load.
+        Should always be true except for classes that handle their own validation
+        :return: True if attribute validation routines should be called when data is loaded.
+        """
         _class = self.__init__['__class__']
         if _class in globals():
-            # print('in lazyload loading from globals')
+            # user created class
             return True
         elif _class.upper() in namespace():
-            # print('in lazyload loading from namespace')
+            # an attribute that is a user created class, it will handle it's own validation
             return False
+        elif _class.upper() in pluginnamespace():
+            # an attribute that relies on a plugin
+            return True
         else:
-            raise TypeError('I cannot find %s in either the globals or namspace dicts' % _class)
+            raise TypeError('I cannot find %s in the globals, plugins or class namespaces' % _class)
 
 
     def __lazyloadclass__(self):
@@ -50,10 +60,13 @@ class attribute(object):
         #print(_class)
         if _class in globals():
             #print('in lazyload loading from globals')
-            return globals()[_class]
+            return copy(globals()[_class])
         elif _class.upper() in namespace():
             #print('in lazyload loading from namespace')
-            return namespace()[_class.upper()]
+            return copy(namespace()[_class.upper()])
+        elif _class.upper() in pluginnamespace():
+            # print('in lazyload loading from namespace')
+            return copy(pluginnamespace()[_class.upper()])
 
     @property
     def attrtype(self):
@@ -138,6 +151,7 @@ class attribute(object):
     """
 
     def __repr__(self):
+        #return '%s' % ['%s' % f for f in self.__storage__]
         return '%s' % self.__storage__
 
     def __cmp__(self, other):

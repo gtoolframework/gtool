@@ -4,7 +4,12 @@ import gtool.types.common as t
 from gtool.types.attributes import attribute
 from gtool.namespace import namespace, registerClass
 from gtool.filewalker import filematch, filematchspace, StructureFactory
-from gtool.utils import loadclasses, projectloader
+from gtool.utils import __loadclasses, projectloader
+
+def debug(config):
+    print('--- conf debug ---')
+    conf.debugClass(config)
+    print('--- test ---')
 
 def testCode1(k):
     print('test 1 checks it object magic methods works')
@@ -358,7 +363,7 @@ def test12():
 
     print('test 12 validates auto loading from simple files, multi item data loads and new required arg')
     print('---- testing 12 begins ----')
-    loadclasses('test\\test12.txt', dbg=False)
+    __loadclasses('test\\test12.txt', dbg=False)
 
     print('--- walk file system ---')
     mypath = 'test\\test12data'
@@ -374,7 +379,7 @@ def test13():
 
     print('test 13 validates auto loading from complex folder structures')
     print('---- testing 13 begins ----')
-    loadclasses('test\\test13.txt', dbg=False)
+    __loadclasses('test\\test13.txt', dbg=False)
 
     print('--- walk file system ---')
     mypath = 'test\\test13data'
@@ -390,7 +395,7 @@ def test14():
 
     print('test 15 validates chained config and chained data reading')
     print('---- testing 14 begins ----')
-    loadclasses('test\\test14.txt', dbg=False)
+    __loadclasses('test\\test14.txt', dbg=False)
 
     print('--- walk file system ---')
     mypath = 'test\\test14data'
@@ -410,11 +415,23 @@ def test15():
 
     print('--- explore results ---')
     for child in sf.children:
+        print('-----')
         print(child.dataasobject)
 
     print('--- test 15 ends ---')
 
-def debug(config):
-    print('--- conf debug ---')
-    conf.debugClass(config)
-    print('--- test ---')
+def test16():
+
+    print('test 16 validates auto loading from simple files, multi item data loads and new required arg')
+    print('---- testing 16 begins ----')
+    __loadclasses('test\\test16.txt', dbg=False)
+
+    print('--- walk file system ---')
+    mypath = 'test\\test16data'
+    sf3 = StructureFactory.treewalk(mypath)
+
+    print('--- explore results ---')
+    for child in sf3.children:
+        print(child.dataasobject)
+
+    print('--- test 16 ends ---')

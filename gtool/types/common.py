@@ -61,7 +61,3 @@ class Choice(CoreType):
         self.__validators__ = ['choices']
         super().__init__(*args, valuetype=str, **kwargs)
 
-
-class Node(CoreType):
-
-    pass

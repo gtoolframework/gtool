@@ -25,7 +25,6 @@ def filematchspace():
 def filematch(exp):
     T = globals()[filematcher()]
     try:
-        #print('file match:', T.key(exp), 'has a value of', T[T.key(exp)])
         return gtool.namespace.namespace()[T[T.key(exp)]]
     except KeyError:
         return None
@@ -164,7 +163,6 @@ class StructureFactory(object):
             else:
                 return "%s" % self.__name__
 
-        @property
         def __objectmatch__(self):
             _ret = filematch(self.name)
             if _ret is None:
@@ -180,8 +178,8 @@ class StructureFactory(object):
 
         @property
         def dataasobject(self):
-            _retobject = self.__objectmatch__()
-            #print(_retobject)
+            _retclass = self.__objectmatch__()
+            _retobject = _retclass()
             if _retobject.loads(self.__data__): # True if loadstring works
                 return _retobject
             else:
@@ -238,7 +236,8 @@ class StructureFactory(object):
 
         @property
         def dataasobject(self):
-            _retobject = self.__objectmatch__()
+            _retclass = self.__objectmatch__()
+            _retobject = _retclass()
             _softload = True
             if not _retobject.loads(self.__data__, softload=_softload):  # True if loadstring works
                 raise TypeError('Could not parse the data from %s into a %s class' % (self.path, type(_retobject)))

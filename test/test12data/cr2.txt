@@ -1,4 +1,3 @@
-@testprop1: zion elder
 @testprop2: ipsum lorum
-horus rictum
+horus rictum 2
 @testprop2: bolder holder

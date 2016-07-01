@@ -1,1 +1,1 @@
-@testprop1: ipsum lorum
+@testprop1: cr1 ipsum lorum

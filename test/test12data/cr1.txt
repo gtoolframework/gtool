@@ -1,1 +1,2 @@
-@testprop2: ipsum lorum horus rictum
+@testprop1: zion elder
+@testprop2: ipsum lorum horus rictum 1

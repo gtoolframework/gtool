@@ -1,0 +1,4 @@
+TSIXTEEN::
+    *file = cr
+    @testprop1:: single: String (required = False)
+    @testprop2:: single: String (required = False)

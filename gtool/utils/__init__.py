@@ -1,7 +1,7 @@
 from .classgen import generateClass
 from .classprocessor import readClass, processClass, debugClass
 from gtool.filewalker import StructureFactory
-from gtool.plugin import loadplugins, pluginspace
+from gtool.plugin import loadplugins
 import os
 
 def load():
@@ -21,15 +21,18 @@ def projectloader(projectroot, dbg=False):
 
     loadplugins(projectpluginroot)
 
-    print('plugins:', pluginspace())
-    for pluginname, pluginobj in pluginspace().items():
+    """
+    print('plugins:', pluginnamespace())
+    for pluginname, pluginobj in pluginnamespace().items():
         print('executing plugin: ', pluginname)
-        pluginobj.do_something_else()
+        x = pluginobj()
+        print(type(x))
+    """
 
-    loadclasses(projectclassroot, dbg=dbg)
+    __loadclasses(projectclassroot, dbg=dbg)
     return StructureFactory.treewalk(projectdataroot)
 
-def loadclasses(classpath, dbg=False):
+def __loadclasses(classpath, dbg=False):
     if os.path.isfile(classpath):
         __loadclass(classpath, dbg=dbg)
     elif os.path.isdir(classpath):
@@ -57,9 +60,9 @@ def __loadclass(classpath, dbg=False):
         debug(classprocessor)
     # TODO capture exceptions
     classDict = processClass(classData)
-    for k, v in classDict.items():
+    for classname, classconfig in classDict.items():
         # TODO capture exceptions
-        generateClass(k, v)
+        generateClass(classname, classconfig)
     f.close()
 
 
