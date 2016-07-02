@@ -1,10 +1,7 @@
-# from gtool.types.common import Number, String, Choice
-# TODO replace with plugin importer
 from gtool.filewalker import registerFileMatcher
 from gtool.namespace import registerClass
 from gtool.types.attributes import attribute
 from distutils.util import strtobool
-#import gtool.utils.classgen.methods as cgm
 from .methods import *
 
 # --- class methods that will be bound by factory ---

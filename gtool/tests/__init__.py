@@ -404,7 +404,7 @@ def test14():
     print('--- test 14 ends ---')
 """
 
-#--- old tests won pre 15 won't work with our refactoring to use new project structure
+#--- old tests pre 15 won't work without refactoring to use new project structure
 
 def test15():
 

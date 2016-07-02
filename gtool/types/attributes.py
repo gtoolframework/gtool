@@ -1,7 +1,5 @@
-#from gtool.types.common import Number, String, Choice
 from gtool.namespace import namespace
 from gtool.plugin import pluginnamespace
-from copy import copy
 
 class attribute(object):
 
@@ -57,16 +55,12 @@ class attribute(object):
         :return: object
         """
         _class = self.__init__['__class__']
-        #print(_class)
         if _class in globals():
-            #print('in lazyload loading from globals')
-            return copy(globals()[_class])
+            return globals()[_class]
         elif _class.upper() in namespace():
-            #print('in lazyload loading from namespace')
-            return copy(namespace()[_class.upper()])
+            return namespace()[_class.upper()]
         elif _class.upper() in pluginnamespace():
-            # print('in lazyload loading from namespace')
-            return copy(pluginnamespace()[_class.upper()])
+            return pluginnamespace()[_class.upper()]
 
     @property
     def attrtype(self):
@@ -86,7 +80,6 @@ class attribute(object):
 
     def __validate__(self, item):
         _class = self.__init__['class']()
-        #print(_class)
         if not isinstance(item, _class):
             raise TypeError('%s can only hold %s but got %s' % (
                 self.__context__(),
