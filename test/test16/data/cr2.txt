@@ -1,0 +1,3 @@
+@testprop1: cr2 ipsum lorum horus
+@testprop2: ipsum lorum horus rictum
+@testprop3: 3

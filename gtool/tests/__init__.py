@@ -1,16 +1,18 @@
 import gtool.utils.classprocessor as conf
-import gtool.utils.classgen as gen
-import gtool.types.common as t
-from gtool.types.attributes import attribute
-from gtool.namespace import namespace, registerClass
-from gtool.filewalker import filematch, filematchspace, StructureFactory
-from gtool.utils import __loadclasses, projectloader
+#import gtool.utils.classgen as gen
+#import gtool.types.common as t
+#from gtool.types.attributes import attribute
+#from gtool.namespace import namespace, registerClass
+#from gtool.filewalker import filematch, filematchspace, StructureFactory
+from gtool.utils import projectloader, __loadclasses
 
 def debug(config):
     print('--- conf debug ---')
     conf.debugClass(config)
     print('--- test ---')
 
+
+"""
 def testCode1(k):
     print('test 1 checks it object magic methods works')
     print('---- testing 1 begins ----')
@@ -172,12 +174,6 @@ def test6():
             print('attempted to add a value that was longer than permitted')
         print(x.testprop1)
         print('--- test prop 2 ---')
-        """
-        for k,v in x.testprop2.validators.items():
-            print(k, "matches:", v == getattr(x.testprop2, k))
-        print(x.testprop2.issingleton())
-        print(x.testprop2)
-        """
         try:
             x.testprop2.append(2)
         except Exception as err:
@@ -393,7 +389,7 @@ def test13():
 
 def test14():
 
-    print('test 15 validates chained config and chained data reading')
+    print('test 14 validates chained config and chained data reading')
     print('---- testing 14 begins ----')
     __loadclasses('test\\test14.txt', dbg=False)
 
@@ -406,6 +402,9 @@ def test14():
         print(child.dataasobject)
 
     print('--- test 14 ends ---')
+"""
+
+#--- old tests won pre 15 won't work with our refactoring to use new project structure
 
 def test15():
 
@@ -422,16 +421,13 @@ def test15():
 
 def test16():
 
-    print('test 16 validates auto loading from simple files, multi item data loads and new required arg')
+    print('test 16 common type plugins')
     print('---- testing 16 begins ----')
-    __loadclasses('test\\test16.txt', dbg=False)
-
-    print('--- walk file system ---')
-    mypath = 'test\\test16data'
-    sf3 = StructureFactory.treewalk(mypath)
+    sf = projectloader('test\\test16', dbg=False)
 
     print('--- explore results ---')
-    for child in sf3.children:
+    for child in sf.children:
+        print('-----')
         print(child.dataasobject)
 
     print('--- test 16 ends ---')

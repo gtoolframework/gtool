@@ -1,4 +1,4 @@
-from gtool.types.common import Number, String, Choice
+#from gtool.types.common import Number, String, Choice
 # TODO replace with plugin importer
 import pyparsing as p
 from collections import defaultdict
