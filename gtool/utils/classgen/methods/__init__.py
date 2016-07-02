@@ -203,10 +203,10 @@ def loads(self, loadstring, softload=False):
         else:
             # TODO load into object attribs
             # TODO pass in args (also refactor load so dict args are correct)
-            try:
-                self.__list_slots__[attrname].__load__(convertandload(self, attrname, attrval))
-            except Exception as err:
-                raise TypeError('got an error when trying to load data for %s: %s' % (self.__class__, err))
+            #try:
+            self.__list_slots__[attrname].__load__(convertandload(self, attrname, attrval))
+            #except Exception as err:
+            #    raise TypeError('got an error when trying to load data for %s: %s' % (self.__class__, err))
 
     return True if len(ret) > 0 else False
 
