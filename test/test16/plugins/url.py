@@ -1,6 +1,7 @@
 from gtool.types.core import CoreType
 from validators import url, ValidationFailure
 from distutils.util import strtobool
+import warnings
 
 class Url(CoreType):
 
@@ -10,6 +11,7 @@ class Url(CoreType):
             public = 0 # False
         else:
             public = strtobool('%s' % _public)
+            warnings.warn('public check does not currently work due a problem in the underlying validators library')
         try:
             url(self.__value__, public=public) # TODO public / private test doesn't work
         except ValidationFailure:

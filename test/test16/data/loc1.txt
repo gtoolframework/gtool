@@ -1,2 +1,2 @@
 @testprop1: http://10.0.0.1
-@testprop2: /test/testb
+@testprop2: /test/test

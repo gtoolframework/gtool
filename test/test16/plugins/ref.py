@@ -7,21 +7,38 @@ class Ref(CoreType):
 
     def isReference(self, ref):
         separator = '/'
-        if separator in ref:
-            _splitlist = ref.split(separator)
-            #print('in ref:', _splitlist)
-            # make sure that the ref starts with a /, has at least one node and doesn't end with /
-            if len(_splitlist) > 1 and len(_splitlist[0]) == 0 and len(_splitlist[-1:]) > 0:
-                return True
+        emptysplit = ''
 
-        return False
+        if separator not in ref:
+            return False
+        _splitlist = ref.split(separator)
+
+        # make sure that the ref starts with a /, has at least one node and doesn't end with /
+        # rejection sieve
+        if len(_splitlist) <= 1:
+            # can't reference the root /
+            return False
+        if _splitlist[0] != emptysplit:
+            # ref must start with /
+            return False
+        if _splitlist[-1:][0] == emptysplit:
+            # ref must node end with /
+            return False
+
+        for node in _splitlist:
+            # node name's can't
+            if not(node.isalpha()) and node != emptysplit:
+                return False
+        # end of rejection sieve
+        # mmust be true then
+        return True
 
     def __validate__(self, valuedict):
         # Ref doesn't have validation options
         if self.isReference(self.__value__):
             return True
         else:
-            raise ValueError('Was expecting a valid reference URI of the form /node/node but got %s' % self.__value__)
+            raise ValueError('Was expecting a valid reference URI of the form /node/node with alphanumeric node names but got %s' % self.__value__)
 
     @classmethod
     def __converter__(cls):

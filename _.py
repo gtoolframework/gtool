@@ -1,69 +1,83 @@
-def __init__(self):
-    pass
+import pyparsing as p
 
-def __repr__(self):
-    if hasattr(self, 'x'):
-        return "%s::%s" % (self.__class__, self.x)
-    else:
-        return "%s::%s" % (self.__class__, [])
+class Filler(object):
 
-class test(object):
+    def __init__(self, fillertext):
+        self.__fillertext__ = fillertext
 
-    def __new__(cls, *args, **kwargs):
-        return super().__new__(cls)
-
-    def __init__(self):
-        self.x = []
+    def process(self):
+        return self.__fillertext__
 
     def __repr__(self):
-        if hasattr(self, 'x'):
-            return "%s::%s" % (self.__class__, self.x)
-        else:
-            return "%s::%s" % (self.__class__, [])
+        return '<%s>:%s' % (self.__class__, self.__fillertext__)
 
-typedict1 = {
-    '__init__':__init__,
-    '__repr__':__repr__,
-    'x': []
-}
+class AttributeMatch(object):
 
-typedict2 = {
-    '__init__':__init__,
-    '__repr__':__repr__,
-    'x': []
-}
+    def __init__(self, attrname):
+        self.__attrname__ = attrname
 
-classdict = {}
+    def process(self):
+        return globals()[self.__attrname__]
 
-classdict['testx'] = type('testx', (object,), typedict1)
-classdict['testy'] = type('testy', (object,), typedict2)
+    def __repr__(self):
+        return '<%s>:%s' % (self.__class__, self.__attrname__)
 
 
-test1 = test()
-test1.x.append(5)
-test2 = test()
-print(id(test1), "::", test1)
-print(id(test2), "::", test2)
+attribmarker = p.Literal('@').suppress()
+cellseparator = '||'
 
-objectlist = []
-testa = classdict['testx']()
-objectlist.append(testa)
-testb = classdict['testx']()
-objectlist.append(testb)
-testc = classdict['testy']()
-objectlist.append(testc)
-testd = classdict['testy']()
-objectlist.append(testd)
+teststring = "(@attrib1) || (@attrib2) C-@attrib3 (@attrib4)"
+print(teststring)
 
-testa.x.append(1)
-testc.x.append(2)
-print('-----')
-print(id(testa) ,"::", testa)
-print(id(testa) ,"::", testb)
-print(id(testa) ,"::", testc)
-print(id(testa) ,"::", testd)
+attrib1 = 'test 1'
+attrib2 = 'A.2'
+attrib3 = '3'
+attrib4 = 'book'
 
-print(testa)
-print(testb)
-print(testc)
-print(testd)
+attribgroup = attribmarker + p.Word(p.alphanums)
+
+test = attribgroup.scanString(teststring)
+
+cells = []
+
+_splitstring = [cell.strip() for cell in teststring.split(cellseparator)]
+
+for cell in _splitstring:
+    #_cell = cell.strip()
+    _scan = attribgroup.scanString(cell)
+    _templist = []
+    prestart = 0
+    for match in _scan:
+        start = match[1]
+        end = match[2]
+
+        _templist.append(Filler(cell[prestart:start]))
+        _templist.append(AttributeMatch(cell[start+1:end]))
+        prestart = end
+        #print('templist:', _templist)
+    _templist.append(Filler(cell[end:]))
+    cells.append(_templist)
+
+
+
+#print('cells:', cells)
+#print('**************')
+
+outstring = ""
+
+for i, cell in enumerate(cells):
+    #print('cell:', cell)
+    for element in cell:
+        #print('element:', element)
+
+        if isinstance(element, Filler) or isinstance(element,AttributeMatch):
+            outstring += element.process()
+
+    if (i+1) == len(cells):
+        pass
+    else:
+        outstring += '||'
+
+print(outstring)
+
+
