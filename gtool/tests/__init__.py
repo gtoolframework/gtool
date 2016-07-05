@@ -431,3 +431,16 @@ def test16():
         print(child.dataasobject)
 
     print('--- test 16 ends ---')
+
+def test17():
+
+    print('test 17 validates outplugins work')
+    print('---- testing 17 begins ----')
+    sf = projectloader('test\\test17', dbg=False)
+
+    print('--- explore results ---')
+    for child in sf.children:
+        print('-----')
+        print(child.dataasobject)
+
+    print('--- test 17 ends ---')

@@ -2,6 +2,7 @@ from .classgen import generateClass
 from .classprocessor import readClass, processClass, debugClass
 from gtool.filewalker import StructureFactory
 from gtool.plugin import loadplugins
+from .config import configloader
 import os
 
 def load():
@@ -11,15 +12,16 @@ def projectloader(projectroot, dbg=False):
 
     PROJECTDATA = "data"
     PROJECTCLASS = "classes"
-    PROJECTCONFIG = "config"
+    PROJECTCONFIG = "gtool.cfg"
     PROJECTPLUGINS = "plugins"
 
     projectclassroot = os.path.join(projectroot, PROJECTCLASS)
     projectdataroot = os.path.join(projectroot, PROJECTDATA)
-    projectconfigroot = os.path.join(projectroot, PROJECTCONFIG)
+    projectconfigpath = os.path.join(projectroot, PROJECTCONFIG)
     projectpluginroot = os.path.join(projectroot, PROJECTPLUGINS)
 
     loadplugins(projectpluginroot)
+    configloader(projectconfigpath)
 
     """
     print('plugins:', pluginnamespace())

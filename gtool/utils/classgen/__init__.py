@@ -1,35 +1,7 @@
-from gtool.filewalker import registerFileMatcher
 from gtool.namespace import registerClass
 from gtool.types.attributes import attribute
 from distutils.util import strtobool
 from .methods import *
-
-# --- class methods that will be bound by factory ---
-# must be outside of class factory or they get factory's context and not the manufactured objects
-# TODO find a better plae to put these classmethods
-
-@classmethod
-def metas(cls):
-    if hasattr(cls, '__metas__'):
-        return cls.__metas__
-    else:
-        print('has no metas')
-        return None
-
-@classmethod
-def classfile(cls):
-    if 'file' in cls.metas():
-        return cls.__metas__.get('file')
-    else:
-        return None
-
-@classmethod
-def register(cls, classname):
-    # only register if a file prefix is provided
-    if cls.classfile() is not None:
-        registerFileMatcher(cls.classfile(), classname)
-
-# --- end of class methods that will be bound by factory ---
 
 class factory(object):
     """

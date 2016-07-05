@@ -1,6 +1,7 @@
 import pyparsing as p
 from collections import defaultdict
 from copy import deepcopy
+from gtool.filewalker import registerFileMatcher
 
 def init(self, **kwargs):
     # Deepcopy required otherwise list gets shared across instances of generated objects
@@ -11,6 +12,33 @@ def init(self, **kwargs):
 
 def new(cls):
     pass
+
+# --- class methods that will be bound by factory ---
+# must be outside of class factory or they get factory's context and not the manufactured objects
+# TODO find a better plae to put these classmethods
+
+@classmethod
+def metas(cls):
+    if hasattr(cls, '__metas__'):
+        return cls.__metas__
+    else:
+        print('has no metas')
+        return None
+
+@classmethod
+def classfile(cls):
+    if 'file' in cls.metas():
+        return cls.__metas__.get('file')
+    else:
+        return None
+
+@classmethod
+def register(cls, classname):
+    # only register if a file prefix is provided
+    if cls.classfile() is not None:
+        registerFileMatcher(cls.classfile(), classname)
+
+# --- end of class methods that will be bound by factory ---
 
 
 # TODO __createattrs__ code is similar to setattr code, can probably be shared
