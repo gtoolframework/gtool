@@ -31,8 +31,8 @@ def configloader(configpath):
     for section in config.sections():
         if not register(section, {f[0]:f[1] for f in config.items(section)}):
             raise ValueError('attemped to register config section %s and encountered an error' % section)
-        else:
-            print('%s config section registered' % section)
+        #else:
+        #    print('%s config section registered' % section)
 
 #--- initialize namespace
 

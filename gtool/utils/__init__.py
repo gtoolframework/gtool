@@ -23,14 +23,6 @@ def projectloader(projectroot, dbg=False):
     loadplugins(projectpluginroot)
     configloader(projectconfigpath)
 
-    """
-    print('plugins:', pluginnamespace())
-    for pluginname, pluginobj in pluginnamespace().items():
-        print('executing plugin: ', pluginname)
-        x = pluginobj()
-        print(type(x))
-    """
-
     __loadclasses(projectclassroot, dbg=dbg)
     return StructureFactory.treewalk(projectdataroot)
 
@@ -48,7 +40,7 @@ def __loadclass(classpath, dbg=False):
     :param dbg: set to ttue to debug config load
     :return: True
     """
-    print(classpath)
+
     if os.path.exists(classpath):
         # TODO check if file is readable
         f = open(classpath, 'r')
@@ -59,9 +51,10 @@ def __loadclass(classpath, dbg=False):
     # TODO capture exceptions
     classData = readClass(classString)
     if dbg is True:
-        debug(classprocessor)
+        debug(classData)
     # TODO capture exceptions
-    classDict = processClass(classData)
+    #classDict = processClass(classData)
+    classDict = classData
     for classname, classconfig in classDict.items():
         # TODO capture exceptions
         generateClass(classname, classconfig)

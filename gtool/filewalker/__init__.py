@@ -311,19 +311,19 @@ class StructureFactory(object):
             #TODO deal with multiple files in a dir and multiple dirs at the root
             if isinstance(location, StructureFactory.Directory):
                 if '_.txt' in [f.name for f in location.children]:
-                    print('Node Container:', location.name)
+                    #print('Node Container:', location.name)
                     return StructureFactory.CNode(fileobject=location, name=location.name)
                 else:
                     # special handler for root of structure
                     _locationname = location.name if isroot is False else '*'
-                    print('Container:', _locationname)
+                    #print('Container:', _locationname)
                     _ret = StructureFactory.Container(name=_locationname, fileobject=location)
                     for child in location.children:
                         _ret.addchildren(recursivewalk(child))
                     return _ret
             elif isinstance(location, StructureFactory.File):
                 _rootname = location.name.split('.')[0]
-                print('Node:', _rootname)
+                #print('Node:', _rootname)
                 return StructureFactory.Node(fileobject=location, name=_rootname)
 
         if not isinstance(location, StructureFactory.Directory):

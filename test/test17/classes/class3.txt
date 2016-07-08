@@ -1,5 +1,0 @@
-TESTCLASSSFOURTEENU::
-    *file = loc
-    *moo = 1
-    @testprop1:: single: Url (required = True)
-    @testprop2:: single: Ref

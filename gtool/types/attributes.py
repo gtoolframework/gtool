@@ -136,7 +136,10 @@ class attribute(object):
 
 
     def __iter__(self):
-        return self.__storage__
+        return iter(self.__storage__)
+
+    def __len__(self):
+        return len(self.__storage__)
 
     """
     def __getattr__(self, attr):

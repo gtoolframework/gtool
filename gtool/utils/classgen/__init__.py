@@ -2,6 +2,7 @@ from gtool.namespace import registerClass
 from gtool.types.attributes import attribute
 from distutils.util import strtobool
 from .methods import *
+from .output import output
 
 class factory(object):
     """
@@ -60,6 +61,7 @@ class factory(object):
         methodsDict['load'] = load
         methodsDict['__repr__'] = repr
         methodsDict['__str__'] = str
+        methodsDict['output'] = output
         return methodsDict
 
     @staticmethod

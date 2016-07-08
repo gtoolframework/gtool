@@ -1,6 +1,23 @@
 TESTCLASSSFOURTEEN::
-    *file = cr
-    *moo = 1
-    @testprop1:: single: String (required = False)
-    @testprop2:: multiple: String (required = True)
-    @testprop3:: single: Real (required = False, max = 6)
+*file = cr
+*moo = 1
+*output1 = cr @testprop1 123 @testprop2 @testprop3
+@testprop1:: single: String (required = False)
+@testprop2:: multiple: String (required = True)
+@testprop3:: single: Real (required = False, max = 6)
+
+TESTCLASSSFOURTEENB::
+*file = cri
+*moo = 1
+*output1 = @testprop1 @testprop2 @testprop3
+@testprop1:: single: String (required = False)
+@testprop2:: multiple: String (required = True)
+@testprop3:: single: Real (required = False, max = 6)
+
+TESTCLASSSFOURTEENC::
+*file = crid
+*moo = 1
+*output1 = @testprop1 @testprop2 @testprop3
+@testprop1:: single: String (required = False)
+@testprop2:: multiple: String (required = True)
+@testprop3:: single: Real (required = False, max = 6)
