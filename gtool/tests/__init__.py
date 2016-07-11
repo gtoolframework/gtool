@@ -1,10 +1,11 @@
-import gtool.utils.classprocessor as conf
+import gtool.core.utils.classprocessor as conf
 #import gtool.utils.classgen as gen
 #import gtool.types.common as t
 #from gtool.types.attributes import attribute
 #from gtool.namespace import namespace, registerClass
 #from gtool.filewalker import filematch, filematchspace, StructureFactory
-from gtool.utils import projectloader, __loadclasses
+from gtool.core.utils import projectloader
+
 
 def debug(config):
     print('--- conf debug ---')

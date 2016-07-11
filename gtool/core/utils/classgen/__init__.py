@@ -1,9 +1,9 @@
-from gtool.namespace import registerClass
-from gtool.types.attributes import attribute
-from gtool.types.core import DynamicType
 from distutils.util import strtobool
-from .methods import *
-#from .output import output
+
+from gtool.core.namespace import registerClass
+from gtool.core.types.attributes import attribute
+from .methods import * # TODO move as many methods in DynamicType
+
 
 class factory(object):
     """

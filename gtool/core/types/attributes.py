@@ -1,5 +1,5 @@
-from gtool.namespace import namespace
-from gtool.plugin import pluginnamespace
+from gtool.core.namespace import namespace
+from gtool.core.plugin import pluginnamespace
 
 class attribute(object):
 

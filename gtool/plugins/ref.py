@@ -1,4 +1,4 @@
-from gtool.types.core import CoreType
+from gtool.core.types.core import CoreType
 
 class Ref(CoreType):
     """

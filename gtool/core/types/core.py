@@ -1,5 +1,7 @@
 import pyparsing as p
-from gtool.utils.config import namespace as confignamespace
+
+from gtool.core.utils.config import namespace as confignamespace
+
 
 class CoreType(object):
 

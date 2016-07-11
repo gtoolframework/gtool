@@ -1,8 +1,11 @@
-import pyparsing as p
 from collections import defaultdict
 from copy import deepcopy
-from gtool.filewalker import registerFileMatcher
-from gtool.types.core import DynamicType
+
+import pyparsing as p
+
+from gtool.core.filewalker import registerFileMatcher
+from gtool.core.types.core import DynamicType
+
 
 def init(self, **kwargs):
     # Deepcopy required otherwise list gets shared across instances of generated objects

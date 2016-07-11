@@ -1,7 +1,10 @@
-from gtool.types.core import CoreType
-from validators import url, ValidationFailure
-from distutils.util import strtobool
 import warnings
+from distutils.util import strtobool
+
+from validators import url, ValidationFailure
+
+from gtool.core.types.core import CoreType
+
 
 class Url(CoreType):
 

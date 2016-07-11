@@ -1,4 +1,4 @@
-import gtool.filewalker
+import gtool.core.filewalker
 
 # --- static ---
 __DYNAMIC_CLASS = 'dynamicclasses' # TODO singleton pattern for multiple global directories --> dynamicClasses, URN, instancenames (type aware), plugins
@@ -23,7 +23,7 @@ def registerClass(className, classObj):
         globals()[dynamicclass()][className].register(className)
 
         """
-        gtool.filewalker.registerFileMatcher(
+        gtool.core.filewalker.registerFileMatcher(
             '%s' % classObj.classfile(),
             #globals()[dynamicclass()][className]
             className

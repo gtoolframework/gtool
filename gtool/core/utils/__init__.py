@@ -1,9 +1,11 @@
+import os
+
+from gtool.core.filewalker import StructureFactory
+from gtool.core.plugin import loadplugins
 from .classgen import generateClass
 from .classprocessor import readClass, processClass, debugClass
-from gtool.filewalker import StructureFactory
-from gtool.plugin import loadplugins
 from .config import configloader
-import os
+
 
 def load():
     pass

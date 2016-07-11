@@ -12,11 +12,8 @@ def loadplugins(pluginbasepath):
 def __enumerateplugins(pluginbasepath):
     # TODO enumerate subdirs
     here = os.path.abspath(os.path.dirname(__file__))
-    gtoolpluginsfolder = "..\plugins"
+    gtoolpluginsfolder = "..\..\plugins" # TODO make this relative pathing be generated dynamically
     gtoolplugins = os.path.join(here, gtoolpluginsfolder)
-    #print(gtoolplugins)
-    #print([pluginbasepath, gtoolplugins])
-    #return [pluginbasepath, gtoolplugins]
     return [gtoolplugins, pluginbasepath]
 
 # --- static ---

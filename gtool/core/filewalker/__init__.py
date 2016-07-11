@@ -1,6 +1,8 @@
-import patricia as pt
-import gtool.namespace
 import os
+
+import patricia as pt
+
+import gtool.core.namespace
 
 # --- static ---
 __DYNAMIC_CLASS = 'filematches'
@@ -25,7 +27,7 @@ def filematchspace():
 def filematch(exp):
     T = globals()[filematcher()]
     try:
-        return gtool.namespace.namespace()[T[T.key(exp)]]
+        return gtool.core.namespace.namespace()[T[T.key(exp)]]
     except KeyError:
         return None
 
@@ -242,26 +244,19 @@ class StructureFactory(object):
             if not _retobject.loads(self.__data__, softload=_softload):  # True if loadstring works
                 raise TypeError('Could not parse the data from %s into a %s class' % (self.path, type(_retobject)))
             if len(_retobject.missingproperties) == 0 and len(_retobject.missingoptionalproperties) == 0:
-                #print('no missing properties')
                 return _retobject
 
             _filelist = [f for f in self.fileobject.children if isinstance(f, StructureFactory.File)]
-            #print('filelist:', _filelist)
+
             for _file in (f for f in _filelist if f.name != "_.txt"):
                 _data = ''.join(_file.read())
-                #print('in dataasobject --> _data:', _data)
                 if '@' in _data[0]:
                     # this is an attribute class object (not a common object)
                     _filenamewithoutext = _file.name.split('.')[:-1][0]
-                    #print(_filenamewithoutext)
-                    #print(getattr(_retobject, _filenamewithoutext))
                     _attrclassobj = getattr(_retobject, _filenamewithoutext)
-                    #print(type(_attrclassobj))
 
                     _attrclassname = _attrclassobj.attrfilematch
-                    #print(_attrclassname)
                     _attrobj = StructureFactory.Node(name=_attrclassname, fileobject=_file)
-                    #print(dir(_retobject[_filenamewithoutext]))
                     setattr(_retobject, _filenamewithoutext, _attrobj.dataasobject)
 
                     if _filenamewithoutext in _retobject.missingproperties:
@@ -311,25 +306,21 @@ class StructureFactory(object):
             #TODO deal with multiple files in a dir and multiple dirs at the root
             if isinstance(location, StructureFactory.Directory):
                 if '_.txt' in [f.name for f in location.children]:
-                    #print('Node Container:', location.name)
                     return StructureFactory.CNode(fileobject=location, name=location.name)
                 else:
                     # special handler for root of structure
                     _locationname = location.name if isroot is False else '*'
-                    #print('Container:', _locationname)
                     _ret = StructureFactory.Container(name=_locationname, fileobject=location)
                     for child in location.children:
                         _ret.addchildren(recursivewalk(child))
                     return _ret
             elif isinstance(location, StructureFactory.File):
                 _rootname = location.name.split('.')[0]
-                #print('Node:', _rootname)
                 return StructureFactory.Node(fileobject=location, name=_rootname)
 
         if not isinstance(location, StructureFactory.Directory):
             raise TypeError('start of file system must be a directory')
-        #ret = StructureFactory.Node2(name='*')
-        #ret.addchildren(recursivewalk(location=location, isroot=True))
+
         return recursivewalk(location=location, isroot=True)
 
     # TODO make this the init call for the class so it can return a new node object with all data (more pythonic)
