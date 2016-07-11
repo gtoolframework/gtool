@@ -1,6 +1,7 @@
-import pyparsing as p
-from gtool.utils.config import namespace as confignamespace
+#import pyparsing as p
+#from gtool.utils.config import namespace as confignamespace
 
+"""
 #TODO collapse Filler and Attribute<atch then subclass
 class Filler(object):
 
@@ -26,7 +27,9 @@ class AttributeMatch(object):
 
     def __repr__(self):
         return '<%s>:%s' % (self.__class__, self.__attrname__)
+"""
 
+"""
 def parseformat(formatstring):
     attribmarker = p.Literal('@').suppress()
     cellseparator = '||'
@@ -74,7 +77,9 @@ def integrate(self, formatlist=None, separator=" "):
         else:
             outstring += '||'
     return outstring
+"""
 
+"""
 def output(self, outputscheme=None):
     if not 'output' in confignamespace():
         raise AttributeError('An output section is not configured in the config file')
@@ -95,4 +100,4 @@ def output(self, outputscheme=None):
 
     print(confignamespace()['output'][outputscheme])
     return integrate(self, formatlist=parseformat(_metas[outputscheme]), separator=separator)
-
+"""

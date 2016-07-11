@@ -1,12 +1,5 @@
-#from copy import copy
-#import traceback as tb
-#import inspect
 import pyparsing as p
 from gtool.utils.config import namespace as confignamespace
-
-
-
-
 
 class CoreType(object):
 
