@@ -1,8 +1,9 @@
 from gtool.namespace import registerClass
 from gtool.types.attributes import attribute
+from gtool.types.core import DynamicType
 from distutils.util import strtobool
 from .methods import *
-from .output import output
+#from .output import output
 
 class factory(object):
     """
@@ -61,7 +62,7 @@ class factory(object):
         methodsDict['load'] = load
         methodsDict['__repr__'] = repr
         methodsDict['__str__'] = str
-        methodsDict['output'] = output
+        #methodsDict['output'] = output
         return methodsDict
 
     @staticmethod
@@ -132,7 +133,7 @@ class factory(object):
 
     @staticmethod
     def generateClass(className, classDict):
-        return type(className, (), factory.generateClassesDict(className, classDict))
+        return type(className, (DynamicType,), factory.generateClassesDict(className, classDict))
 
 
 def generateClass(className, classDict):

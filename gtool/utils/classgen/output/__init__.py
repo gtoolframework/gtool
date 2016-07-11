@@ -41,6 +41,7 @@ def parseformat(formatstring):
         _scan = attribgroup.scanString(cell)
         _templist = []
         prestart = 0
+        end = 0
         for match in _scan:
             start = match[1]
             end = match[2]
@@ -81,14 +82,17 @@ def output(self, outputscheme=None):
         raise ValueError('No outputscheme provided for %s class' % self.__class__)
     if not outputscheme in confignamespace()['output']:
         raise NameError('%s is not configured in the [output] section in the config file' % outputscheme)
-    _metas = self.metas()
-    if outputscheme in _metas:
-        separatorname = outputscheme + '_separator'
-        separator = " "
-        if separatorname in confignamespace()['output']:
-            separator = confignamespace()['output'][separatorname]
-            if separator.startswith('"') and separator.endswith('"'):
-                separator = separator [1:-1]
-        return integrate(self, formatlist=parseformat(_metas[outputscheme]), separator=separator)
-    else:
+    _metas = self.metas() # assume metas() exist by virtue of class construction
+    if not outputscheme in _metas:
         raise NameError('%s class does not have an output scheme called %s' % (self.__class__, outputscheme))
+    # validation checks passed
+    separatorname = outputscheme + '_separator'
+    separator = " "
+    if separatorname in confignamespace()['output']:
+        separator = confignamespace()['output'][separatorname]
+        if separator.startswith('"') and separator.endswith('"'):
+            separator = separator [1:-1]
+
+    print(confignamespace()['output'][outputscheme])
+    return integrate(self, formatlist=parseformat(_metas[outputscheme]), separator=separator)
+

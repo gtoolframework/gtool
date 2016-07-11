@@ -1,4 +1,4 @@
 import gtool.tests as t
 
 if __name__ == '__main__':
-    t.test17('output1')
+    t.test18()

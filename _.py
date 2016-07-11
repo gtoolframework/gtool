@@ -1,22 +1,47 @@
-import pyparsing as p
+x = [1,2,3,4,5, [[61,7,8,9],
+                 [62,7,8,9],
+                 [63,7,8,9, 0, 0]
+                 ]]
 
-teststring = "@attrib2:: test2\n" \
-             "*output1 = @blah1 @blah2\n" \
-             "*output2 = @attr1 @att2 || @attr3\n" \
-             "@attrib1:: test\n"
+y = [1,2,3,4,5,6,7]
+z = [1,2,3,4,5, [6,7,8]]
 
-teststring2 = "@attrib1:: test\n"
+a = [1, 2, 3, 4, 5, [[61, 7, 8, 9],
+                     [62, 7, 8, 9],
+                     [63, 7, 8, 9, 0, [
+                         [1,2,3],
+                         [1,2,3],
+                         [1,2,3]
+                     ]]
+                     ]]
+def looper(iteritem, currentheight=1):
+    height = currentheight
+    width = 0
 
-parser1 = p.Combine(p.LineStart() + p.Literal('*').suppress() + p.Word(p.printables)) + p.Literal('=').suppress() + p.restOfLine() + p.LineEnd().suppress()
-parser2 = p.Combine(p.LineStart() + p.Literal('@').suppress() + p.Word(p.alphanums + '_-') + p.Suppress(p.Literal('::'))) + p.restOfLine() + p.LineEnd().suppress()
+    print('len:',len(iteritem))
+    if all(isinstance(f, list) for f in iteritem):
+        height += len(iteritem)
+        width += max([len(f) for f in iteritem])
+    for i in iteritem:
+        if not isinstance(i, list):
+            width += 1
+        elif isinstance(i, list):
+            _tup = looper(i, currentheight=height)
+            height = _tup[0]
+            width += _tup[1]
 
-#x = parser1.parseString(teststring)
-y = parser1.searchString(teststring)
-a = parser2.searchString(teststring)
-#b = parser2.parseString(teststring)
-#q = parser2.searchString(teststring2)
+    #height = max(1,height)
+    return (height,width)
 
-#print(x)
-print(y)
-print(a)
-#print(q)
+def recursive_len(item):
+    if type(item) == list:
+        return sum(recursive_len(subitem) for subitem in item)
+    else:
+        return 1
+
+#print(looper(x))
+#print(looper(y))
+#print(looper(z))
+print(looper(a))
+print(recursive_len(a))
+

@@ -2,12 +2,16 @@ import pyparsing as p
 from collections import defaultdict
 from copy import deepcopy
 from gtool.filewalker import registerFileMatcher
+from gtool.types.core import DynamicType
 
 def init(self, **kwargs):
     # Deepcopy required otherwise list gets shared across instances of generated objects
     self.__list_slots__ = deepcopy(self.__list_slots__)
     self.kwargs = kwargs
     self.__createattrs__(self.kwargs)
+    if not (isinstance(self, DynamicType)):
+        # all dynamic classes must inherit from gtool's Dynamic type found in gtool.types.core
+         raise TypeError('The dynamic class %s was generated that does not inherit from gtool.types.core.DynamicType' % self.__class__)
 
 
 def new(cls):

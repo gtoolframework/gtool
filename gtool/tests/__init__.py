@@ -432,9 +432,9 @@ def test16():
 
     print('--- test 16 ends ---')
 
-def test17(outputscheme):
-
-    print('test 17 validates outplugins work')
+def test17():
+    outputscheme = 'output1'
+    print('test 17 validates output format strings and config works')
     print('---- testing 17 begins ----')
 
     sf = projectloader('test\\test17', dbg=False)
@@ -447,3 +447,19 @@ def test17(outputscheme):
         print(_x.output(outputscheme=outputscheme))
 
     print('--- test 17 ends ---')
+
+def test18():
+    outputscheme = 'output1'
+    print('test 18 validates list generation works and excel/word outputs work')
+    print('---- testing 18 begins ----')
+
+    sf = projectloader('test\\test18', dbg=False)
+
+    print('--- explore results ---')
+    for child in sf.children:
+        #print(child)
+
+        _x = child.dataasobject
+        print(_x.output(outputscheme=outputscheme))
+
+    print('--- test 18 ends ---')
