@@ -1,16 +1,23 @@
 from pluginbase import PluginBase
+import os
 
 def loadplugins(pluginbasepath):
     plugin_base = PluginBase(package='gtool.plugins')
     plugin_source = plugin_base.make_plugin_source(searchpath=__enumerateplugins(pluginbasepath), identifier='gtool', persist=True)
     for plugin_name in plugin_source.list_plugins():
-        #print('loading plug-in:', plugin_name)
+        print('loading plug-in:', plugin_name)
         _plugin = plugin_source.load_plugin(plugin_name)
         registerPlugin(plugin_name.upper(), _plugin.load())
 
 def __enumerateplugins(pluginbasepath):
     # TODO enumerate subdirs
-    return [pluginbasepath]
+    here = os.path.abspath(os.path.dirname(__file__))
+    gtoolpluginsfolder = "..\plugins"
+    gtoolplugins = os.path.join(here, gtoolpluginsfolder)
+    #print(gtoolplugins)
+    #print([pluginbasepath, gtoolplugins])
+    #return [pluginbasepath, gtoolplugins]
+    return [gtoolplugins, pluginbasepath]
 
 # --- static ---
 
