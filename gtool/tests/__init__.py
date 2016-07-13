@@ -449,6 +449,34 @@ def test17():
 
     print('--- test 17 ends ---')
 
+def test18sub1():
+    print('test 18sub1 validates the matrix class works')
+    print('---- testing 18sub1 begins ----')
+    from gtool.core.types.matrix import Matrix
+
+    m = Matrix(startwidth=10, startheight=2)
+
+    for x in m.data():
+        print(x)
+
+    print(m.__v_utilization__())
+
+    print(m.__h_utlization__())
+
+    print(m.cursor)
+
+    m.insert(cursor=(2, 1), datalist=['x'] * 20)
+
+    for x in m.data():
+        print('len:', len(x), '-->', x)
+
+    m.bulk_insert(cursor=(2, 2), rows=[['y'] * 10] * 3)
+
+    for x in m.data():
+        print('len:', len(x), '-->', x)
+    print('--- test 18sub1 ends ---')
+
+
 def test18():
     outputscheme = 'output1'
     print('test 18 validates list generation works and excel/word outputs work')

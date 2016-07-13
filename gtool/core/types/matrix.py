@@ -37,7 +37,7 @@ class Matrix(object):
     def dimensions(self):
         return (self.__width__(), self.__height__())
 
-    def horitzontal_utlization(self):
+    def __h_utlization__(self):
         _result = 0
         rowlength = self.__width__()
         for row in self.__storage__:
@@ -51,15 +51,20 @@ class Matrix(object):
         # calculate utlization
         return round(_result/rowlength, 2)
 
-    def vertical_utilization(self):
+    def __v_utilization__(self):
         colheight = len(self.__storage__)
         for i, row in enumerate(self.__storage__):
             if any(x is not None for x in self.__storage__[-i+1]):
                 return round((colheight - (i+1))/colheight, 2)
 
     def utilization(self):
-        # x,y
-        return(self.horitzontal_utlization(),self.vertical_utilization())
+        # return x,y utilization
+        return(self.__h_utlization__(), self.__v_utilization__())
+
+    def healthcheck(self):
+        # check utilization and if above threshold append more rows or columns to matrix
+        # TODO implement health check
+        pass
 
     def append_cols(self, cols=10):
         rowlength = self.__width__()
@@ -118,15 +123,18 @@ class Matrix(object):
         # return storage one row at a time iter generator
         return (row for row in self.__storage__)
 
-    def insert(self, cursor=(0,0), datamatrix=None):
+    def insert(self, cursor=(0,0), datalist=None, healthcheck=True):
         x, y = cursor
-        if datamatrix is None or not isinstance(datamatrix, list):
-            raise ValueError('Was expecting to insert a list but got a %s' % type(datamatrix))
+        if datalist is None or not isinstance(datalist, list):
+            raise ValueError('Was expecting to insert a list but got a %s' % type(datalist))
+        if not len(datalist) > 0:
+            raise ValueError('Cannot insert a datalist of 0 length')
         if x < 0:
             raise IndexError('A coordinate outside the x axis of the matrix was provided')
         if y < 0:
             raise IndexError('A coordinate outside the y axis of the matrix was provided')
 
+        # grow columns if needed
         if y > int(self.__height__() * self.__utilization_threshold__):
             # grow enough so that we're back to ~70% vertical utilization
             _delta = int(y / (self.__utilization_threshold__ - .05) - self.__height__()) + 1
@@ -134,17 +142,45 @@ class Matrix(object):
             if not self.append_rows(rows=_delta):
                 raise Exception('Could not append more rows to the matrix')
 
-        if x + len(datamatrix) > self.__width__():
+        # grow rows if needed
+        if x + len(datalist) > self.__width__():
             print('expanding x')
-            _delta = int(x / (self.__utilization_threshold__ - .05) - self.__width__()) + 1
+            _delta = int((x + len(datalist)) / (self.__utilization_threshold__ - .05) - self.__width__()) + 1
             print(_delta)
             if not self.append_cols(cols=_delta):
                 raise Exception('Could not append more columns to the matrix')
 
         # TODO secondary safety check to make sure we'll be in range
+        # TODO call healthcheck (don't if being called by bulk_insert)
 
-        _x_end = x + (len(datamatrix) - 1)
-        self.__storage__[y][x:_x_end] = datamatrix
+        _x_end = x + (len(datalist))
+        try:
+            self.__storage__[y][x:_x_end] = datalist
+        except:
+            raise Exception('An error occured when attempting to insert a row into the matrix')
+
+        #TODO update cursor
+
+        if healthcheck is True:
+            self.healthcheck()
+        return True
+
+    def bulk_insert(self, cursor=(0,0), rows=None):
+        # TODO can we make bulk insert more efficient, currently it's just a wrapper
+        #insert multiple rows, all must start at the same column
+        x, y = cursor
+        if rows is None or not isinstance(rows, list):
+            raise ValueError('Was expecting to insert a list but got a %s' % type(rows))
+        if not all(isinstance(row, list) for row in rows):
+            raise ValueError('Was expecting a list of lists to be passed through param rows')
+        for i, row in enumerate(rows):
+            if not len(row) > 0:
+                raise ValueError('Cannot insert row %s as it has zero length' % i)
+            if not self.insert(cursor=(x,y+i), datalist=row, healthcheck=False):
+                raise Exception('Could not insert row %s into the matrix' % i)
+
+        self.healthcheck() #do healthcheck here instead of inside insert so that we don't call healthcheck repeatedly
+        return True
 
     def __matrixmap__(self):
         # returns a matrix of the same size but shows how much data is

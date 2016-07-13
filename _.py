@@ -1,18 +1,26 @@
 from gtool.core.types.matrix import Matrix
 
-m = Matrix(startwidth=4, startheight=4)
+m = Matrix(startwidth=10, startheight=2)
 
 for x in m.data():
     print(x)
 
-print(m.vertical_utilization())
+print(m.__v_utilization__())
 
-print(m.horitzontal_utlization())
+print(m.__h_utlization__())
 
 print(m.cursor)
 
-m.insert(cursor=(0,2), datamatrix=[1,2,3,4,5,6])
+m.insert(cursor=(2,1), datalist=['x'] * 20)
 
 for x in m.data():
-    print(x)
+    print('len:', len(x), '-->', x)
 
+m.bulk_insert(cursor=(2,2), rows = [['y'] * 10] * 3)
+
+for x in m.data():
+    print('len:', len(x), '-->', x)
+
+print(m.__v_utilization__())
+
+print(m.__h_utlization__())
