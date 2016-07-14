@@ -461,7 +461,7 @@ def test18sub1():
 
     print(m.__v_utilization__())
 
-    print(m.__h_utlization__())
+    print(m.__h_utilization__())
 
     print(m.cursor)
 
@@ -489,6 +489,6 @@ def test18():
         #print(child)
 
         _x = child.dataasobject
-        print(_x.output(outputscheme=outputscheme))
+        print(_x.outputaslist(outputscheme=outputscheme))
 
     print('--- test 18 ends ---')

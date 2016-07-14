@@ -285,6 +285,11 @@ class StructureFactory(object):
 
             return _retobject
 
+        def dataaslist(self, returnmatrix):
+            #returnmatrix is updated by reference, don't need to return it
+            #implement in node and container too
+            return True
+
 
     @staticmethod
     def __treewalk__(root):

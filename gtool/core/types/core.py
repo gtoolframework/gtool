@@ -1,6 +1,7 @@
 import pyparsing as p
 
 from gtool.core.utils.config import namespace as confignamespace
+from gtool.core.types.matrix import Matrix
 
 
 class CoreType(object):
@@ -204,7 +205,7 @@ class DynamicType(object):
                 outstring += '||'
         return outstring
 
-    def output(self, outputscheme=None):
+    def __output__(self, outputscheme=None, separatoroverride=None):
         if not 'output' in confignamespace():
             raise AttributeError('An output section is not configured in the config file')
         if outputscheme == None:
@@ -216,12 +217,22 @@ class DynamicType(object):
             raise NameError('%s class does not have an output scheme called %s' % (self.__class__, outputscheme))
         # validation checks passed
         separatorname = outputscheme + '_separator'
-        separator = " "
-        if separatorname in confignamespace()['output']:
+        #separator = " " # default value
+        if separatorname in confignamespace()['output'] and separatoroverride is None:
             separator = confignamespace()['output'][separatorname]
             if separator.startswith('"') and separator.endswith('"'):
                 separator = separator [1:-1]
+        else:
+            separator = separatoroverride
 
         print(confignamespace()['output'][outputscheme])
         return self.integrate(formatlist=self.parseformat(_metas[outputscheme]), separator=separator)
+
+    def output(self, outputscheme=None):
+        return self.__output__(outputscheme=outputscheme)
+
+    def outputaslist(self, outputscheme=None):
+        # TODO make this more efficient - get an array from integrate instead of a string
+        _integratedstring = self.__output__(outputscheme=outputscheme, separatoroverride='\n')
+        return _integratedstring.split('||')
 

@@ -1,10 +1,10 @@
 class Matrix(object):
 
-    def __init__(self, startwidth=100, startheight=100):
+    def __init__(self, startwidth=100, startheight=100, threshold=.75):
         self.__storage__ = [[None for i in range(startwidth)] for i in range(startheight)]
         self.__current_row__ = 0
         self.__current_col__ = 0
-        self.__utilization_threshold__ = .75
+        self.__utilization_threshold__ = threshold
 
     @property
     def cursor(self):
@@ -37,7 +37,7 @@ class Matrix(object):
     def dimensions(self):
         return (self.__width__(), self.__height__())
 
-    def __h_utlization__(self):
+    def __h_utilization__(self):
         _result = 0
         rowlength = self.__width__()
         for row in self.__storage__:
@@ -49,28 +49,81 @@ class Matrix(object):
                     break # avoids unnecesary interations
             _result = max(endoflist, _result)
         # calculate utlization
-        return round(_result/rowlength, 2)
+        if _result is None:
+            _result = 0
+        return _result
+
+    def __h_utilization_percentage__(self):
+        return round(self.__h_utilization__() / self.__width__(), 2)
 
     def __v_utilization__(self):
         colheight = len(self.__storage__)
         for i, row in enumerate(self.__storage__):
             if any(x is not None for x in self.__storage__[-i+1]):
-                return round((colheight - (i+1))/colheight, 2)
+                return colheight - (i+1)
+        return 0 #default if no utilization
+
+    def __v_utilization_percentage__(self):
+        colheight = self.__v_utilization__()
+        return round(colheight/ colheight, 2)
 
     def utilization(self):
         # return x,y utilization
-        return(self.__h_utlization__(), self.__v_utilization__())
+        return(self.__h_utilization_percentage__(), self.__v_utilization_percentage__())
 
     def healthcheck(self):
         # check utilization and if above threshold append more rows or columns to matrix
-        # TODO implement health check
-        pass
+
+        _h_use = self.__h_utilization_percentage__()
+        _v_use = self.__v_utilization_percentage__()
+        threshold = self.__utilization_threshold__
+
+        if _v_use > threshold:
+            if not self.append_rows(rows=(int(_v_use / (threshold - .05))) - self.__height__()):
+                raise Exception('could not expand the matrix with additional rows')
+
+        if _h_use > threshold:
+            if not self.append_cols(cols=(int(_h_use / (threshold - .05))) - self.__width__()):
+                raise Exception('could not expand the matrix with additional columns')
+
+        return True
+
+    def trim(self):
+        """
+        Trims unused space from the right (highest X coord) and bottom (highest Y coord) sides of the matrix
+        :return: True if trimming occurred.
+        """
+
+        h_use = self.__h_utilization__()
+        v_use = self.__v_utilization__()
+        _ret = False #default return value
+
+        if v_use < self.__height__():
+            _ret = True
+            try:
+                del self.__storage__[v_use:]
+            except:
+                raise Exception('Could not delete row %s from the matrix' % v_use)
+
+        if h_use < self.__width__():
+            _ret = True
+            for i, row in enumerate(self.__storage__):
+                try:
+                    del row[h_use+1:]
+                except:
+                    raise Exception('Could not delete columns in row %s from the matrix' % i)
+
+        #TODO check if self.cursor is out of bounds
+
+        return _ret
+
+
 
     def append_cols(self, cols=10):
         rowlength = self.__width__()
         for i, row in enumerate(self.__storage__):
             if len(row) == rowlength:
-                row.extend([None for x in range(cols)])
+                row.extend([None] * cols)
             else:
                 raise IndexError('Row %s is not the same length as the other rows in the matrix' % i)
         return True
@@ -106,7 +159,7 @@ class Matrix(object):
 
     def append_rows(self, rows=10):
         rowlength = self.__width__()
-        _newrows = [[None for x in range(rowlength)] for y in range(rows)]
+        _newrows = [[None] * rowlength] * rows
         self.__storage__.extend(_newrows)
         return True
 
@@ -119,9 +172,10 @@ class Matrix(object):
     def getcell(self, x, y):
         return self.__storage__[y][x]
 
-    def data(self):
+    def __iter__(self):
         # return storage one row at a time iter generator
-        return (row for row in self.__storage__)
+        for row in self.__storage__:
+            yield row
 
     def insert(self, cursor=(0,0), datalist=None, healthcheck=True):
         x, y = cursor
@@ -160,6 +214,8 @@ class Matrix(object):
             raise Exception('An error occured when attempting to insert a row into the matrix')
 
         #TODO update cursor
+        self.__current_row__ = y
+        self.__current_col__ = x + len(datalist) + 1
 
         if healthcheck is True:
             self.healthcheck()
@@ -169,8 +225,8 @@ class Matrix(object):
         # TODO can we make bulk insert more efficient, currently it's just a wrapper
         #insert multiple rows, all must start at the same column
         x, y = cursor
-        if rows is None or not isinstance(rows, list):
-            raise ValueError('Was expecting to insert a list but got a %s' % type(rows))
+        if rows is None or not (isinstance(rows, list) or isinstance(rows, Matrix)):
+            raise ValueError('Was expecting to insert a list or Matrix but got a %s' % type(rows))
         if not all(isinstance(row, list) for row in rows):
             raise ValueError('Was expecting a list of lists to be passed through param rows')
         for i, row in enumerate(rows):
