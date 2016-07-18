@@ -74,6 +74,7 @@ class factory(object):
         attribsDict['__mandatory_properties__'] = []
         attribsDict['__missing_mandatory_properties__'] = []
         attribsDict['__missing_optional_properties__'] = []
+        print('*' * 30)
         for attributeName, attributeValues in classDict['attributes'].items():
             paramDict = {}
             if attributeValues['list']:
@@ -88,7 +89,8 @@ class factory(object):
             _kwargsdict = {i[0]:i[1] for i in attributeValues['args']['kwargs']}
             #print('kwargdict', _kwargsdict)
             try:
-                paramDict['required'] = strtobool(_kwargsdict['required']) if 'required' in _kwargsdict else True
+                paramDict['required'] = strtobool(_kwargsdict['required']) if 'required' in _kwargsdict else 1
+                #print('in classgen %s attribute:' % className, attributeName)
             except ValueError:
                 raise ValueError('When parsing the required option for %s::%s got a value that could not be converted to a boolean' % (className, attributeName))
 
@@ -107,8 +109,12 @@ class factory(object):
             attribsDict['__dynamic_properties__'].append(attributeName)
 
             # TODO make a method that dynamically queries dynamic prop list to determine in attribute is required
+            #print("paramDict['required']:", paramDict['required'])
             if paramDict['required'] == True:
+                #print('appending %s to mandatory props:' % attributeName)
                 attribsDict['__mandatory_properties__'].append(attributeName)
+
+        #print('in classgen %s __mandatory_properties__:' % className, attribsDict['__mandatory_properties__'])
         return attribsDict
 
     @staticmethod

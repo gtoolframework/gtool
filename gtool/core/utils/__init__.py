@@ -51,7 +51,7 @@ def __loadclass(classpath, dbg=False):
     else:
         raise FileNotFoundError('%s does not exist' % classpath)
     # TODO capture exceptions
-    classData = readClass(classString)
+    classData = readClass(classString + '\n') #TODO get rid of \n by fixing attribute parser
     if dbg is True:
         debug(classData)
     # TODO capture exceptions

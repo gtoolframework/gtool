@@ -22,6 +22,7 @@ class attribute(object):
         self.__parent__ = parent
         self.__attributename__ = attributename
         self.__required__ = required # TODO do something with this (in classgen have mandatoryproperties query this)
+        pass
 
     @property
     def attrfilematch(self):

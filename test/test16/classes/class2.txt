@@ -1,6 +1,6 @@
 TESTCLASSSFOURTEENB::
-    *file = cri
-    *moo = 1
-    @testprop1:: single: Number
-    @testprop2:: multiple: Number (required = False)
-    @testprop3:: single: TESTCLASSSFOURTEEN (required = False)
+*file = cri
+*moo = 1
+@testprop1:: single: Number
+@testprop2:: multiple: Number (required = False)
+@testprop3:: single: TESTCLASSSFOURTEEN (required = False)

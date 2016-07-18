@@ -146,9 +146,12 @@ class DynamicType(object):
         def __init__(self, attrname):
             self.__attrname__ = attrname
 
-        def process(self, obj=None, sep=" "):
+        def process(self, obj=None, sep=" ", outputscheme = None):
             if hasattr(obj, self.__attrname__):
-                return sep.join(['%s' % f for f in getattr(obj, self.__attrname__)])
+                for g in getattr(obj, self.__attrname__):
+                    if isinstance(g,DynamicType):
+                        print(type(g))
+                return sep.join(['%s' % f if not isinstance(f,DynamicType) else f.outputaslist(outputscheme=outputscheme) for f in getattr(obj, self.__attrname__)])
             else:
                 raise AttributeError('%s does not have a %s attribute as specified in the output format scheme:' % (
                     obj.__class__, self.__attrname__))
@@ -185,7 +188,7 @@ class DynamicType(object):
 
         return cells
 
-    def integrate(self, formatlist=None, separator=" "):
+    def integrate(self, formatlist=None, separator=" ", outputscheme=None):
 
         outstring = ""
 
@@ -197,7 +200,7 @@ class DynamicType(object):
                     outstring += element.process()
 
                 if isinstance(element, self.__AttributeMatch):
-                    outstring += element.process(obj=_obj, sep=separator)
+                    outstring += element.process(obj=_obj, sep=separator, outputscheme=outputscheme)
 
             if (i + 1) == len(formatlist):
                 pass
@@ -205,7 +208,7 @@ class DynamicType(object):
                 outstring += '||'
         return outstring
 
-    def __output__(self, outputscheme=None, separatoroverride=None):
+    def __output__(self, outputscheme=None, separatoroverride=" "):
         if not 'output' in confignamespace():
             raise AttributeError('An output section is not configured in the config file')
         if outputscheme == None:
@@ -226,7 +229,7 @@ class DynamicType(object):
             separator = separatoroverride
 
         print(confignamespace()['output'][outputscheme])
-        return self.integrate(formatlist=self.parseformat(_metas[outputscheme]), separator=separator)
+        return self.integrate(formatlist=self.parseformat(_metas[outputscheme]), outputscheme=outputscheme, separator=separator)
 
     def output(self, outputscheme=None):
         return self.__output__(outputscheme=outputscheme)

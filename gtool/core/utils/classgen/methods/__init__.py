@@ -15,6 +15,7 @@ def init(self, **kwargs):
     if not (isinstance(self, DynamicType)):
         # all dynamic classes must inherit from gtool's Dynamic type found in gtool.types.core
          raise TypeError('The dynamic class %s was generated that does not inherit from gtool.types.core.DynamicType' % self.__class__)
+    #print('mandatory properties for %s' % type(self), self.__mandatory_properties__)
 
 
 def new(cls):
@@ -29,7 +30,7 @@ def metas(cls):
     if hasattr(cls, '__metas__'):
         return cls.__metas__
     else:
-        print('has no metas')
+        #print('has no metas')
         return None
 
 @classmethod
@@ -201,21 +202,7 @@ def loads(self, loadstring, softload=False):
         cfunc = _self.__list_slots__[attrname].__convert__
         attrfunc = _self.__list_slots__[attrname].attrtype
 
-        """
-        if len(attrval) > 1:
-            return [attrfunc(cfunc(s.strip())) for s in attrval]
-        else:
-            return attrfunc(cfunc(attrval))
-        """
         return [attrfunc(cfunc(s.strip())) for s in attrval]
-
-        """
-        # TODO use pyparsing
-        if '||' in attrval:
-           return [attrfunc(cfunc(s.strip())) for s in attrval.split('||')]
-        else:
-            return attrfunc(cfunc(attrval))
-        """
 
     ret = parseLoadstring(loadstring)
     attriblist = [k for k in ret.keys()]

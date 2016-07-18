@@ -1,1 +1,2 @@
 @testprop1: cr1 ipsum lorum
+@testprop3: 2.9
