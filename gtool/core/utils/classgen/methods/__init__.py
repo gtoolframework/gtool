@@ -238,7 +238,7 @@ def load(self, loadfile, softload=False):
 
     # TODO make sure we can read file (in case it's large)
     try:
-        f = open(loadfile, mode='r')
+        f = open(loadfile, mode='r', newline="\n")
     except FileNotFoundError:
         raise FileNotFoundError('%s does not exist' % loadfile)
     except IOError:
