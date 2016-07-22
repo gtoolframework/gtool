@@ -456,7 +456,7 @@ def test18sub1():
 
     m = Matrix(startwidth=10, startheight=2)
 
-    for x in m.data():
+    for x in m:
         print(x)
 
     print(m.__v_utilization__())
@@ -467,12 +467,35 @@ def test18sub1():
 
     m.insert(cursor=(2, 1), datalist=['x'] * 20)
 
-    for x in m.data():
+    for x in m:
         print('len:', len(x), '-->', x)
 
     m.bulk_insert(cursor=(2, 2), rows=[['y'] * 10] * 3)
 
-    for x in m.data():
+    m.trim()
+
+    print('m v util:',m.__v_utilization__())
+
+    print('m h util:',m.__h_utilization__())
+
+    print('m cursor:',m.cursor)
+
+    for x in m:
+        print('len:', len(x), '-->', x)
+
+    print('column 3:', m.col(3))
+    mmap = m.__matrixmap__()
+    print('*' * 20)
+    for x in mmap:
+        print(x)
+
+    print('mmap v util:', mmap.__v_utilization__())
+
+    print('mmap h util:', mmap.__h_utilization__())
+
+    print('mmap cursor:',mmap.cursor)
+
+    for x in mmap:
         print('len:', len(x), '-->', x)
     print('--- test 18sub1 ends ---')
 
@@ -489,6 +512,6 @@ def test18():
         #print(child)
 
         _x = child.dataasobject
-        print(_x.outputaslist(outputscheme=outputscheme))
+        print(_x.output(outputscheme=outputscheme))
 
     print('--- test 18 ends ---')

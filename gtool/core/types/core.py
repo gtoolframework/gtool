@@ -146,6 +146,9 @@ class DynamicType(object):
         def __init__(self, attrname):
             self.__attrname__ = attrname
 
+        def isdynamic(self, obj):
+            return isinstance(obj, DynamicType)
+
         def process(self, obj=None, sep=" ", outputscheme = None):
             if hasattr(obj, self.__attrname__):
                 """for g in getattr(obj, self.__attrname__):
@@ -203,7 +206,7 @@ class DynamicType(object):
         return cells
 
     def integrate(self, formatlist=None, separator=" ", outputscheme=None):
-        print('integrate seperator: *%s*' % separator)
+        #print('integrate seperator: *%s*' % separator)
         outstring = ""
 
         _obj = self
@@ -220,6 +223,32 @@ class DynamicType(object):
                 pass
             else:
                 outstring += '||'
+            #print(outstring)
+        return outstring
+
+    def _integrate(self, formatlist=None, separator=" ", outputscheme=None):
+        #print('integrate seperator: *%s*' % separator)
+
+        _retmatrix = Matrix(startheight=20,startwidth=20)
+
+        _datalist = []
+
+        _obj = self
+
+        for i, cell in enumerate(formatlist):
+            _outstring = ""
+
+            for element in cell:
+                if isinstance(element, self.__Filler):
+                    _outstring += element.process()
+
+                if isinstance(element, self.__AttributeMatch):
+                    _outstring += element.process(obj=_obj, sep=separator, outputscheme=outputscheme)
+                #if len(cell) == 1 then... recurse as matrix else recurse as flattened string
+                #returns matrix <-- need a flattener
+            #_datalist.append(_outstring)
+            _retmatrix.insert(cursor=(0,0),datalist=[_outstring])
+
         return outstring
 
     def __output__(self, outputscheme=None, separatoroverride=None, listmode=False):
@@ -243,7 +272,7 @@ class DynamicType(object):
             if separator.startswith('"') and separator.endswith('"'):
                 #separator = '%s' % separator [1:-1]
                 separator = bytes('%s' % separator [1:-1], "utf-8").decode("unicode_escape") # prevent escaping
-                print('in output: *%s*' % separator)
+                #print('in output: *%s*' % separator)
         else:
             separator = separatoroverride
 
@@ -260,88 +289,4 @@ class DynamicType(object):
     def outputaslist(self, outputscheme=None):
         # TODO make this more efficient - get an array from integrate instead of a string
         _integratedstring = self.__output__(outputscheme=outputscheme, separatoroverride="\n", listmode=True)
-        return _integratedstring.split('||')
-
-#------------
-
-    def xparseformat(self, formatstring):
-        attribmarker = p.Literal('@').suppress()
-        cellseparator = '||'
-
-        attribgroup = attribmarker + p.Word(p.alphanums)
-
-        cells = []
-
-        _splitstring = [cell.strip() for cell in formatstring.split(cellseparator)]
-
-        for cell in _splitstring:
-            _scan = attribgroup.scanString(cell)
-            _templist = []
-            prestart = 0
-            end = 0
-            for match in _scan:
-                start = match[1]
-                end = match[2]
-
-                _templist.append(self.__Filler(cell[prestart:start]))
-                _templist.append(self.__AttributeMatch(cell[start + 1:end]))
-                prestart = end
-                # print('templist:', _templist)
-            _templist.append(self.__Filler(cell[end:]))
-            cells.append(_templist)
-
-        return cells
-
-    def xintegrate(self, formatlist=None, separator=" ", outputscheme=None, listmode=False):
-
-        outstring = ""
-
-        _obj = self
-
-        for i, cell in enumerate(formatlist):
-            for element in cell:
-                if isinstance(element, self.__Filler):
-                    outstring += element.process()
-
-                if isinstance(element, self.__AttributeMatch):
-                    outstring += element.process(obj=_obj, sep=separator, outputscheme=outputscheme)
-
-            if (i + 1) == len(formatlist):
-                pass
-            else:
-                outstring += '||'
-        return outstring
-
-    def __xoutput__(self, outputscheme=None, separatoroverride=None, listmode=False):
-        # --- validation section ---
-        if not 'output' in confignamespace():
-            raise AttributeError('An output section is not configured in the config file')
-        if outputscheme == None:
-            raise ValueError('No outputscheme provided for %s class' % self.__class__)
-        if not outputscheme in confignamespace()['output']:
-            raise NameError('%s is not configured in the [output] section in the config file' % outputscheme)
-        _metas = self.metas()  # assume metas() exist by virtue of class construction
-        if not outputscheme in _metas:
-            raise NameError('%s class does not have an output scheme called %s' % (self.__class__, outputscheme))
-        # validation checks passed
-
-        # --- separator handler ---
-        separatorname = outputscheme + '_separator'
-        # separator = " " # default value
-        if separatorname in confignamespace()['output'] and separatoroverride is None:
-            separator = confignamespace()['output'][separatorname]
-            if separator.startswith('"') and separator.endswith('"'):
-                separator = separator[1:-1]
-        else:
-            separator = separatoroverride
-
-        # --- intergrate data using the output formatter ---
-        return self.xintegrate(formatlist=self.xparseformat(_metas[outputscheme]),
-                               outputscheme=outputscheme,
-                               separator=separator,
-                               listmode=listmode)
-
-    def outputasmatrix(self, outputscheme=None):
-
-        _integratedstring = self.__xoutput__(outputscheme=outputscheme, separatoroverride='\n', listmode=True)
         return _integratedstring.split('||')

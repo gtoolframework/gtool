@@ -192,15 +192,15 @@ class Matrix(object):
         if y > int(self.__height__() * self.__utilization_threshold__):
             # grow enough so that we're back to ~70% vertical utilization
             _delta = int(y / (self.__utilization_threshold__ - .05) - self.__height__()) + 1
-            print(_delta)
+            #print(_delta)
             if not self.append_rows(rows=_delta):
                 raise Exception('Could not append more rows to the matrix')
 
         # grow rows if needed
         if x + len(datalist) > self.__width__():
-            print('expanding x')
+            #print('expanding x')
             _delta = int((x + len(datalist)) / (self.__utilization_threshold__ - .05) - self.__width__()) + 1
-            print(_delta)
+            #print(_delta)
             if not self.append_cols(cols=_delta):
                 raise Exception('Could not append more columns to the matrix')
 
@@ -238,6 +238,33 @@ class Matrix(object):
         self.healthcheck() #do healthcheck here instead of inside insert so that we don't call healthcheck repeatedly
         return True
 
-    def __matrixmap__(self):
+    def col(self, x):
+        """
+        Returns the column of a matrix
+        :param x: x coordinate of column you want returned
+        :return: list containing column values
+        """
+        if not isinstance(x, int):
+            raise TypeError('Was expecting an integer but got a', type(x))
+        return [row[x] for row in self.__storage__]
+
+    def row(self, y):
+        """
+        Returns the column of a matrix
+        :param y: y coordinate of row you want returned
+        :return: list containing row values
+        """
+        if not isinstance(y, int):
+            raise TypeError('Was expecting an integer but got a', type(y))
+        return self.__storage__[y]
+
+    def __matrixmap__(self, trim=True):
         # returns a matrix of the same size but shows how much data is
-        return [[len(x) if x is not None else 0 for x in y] for y in self.__storage__]
+        _retmatrix = Matrix(startwidth=self.__h_utilization__(), startheight=self.__v_utilization__())
+        _mmap = [[len(x) if x is not None else 0 for x in y] for y in self.__storage__]
+
+        _retmatrix.bulk_insert(rows=_mmap)
+        if trim:
+            _retmatrix.trim()
+            _retmatrix.trim()
+        return _retmatrix
