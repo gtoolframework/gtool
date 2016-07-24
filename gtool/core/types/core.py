@@ -2,7 +2,8 @@ import pyparsing as p
 
 from gtool.core.utils.config import namespace as confignamespace
 from gtool.core.types.matrix import Matrix
-from gtool.core.utils.output import flatten
+from gtool.core.utils.output import flatten, formatternamespace
+from gtool.core.types.outmanagers import Filler, AttributeMatch
 
 
 class CoreType(object):
@@ -133,6 +134,7 @@ class CoreType(object):
 
 class DynamicType(object):
     # TODO collapse Filler and AttributeMatch then subclass
+    """
     class __Filler(object):
         def __init__(self, fillertext):
             self.__fillertext__ = fillertext
@@ -177,10 +179,6 @@ class DynamicType(object):
 
         def process_to_list(self, obj=None, sep=" ", outputscheme=None):
             if hasattr(obj, self.__attrname__):
-                """for g in getattr(obj, self.__attrname__):
-                    if isinstance(g,DynamicType):
-                        print(type(g))
-                """
                 # return sep.join(['%s' % f if not isinstance(f,DynamicType) else f.outputaslist(outputscheme=outputscheme) for f in getattr(obj, self.__attrname__)])
                 return [f for f in getattr(obj, self.__attrname__)]
             else:
@@ -190,6 +188,8 @@ class DynamicType(object):
         def __repr__(self):
             return '<%s>:%s' % (self.__class__, self.__attrname__)
 
+    """
+
     @classmethod
     def metas(cls):
         if hasattr(cls, '__metas__'):
@@ -198,7 +198,16 @@ class DynamicType(object):
             # print('has no metas')
             return None
 
+
+    @classmethod
+    def formatter(cls):
+        _type = '%s' % cls
+        _type = _type[6:-2].split('.')[-1]
+        #print('formatter', _type)
+        return formatternamespace()[_type]
+
     # TODO determine which methods from utils.classgen.methods can be moved in here
+    """
     def parseformat(self, formatstring):
         attribmarker = p.Literal('@').suppress()
         cellseparator = '||'
@@ -227,6 +236,7 @@ class DynamicType(object):
             cells.append(_templist)
 
         return cells
+    """
 
     def integrate(self, formatlist=None, separator=" ", outputscheme=None):
         #print('integrate seperator: *%s*' % separator)
@@ -236,10 +246,10 @@ class DynamicType(object):
 
         for i, cell in enumerate(formatlist):
             for element in cell:
-                if isinstance(element, self.__Filler):
+                if isinstance(element, Filler):
                     outstring += element.process()
 
-                if isinstance(element, self.__AttributeMatch):
+                if isinstance(element, AttributeMatch):
                     outstring += element.process(obj=_obj, sep=separator, outputscheme=outputscheme)
 
             if (i + 1) == len(formatlist):
@@ -264,10 +274,10 @@ class DynamicType(object):
             notsingle = False if len(cell) == 1 else True
 
             for element in cell:
-                if isinstance(element, self.__Filler):
+                if isinstance(element, Filler):
                     _outstring += element.process()
 
-                if isinstance(element, self.__AttributeMatch):
+                if isinstance(element, AttributeMatch):
                     _outstring += element.process(obj=_obj, sep=separator, outputscheme=outputscheme, flatten=notsingle)
                 #if len(cell) == 1 then... recurse as matrix else recurse as flattened string
                 #returns matrix <-- need a flattener
@@ -304,9 +314,11 @@ class DynamicType(object):
         #print(confignamespace()['output'][outputscheme])
         if listmode:
             pass
-        return self.integrate(formatlist=self.parseformat(_metas[outputscheme]),
-                                  outputscheme=outputscheme,
-                                  separator=separator)
+
+        _formatlist = self.formatter()
+        #print(_formatlist)
+        # self.parseformat(_metas[outputscheme])
+        return self.integrate(formatlist=_formatlist, outputscheme=outputscheme, separator=separator)
 
     def __output2__(self, outputscheme=None, separatoroverride=None, matrix=None):
         #--- validation section ---
@@ -336,10 +348,11 @@ class DynamicType(object):
             separator = separatoroverride
 
         #print(confignamespace()['output'][outputscheme])
-        formatlist = self.parseformat(_metas[outputscheme])
+        formatlist = self.formatter() #self.parseformat(_metas[outputscheme])
         return self.integrate(formatlist=formatlist, outputscheme=outputscheme, separator=separator)
 
     def output(self, outputscheme=None):
+        #print('output:', self.formatter())
         return self.__output__(outputscheme=outputscheme)
 
     def outputaslist(self, outputscheme=None):

@@ -36,11 +36,12 @@ def __loadclasses(classpath, dbg=False):
 
 def __outputparser(globalnamespace, outputscheme=None):
     if outputscheme is None:
-        raise ValueError('An outputscheme was not provided, cannot build output tree')
-    print('Namespace:...')
+        raise ValueError('An outputscheme was not provided, cannot build output format tree')
+    #print('Namespace:...')
     for k, v in globalnamespace.items():
-        print(k, ':', v.metas()[outputscheme])
-        print(parseformat(v.metas()[outputscheme]))
+        #print(k, ':', v.metas()[outputscheme])
+        registerFormatter(k, parseformat(v.metas()[outputscheme]))
+        #print(parseformat(v.metas()[outputscheme]))
 
 def __loadclass(classpath, dbg=False):
     """
