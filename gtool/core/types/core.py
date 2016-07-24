@@ -2,6 +2,7 @@ import pyparsing as p
 
 from gtool.core.utils.config import namespace as confignamespace
 from gtool.core.types.matrix import Matrix
+from gtool.core.utils.output import flatten
 
 
 class CoreType(object):
@@ -144,22 +145,35 @@ class DynamicType(object):
 
     class __AttributeMatch(object):
         def __init__(self, attrname):
-            self.__attrname__ = attrname
+            self.__concatmode__ = True if attrname[0] == '+' else False
+            self.__attrname__ = attrname[1:] if self.__concatmode__ is True else attrname
+            #print('__AttributeMatch:', self.__attrname__, 'concat mode:', self.__concatmode__)
 
-        def isdynamic(self, obj):
-            return isinstance(obj, DynamicType)
+        def __isdynamic__(self, obj):
+            return getattr(obj, self.__attrname__).isdynamic
 
-        def process(self, obj=None, sep=" ", outputscheme = None):
-            if hasattr(obj, self.__attrname__):
-                """for g in getattr(obj, self.__attrname__):
-                    if isinstance(g,DynamicType):
-                        print(type(g))
-                """
-                return sep.join(['%s' % f if not isinstance(f,DynamicType) else f.output(outputscheme=outputscheme) for f in getattr(obj, self.__attrname__)])
-                #return sep.join(['%s' % f for f in getattr(obj, self.__attrname__)])
-            else:
+        @property
+        def isconcatter(self):
+            return self.__concatmode__
+
+        def process(self, obj=None, sep=" ", outputscheme = None, flat=False):
+            if obj is None:
+                raise TypeError('Expected an object in obj kwarg')
+            if not hasattr(obj, self.__attrname__):
                 raise AttributeError('%s does not have a %s attribute as specified in the output format scheme:' % (
                     obj.__class__, self.__attrname__))
+
+            if not getattr(obj, self.__attrname__).isdynamic:
+                return sep.join(['%s' % f for f in getattr(obj, self.__attrname__)])
+            elif flat:
+                return sep.join([f.output(outputscheme=outputscheme) for f in getattr(obj, self.__attrname__)])
+            else:
+                return
+
+
+            #return sep.join(['%s' % f if not self.__isdynamic__(f) else f.output(outputscheme=outputscheme) for f in getattr(obj, self.__attrname__)])
+            #return sep.join(['%s' % f for f in getattr(obj, self.__attrname__)])
+
 
         def process_to_list(self, obj=None, sep=" ", outputscheme=None):
             if hasattr(obj, self.__attrname__):
@@ -180,8 +194,9 @@ class DynamicType(object):
     def parseformat(self, formatstring):
         attribmarker = p.Literal('@').suppress()
         cellseparator = '||'
+        concatmarker = p.Optional(p.Literal('+'))
 
-        attribgroup = attribmarker + p.Word(p.alphanums)
+        attribgroup = attribmarker + concatmarker + p.Word(p.alphanums)
 
         cells = []
 
@@ -229,7 +244,7 @@ class DynamicType(object):
     def _integrate(self, formatlist=None, separator=" ", outputscheme=None):
         #print('integrate seperator: *%s*' % separator)
 
-        _retmatrix = Matrix(startheight=20,startwidth=20)
+        _retmatrix = Matrix(startheight=5,startwidth=10)
 
         _datalist = []
 
@@ -238,18 +253,20 @@ class DynamicType(object):
         for i, cell in enumerate(formatlist):
             _outstring = ""
 
+            notsingle = False if len(cell) == 1 else True
+
             for element in cell:
                 if isinstance(element, self.__Filler):
                     _outstring += element.process()
 
                 if isinstance(element, self.__AttributeMatch):
-                    _outstring += element.process(obj=_obj, sep=separator, outputscheme=outputscheme)
+                    _outstring += element.process(obj=_obj, sep=separator, outputscheme=outputscheme, flatten=notsingle)
                 #if len(cell) == 1 then... recurse as matrix else recurse as flattened string
                 #returns matrix <-- need a flattener
             #_datalist.append(_outstring)
             _retmatrix.insert(cursor=(0,0),datalist=[_outstring])
 
-        return outstring
+        return _retmatrix
 
     def __output__(self, outputscheme=None, separatoroverride=None, listmode=False):
         #--- validation section ---
@@ -283,6 +300,37 @@ class DynamicType(object):
                                   outputscheme=outputscheme,
                                   separator=separator)
 
+    def __output2__(self, outputscheme=None, separatoroverride=None, matrix=None):
+        #--- validation section ---
+        if not 'output' in confignamespace():
+            raise AttributeError('An output section is not configured in the config file')
+        if outputscheme == None:
+            raise ValueError('No outputscheme provided for %s class' % self.__class__)
+        if not outputscheme in confignamespace()['output']:
+            raise NameError('%s is not configured in the [output] section in the config file' % outputscheme)
+        _metas = self.metas() # assume metas() exist by virtue of class construction
+        if not outputscheme in _metas:
+            raise NameError('%s class does not have an output scheme called %s' % (self.__class__, outputscheme))
+        if not isinstance(matrix, Matrix):
+            raise TypeError('Was expecting a matrix object for matrix keyword but got a', type(matrix))
+        # validation checks passed
+
+        #--- separator handler ---
+        separatorname = outputscheme + '_separator'
+        #separator = " " # default value
+        if separatorname in confignamespace()['output'] and separatoroverride is None:
+            separator = confignamespace()['output'][separatorname]
+            if separator.startswith('"') and separator.endswith('"'):
+                #separator = '%s' % separator [1:-1]
+                separator = bytes('%s' % separator [1:-1], "utf-8").decode("unicode_escape") # prevent escaping
+                #print('in output: *%s*' % separator)
+        else:
+            separator = separatoroverride
+
+        #print(confignamespace()['output'][outputscheme])
+        formatlist = self.parseformat(_metas[outputscheme])
+        return self.integrate(formatlist=formatlist, outputscheme=outputscheme, separator=separator)
+
     def output(self, outputscheme=None):
         return self.__output__(outputscheme=outputscheme)
 
@@ -290,3 +338,13 @@ class DynamicType(object):
         # TODO make this more efficient - get an array from integrate instead of a string
         _integratedstring = self.__output__(outputscheme=outputscheme, separatoroverride="\n", listmode=True)
         return _integratedstring.split('||')
+
+    def outputasmatrix(self, outputscheme=None, returnmatrix=Matrix(startwidth=10, startheight=5)):
+        if not isinstance(returnmatrix, Matrix):
+            raise TypeError('Was exoecting a matrix object for returnmatrix keyword but got a', type(returnmatrix))
+        _retmatrix = returnmatrix
+        self.__output2__(outputscheme=outputscheme, separatoroverride="\n", listmode=True)
+
+    def asdict(self):
+        _retdict = {}
+        _retdict[type(self)] = {}

@@ -1,6 +1,6 @@
 SUBA::
 *file = dk
-*output1 = dk@testpropd1 || @testpropd2 || @testpropd3
+*output1 = dk@testpropd1 || @testpropd2 || @+testpropd3
 @testpropd1:: single: String (required = True)
 @testpropd2:: multiple: String (required = True)
 @testpropd3:: single: TESTCLASSSFOURTEEN (required = False)

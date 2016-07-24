@@ -1,5 +1,6 @@
 from gtool.core.namespace import namespace
 from gtool.core.plugin import pluginnamespace
+from gtool.core.types.core import DynamicType
 
 class attribute(object):
 
@@ -22,7 +23,6 @@ class attribute(object):
         self.__parent__ = parent
         self.__attributename__ = attributename
         self.__required__ = required # TODO do something with this (in classgen have mandatoryproperties query this)
-        pass
 
     @property
     def attrfilematch(self):
@@ -66,6 +66,10 @@ class attribute(object):
     @property
     def attrtype(self):
         return self.__init__['class']()
+
+    @property
+    def isdynamic(self):
+        return isinstance(self.attrtype, DynamicType)
 
     def __convert__(self, value):
         return self.__init__['class']().__converter__()(value) # return a type from type definition (such at gtool.types.common)
@@ -166,3 +170,20 @@ class attribute(object):
 
     def __context__(self):
         return '%s::%s' % (self.__parent__, self.__attributename__)
+
+    def aslist(self):
+        # TODO recurse
+        if not self.isdynamic:
+            return self.__storage__
+
+        _retlist = []
+        for f in self.__storage__:
+            _retlist.append(f.aslist())
+        return _retlist
+
+    def asdict(self):
+        # TODO recurse
+        return {self.__attributename__: self.__storage__}
+
+    def asmatrix(self):
+        pass
