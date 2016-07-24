@@ -5,12 +5,10 @@ from gtool.core.plugin import loadplugins
 from .classgen import generateClass
 from .classprocessor import readClass, processClass, debugClass
 from .config import configloader
+from gtool.core.namespace import namespace
+from gtool.core.utils.output import parseformat, registerFormatter
 
-
-def load():
-    pass
-
-def projectloader(projectroot, dbg=False):
+def projectloader(projectroot, dbg=False, outputscheme=None):
 
     PROJECTDATA = "data"
     PROJECTCLASS = "classes"
@@ -26,6 +24,7 @@ def projectloader(projectroot, dbg=False):
     configloader(projectconfigpath)
 
     __loadclasses(projectclassroot, dbg=dbg)
+    __outputparser(namespace(), outputscheme=outputscheme) #TODO make this a functional style call <-- return namespace from __loadclasses
     return StructureFactory.treewalk(projectdataroot)
 
 def __loadclasses(classpath, dbg=False):
@@ -34,6 +33,14 @@ def __loadclasses(classpath, dbg=False):
     elif os.path.isdir(classpath):
         for classfile in [f for f in os.listdir(classpath) if os.path.isfile(os.path.join(classpath, f))]:
             __loadclass(os.path.join(classpath, classfile), dbg=dbg)
+
+def __outputparser(globalnamespace, outputscheme=None):
+    if outputscheme is None:
+        raise ValueError('An outputscheme was not provided, cannot build output tree')
+    print('Namespace:...')
+    for k, v in globalnamespace.items():
+        print(k, ':', v.metas()[outputscheme])
+        print(parseformat(v.metas()[outputscheme]))
 
 def __loadclass(classpath, dbg=False):
     """

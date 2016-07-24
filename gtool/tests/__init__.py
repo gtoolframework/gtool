@@ -505,7 +505,7 @@ def test18():
     print('test 18 validates list generation works and excel/word outputs work')
     print('---- testing 18 begins ----')
 
-    sf = projectloader('test\\test18', dbg=False)
+    sf = projectloader('test\\test18', dbg=False, outputscheme=outputscheme)
 
     print('--- explore results ---')
     for child in sf.children:

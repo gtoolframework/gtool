@@ -190,6 +190,14 @@ class DynamicType(object):
         def __repr__(self):
             return '<%s>:%s' % (self.__class__, self.__attrname__)
 
+    @classmethod
+    def metas(cls):
+        if hasattr(cls, '__metas__'):
+            return cls.__metas__
+        else:
+            # print('has no metas')
+            return None
+
     # TODO determine which methods from utils.classgen.methods can be moved in here
     def parseformat(self, formatstring):
         attribmarker = p.Literal('@').suppress()

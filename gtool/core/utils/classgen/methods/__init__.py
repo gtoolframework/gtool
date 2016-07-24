@@ -26,14 +26,6 @@ def new(cls):
 # TODO find a better plae to put these classmethods
 
 @classmethod
-def metas(cls):
-    if hasattr(cls, '__metas__'):
-        return cls.__metas__
-    else:
-        #print('has no metas')
-        return None
-
-@classmethod
 def classfile(cls):
     if 'file' in cls.metas():
         return cls.__metas__.get('file')

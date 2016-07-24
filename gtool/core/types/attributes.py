@@ -171,6 +171,7 @@ class attribute(object):
     def __context__(self):
         return '%s::%s' % (self.__parent__, self.__attributename__)
 
+    """
     def aslist(self):
         # TODO recurse
         if not self.isdynamic:
@@ -187,3 +188,4 @@ class attribute(object):
 
     def asmatrix(self):
         pass
+    """

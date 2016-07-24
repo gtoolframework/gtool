@@ -56,7 +56,7 @@ class factory(object):
         methodsDict['missingproperties'] = missingproperties
         methodsDict['missingoptionalproperties'] = missingoptionalproperties
         methodsDict['classfile'] = classfile
-        methodsDict['metas'] = metas
+        #methodsDict['metas'] = metas
         methodsDict['register'] = register
         methodsDict['loads'] = loads
         methodsDict['load'] = load
