@@ -3,7 +3,7 @@ from copy import deepcopy
 
 import pyparsing as p
 
-from gtool.core.filewalker import registerFileMatcher
+#from gtool.core.filewalker import registerFileMatcher
 from gtool.core.types.core import DynamicType
 
 
@@ -13,18 +13,15 @@ def init(self, **kwargs):
     self.kwargs = kwargs
     self.__createattrs__(self.kwargs)
     if not (isinstance(self, DynamicType)):
-        # all dynamic classes must inherit from gtool's Dynamic type found in gtool.types.core
+        # all dynamic classes must inherit from gtool's Dynamic type found in gtool.core.types.core
          raise TypeError('The dynamic class %s was generated that does not inherit from gtool.types.core.DynamicType' % self.__class__)
     #print('mandatory properties for %s' % type(self), self.__mandatory_properties__)
-
-
-def new(cls):
-    pass
 
 # --- class methods that will be bound by factory ---
 # must be outside of class factory or they get factory's context and not the manufactured objects
 # TODO find a better plae to put these classmethods
 
+"""
 @classmethod
 def classfile(cls):
     if 'file' in cls.metas():
@@ -37,7 +34,7 @@ def register(cls, classname):
     # only register if a file prefix is provided
     if cls.classfile() is not None:
         registerFileMatcher(cls.classfile(), classname)
-
+"""
 # --- end of class methods that will be bound by factory ---
 
 

@@ -1,5 +1,5 @@
 from gtool.core.types.matrix import Matrix
-import gtool.core.types.outmanagers as om
+import gtool.core.types.outputmanagers as om
 import pyparsing as p
 
 def flatten(matrix, sep=', '):

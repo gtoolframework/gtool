@@ -1,3 +1,5 @@
+# TODO collapse Filler and AttributeMatch then subclass
+
 class Filler(object):
     def __init__(self, fillertext):
         self.__fillertext__ = fillertext

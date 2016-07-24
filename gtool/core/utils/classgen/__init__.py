@@ -55,9 +55,9 @@ class factory(object):
         methodsDict['mandatoryproperties'] = mandatoryproperties
         methodsDict['missingproperties'] = missingproperties
         methodsDict['missingoptionalproperties'] = missingoptionalproperties
-        methodsDict['classfile'] = classfile
+        #methodsDict['classfile'] = classfile
         #methodsDict['metas'] = metas
-        methodsDict['register'] = register
+        #methodsDict['register'] = register
         methodsDict['loads'] = loads
         methodsDict['load'] = load
         methodsDict['__repr__'] = repr
