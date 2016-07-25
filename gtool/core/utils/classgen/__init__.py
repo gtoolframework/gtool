@@ -55,14 +55,10 @@ class factory(object):
         methodsDict['mandatoryproperties'] = mandatoryproperties
         methodsDict['missingproperties'] = missingproperties
         methodsDict['missingoptionalproperties'] = missingoptionalproperties
-        #methodsDict['classfile'] = classfile
-        #methodsDict['metas'] = metas
-        #methodsDict['register'] = register
         methodsDict['loads'] = loads
         methodsDict['load'] = load
         methodsDict['__repr__'] = repr
         methodsDict['__str__'] = str
-        #methodsDict['output'] = output
         return methodsDict
 
     @staticmethod

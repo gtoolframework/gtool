@@ -19,24 +19,6 @@ def init(self, **kwargs):
 
 # --- class methods that will be bound by factory ---
 # must be outside of class factory or they get factory's context and not the manufactured objects
-# TODO find a better plae to put these classmethods
-
-"""
-@classmethod
-def classfile(cls):
-    if 'file' in cls.metas():
-        return cls.__metas__.get('file')
-    else:
-        return None
-
-@classmethod
-def register(cls, classname):
-    # only register if a file prefix is provided
-    if cls.classfile() is not None:
-        registerFileMatcher(cls.classfile(), classname)
-"""
-# --- end of class methods that will be bound by factory ---
-
 
 # TODO __createattrs__ code is similar to setattr code, can probably be shared
 

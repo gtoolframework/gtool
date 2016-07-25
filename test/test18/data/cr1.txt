@@ -1,4 +1,4 @@
 @testprop1: cr1 ipsum lorum horus
 @testprop2: alpha beta
 @testprop2: ipsum lorum horus rictum
-@testprop3: 3
+@testprop3: 5

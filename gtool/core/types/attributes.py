@@ -69,7 +69,8 @@ class attribute(object):
 
     @property
     def isdynamic(self):
-        return isinstance(self.attrtype, DynamicType)
+        #print('isdynamic:', self.__init__)
+        return isinstance(self.__lazyloadclass__()(), DynamicType)
 
     def __convert__(self, value):
         return self.__init__['class']().__converter__()(value) # return a type from type definition (such at gtool.types.common)

@@ -38,7 +38,7 @@ def flatten(matrix, sep=', '):
     return _retlist
 
 
-def parseformat(formatstring):
+def parseformat(classname=None, formatstring=None):
     attribmarker = p.Literal('@').suppress()
     cellseparator = '||'
     concatmarker = p.Optional(p.Literal('+'))
@@ -59,7 +59,7 @@ def parseformat(formatstring):
             end = match[2]
 
             _templist.append(om.Filler(cell[prestart:start]))
-            _templist.append(om.AttributeMatch(cell[start + 1:end]))
+            _templist.append(om.AttributeMatch(cell[start + 1:end], classname=classname))
             prestart = end
             # print('templist:', _templist)
         _templist.append(om.Filler(cell[end:]))

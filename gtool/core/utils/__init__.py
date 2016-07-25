@@ -24,6 +24,7 @@ def projectloader(projectroot, dbg=False, outputscheme=None):
     configloader(projectconfigpath)
 
     __loadclasses(projectclassroot, dbg=dbg)
+    # loading output parser can only occur after all classes are loaded
     __outputparser(namespace(), outputscheme=outputscheme) #TODO make this a functional style call <-- return namespace from __loadclasses
     return StructureFactory.treewalk(projectdataroot)
 
@@ -40,7 +41,7 @@ def __outputparser(globalnamespace, outputscheme=None):
     #print('Namespace:...')
     for k, v in globalnamespace.items():
         #print(k, ':', v.metas()[outputscheme])
-        registerFormatter(k, parseformat(v.metas()[outputscheme]))
+        registerFormatter(k, parseformat(classname=k, formatstring=v.metas()[outputscheme]))
         #print(parseformat(v.metas()[outputscheme]))
 
 def __loadclass(classpath, dbg=False):

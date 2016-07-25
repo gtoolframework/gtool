@@ -12,13 +12,17 @@ class Filler(object):
 
 
 class AttributeMatch(object):
-    def __init__(self, attrname):
+    def __init__(self, attrname, classname=""):
         self.__concatmode__ = True if attrname[0] == '+' else False
         self.__attrname__ = attrname[1:] if self.__concatmode__ is True else attrname
         # print('__AttributeMatch:', self.__attrname__, 'concat mode:', self.__concatmode__)
 
     def __isdynamic__(self, obj):
         return getattr(obj, self.__attrname__).isdynamic
+
+    def __descent__(self, attrname):
+        #recurse
+        pass
 
     @property
     def isconcatter(self):
@@ -31,12 +35,12 @@ class AttributeMatch(object):
             raise AttributeError('%s does not have a %s attribute as specified in the output format scheme:' % (
                 obj.__class__, self.__attrname__))
 
-        if not getattr(obj, self.__attrname__).isdynamic:
-            return sep.join(['%s' % f for f in getattr(obj, self.__attrname__)])
-        elif flat:
-            return sep.join([f.output(outputscheme=outputscheme) for f in getattr(obj, self.__attrname__)])
-        else:
-            return
+        #if not getattr(obj, self.__attrname__).isdynamic:
+        return sep.join(['%s' % f for f in getattr(obj, self.__attrname__)])
+        #elif flat:
+        #    return sep.join([f.output(outputscheme=outputscheme) for f in getattr(obj, self.__attrname__)])
+        #else:
+        #    return
 
 
             # return sep.join(['%s' % f if not self.__isdynamic__(f) else f.output(outputscheme=outputscheme) for f in getattr(obj, self.__attrname__)])

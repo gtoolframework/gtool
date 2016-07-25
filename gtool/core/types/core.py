@@ -159,6 +159,11 @@ class DynamicType(object):
     @classmethod
     def formatter(cls):
         _classname = '{}'.format(cls)[6:-2].split('.')[-1] #TODO this is hacky - removes '<class and >'
+        #print('formatter: dynamic props', cls.__dynamic_properties__)
+        #print('formatter: list slots:', cls.__list_slots__)
+        #for k, v in cls.__list_slots__.items():
+        #    print(k, ':', v.isdynamic) # isinstance(v.__lazyloadclass__()(), DynamicType))
+
         return formatternamespace()[_classname]
 
     # TODO determine which methods from utils.classgen.methods can be moved in here
