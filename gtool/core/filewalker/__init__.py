@@ -3,6 +3,7 @@ import os
 import patricia as pt
 
 import gtool.core.namespace
+from functools import lru_cache
 
 # --- static ---
 __DYNAMIC_CLASS = 'filematches'
@@ -33,6 +34,8 @@ def filematch(exp):
 
 #--- classes ---
 
+def striptoclassname(fullclassstring):
+    return '{0}'.format(fullclassstring)[7:-2].split('.')[-1]
 
 class StructureFactory(object):
 
@@ -187,6 +190,15 @@ class StructureFactory(object):
             else:
                 raise TypeError('Could not parse the data from %s into a %s class' % (self.path, type(_retobject)))
 
+        def treestructure(self):
+            #_currentnodelist = '%s' % self.__objectmatch__() if self.__parent__ is not None else None
+            _currentnode = striptoclassname(self.__objectmatch__()) if self.__parent__ is not None else None
+            #print(len(self.children))
+            if len(self.children) == 0:
+                return _currentnode
+            else:
+                return {_currentnode: [f.treestructure() for f in self.children]} # ret objectmatch?
+
 
     class Container(Node):
 
@@ -236,7 +248,57 @@ class StructureFactory(object):
 
             return _ret
 
+        def treestructure(self):
+            #TODO make this recursive
+            # TODO this would not be required in files inside cnode were turned into nodes
+
+            def __treestructure__(self):
+                _children = []
+                _currentnode = super().treestructure()
+                _retobject = self.dataasobject
+                # print(_retobject.__list_slots__)
+                # _props = _retobject.dynamicproperties
+                _missingoptional = _retobject.missingoptionalproperties  # we don't check missing mandatory properties because dataasobject would have thrown an error already
+                _dynamics = list(gtool.core.namespace.namespace().values())
+                # print(_dynamics)
+                for i in _retobject.dynamicproperties:
+                    if i not in _missingoptional:
+                        _x = _retobject.__list_slots__[i].__lazyloadclass__()
+                        if _x in _dynamics:
+                            # print('dynamic')
+                            _children.append(striptoclassname(_x))
+
+                return {_currentnode: _children} if len(_children) > 0 else _currentnode
+
+            """
+            _children = []
+            _currentnode = super().treestructure()
+            _retobject = self.dataasobject
+            #print(_retobject.__list_slots__)
+            #_props = _retobject.dynamicproperties
+            _missingoptional = _retobject.missingoptionalproperties # we don't check missing mandatory properties because dataasobject would have thrown an error already
+            _dynamics = list(gtool.core.namespace.namespace().values())
+            #print(_dynamics)
+            for i in _retobject.dynamicproperties:
+                if i not in _missingoptional:
+                    _x = _retobject.__list_slots__[i].__lazyloadclass__()
+                    if _x in _dynamics:
+                        #print('dynamic')
+                        _children.append(striptoclassname(_x))
+
+            print('CNODE TREESTRUCTURE')
+            print('_ret:', _ret)
+            print('_children:', _children)
+            print('#' * 20)
+
+
+            return {_currentnode: _children} if len(_children) > 0 else _currentnode
+            """
+
+            return __treestructure__(self)
+
         @property
+        @lru_cache() # caches results for when .treestructure calls
         def dataasobject(self):
             _retclass = self.__objectmatch__()
             _retobject = _retclass()
@@ -317,7 +379,7 @@ class StructureFactory(object):
                     _locationname = location.name if isroot is False else '*'
                     _ret = StructureFactory.Container(name=_locationname, fileobject=location)
                     for child in location.children:
-                        _ret.addchildren(recursivewalk(child))
+                        _ret.addchildren(recursivewalk(location=child))
                     return _ret
             elif isinstance(location, StructureFactory.File):
                 _rootname = location.name.split('.')[0]

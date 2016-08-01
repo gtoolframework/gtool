@@ -68,8 +68,8 @@ class factory(object):
         # TODO this could be computed by a method dynamically by looking for funcs/props that start with X
         attribsDict['__dynamic_properties__'] = []
         attribsDict['__mandatory_properties__'] = []
-        attribsDict['__missing_mandatory_properties__'] = []
-        attribsDict['__missing_optional_properties__'] = []
+        #attribsDict['__missing_mandatory_properties__'] = []
+        #attribsDict['__missing_optional_properties__'] = []
         print('*' * 30)
         for attributeName, attributeValues in classDict['attributes'].items():
             paramDict = {}

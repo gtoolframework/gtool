@@ -1,37 +1,45 @@
-from gtool.core.types.matrix import Matrix
+def flatten(exp):
 
-m = Matrix(startwidth=10, startheight=2)
+    def sub(exp, res):
+        if type(exp) == dict:
+            for k, v in exp.items():
+                yield from sub(v, res+[k])
+        elif type(exp) == list:
+            for v in exp:
+                yield from sub(v, res)
+        else:
+            yield "/".join(res+[exp])
 
-for x in m:
-    print(x)
+    yield from sub(exp, [])
 
-print('v_util:', m.__v_utilization__())
+l = {'a': [
+  {'b':
+     {'c': 'd', 'e': 'f', 'g': 'h', 'i': {'j': {'k': ['l'], 'm': 'n'}},
+                  'o': {'p': {'q': ['r', 's'], 't': 'u'}}
+                  }
+            }]
+     }
 
-print('h_util:', m.__h_utilization__())
 
-print(m.cursor)
+for i in sorted(flatten(l)):
+  print(i)
 
-m.insert(cursor=(2,1), datalist=['x'] * 20)
 
-for x in m:
-    print('len:', len(x), '-->', x)
+print('\n\n','-' * 20, '\n\n',sep='')
 
-m.bulk_insert(cursor=(2,2), rows = [['y'] * 10] * 3)
+m = {'*': {'a': 'b', 'c': ['d', 'e', 'f', {'f' : 'g'}]}}
 
-for x in m:
-    print('len:', len(x), '-->', x)
+for i in sorted(flatten(m)):
+  print(i)
 
-print(m.__v_utilization__())
+print('\n\n','-' * 20, '\n\n',sep='')
 
-print(m.__h_utilization__())
+m = {'a': 'b', 'c': ['d', 'd', 'e', 'f', {'f' : 'g'}]}
 
-print(m.cursor)
+s = set()
 
-m.trim()
+for i in sorted(flatten(m)):
+  print(i)
+  s.add(i)
 
-for x in m:
-    print('len:', len(x), '-->', x)
-
-print(m.__v_utilization__(), '/', m.__height__())
-
-print(m.__h_utilization__(), '/', m.__width__())
+print(s)

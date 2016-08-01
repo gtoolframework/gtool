@@ -17,6 +17,9 @@ def init(self, **kwargs):
          raise TypeError('The dynamic class %s was generated that does not inherit from gtool.types.core.DynamicType' % self.__class__)
     #print('mandatory properties for %s' % type(self), self.__mandatory_properties__)
 
+    self.__missing_mandatory_properties__ = []
+    self.__missing_optional_properties__ = []
+
 # --- class methods that will be bound by factory ---
 # must be outside of class factory or they get factory's context and not the manufactured objects
 

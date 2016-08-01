@@ -26,7 +26,7 @@ def projectloader(projectroot, dbg=False, outputscheme=None):
     __loadclasses(projectclassroot, dbg=dbg)
     # loading output parser can only occur after all classes are loaded
     __outputparser(namespace(), outputscheme=outputscheme) #TODO make this a functional style call <-- return namespace from __loadclasses
-    return StructureFactory.treewalk(projectdataroot)
+    return StructureFactory.treewalk(projectdataroot) # returns the project data
 
 def __loadclasses(classpath, dbg=False):
     if os.path.isfile(classpath):

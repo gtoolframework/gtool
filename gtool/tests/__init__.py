@@ -507,11 +507,13 @@ def test18():
 
     sf = projectloader('test\\test18', dbg=False, outputscheme=outputscheme)
 
+    print(sf.treestructure())
     print('--- explore results ---')
     for child in sf.children:
-        #print(child)
+        print(child)
 
-        _x = child.dataasobject
-        print(_x.output(outputscheme=outputscheme))
+        #print(child.treestructure())
+        #_x = child.dataasobject
+        #print(_x.output(outputscheme=outputscheme))
 
     print('--- test 18 ends ---')

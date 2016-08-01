@@ -1,3 +1,5 @@
+#from gtool.core.namespace import namespace
+
 # TODO collapse Filler and AttributeMatch then subclass
 
 class Filler(object):
@@ -20,7 +22,7 @@ class AttributeMatch(object):
     def __isdynamic__(self, obj):
         return getattr(obj, self.__attrname__).isdynamic
 
-    def __descent__(self, attrname):
+    def __descent__(self, classname=None, attrname=None):
         #recurse
         pass
 
@@ -35,12 +37,13 @@ class AttributeMatch(object):
             raise AttributeError('%s does not have a %s attribute as specified in the output format scheme:' % (
                 obj.__class__, self.__attrname__))
 
-        #if not getattr(obj, self.__attrname__).isdynamic:
-        return sep.join(['%s' % f for f in getattr(obj, self.__attrname__)])
+        if not getattr(obj, self.__attrname__).isdynamic:
+            return sep.join(['%s' % f for f in getattr(obj, self.__attrname__)])
         #elif flat:
         #    return sep.join([f.output(outputscheme=outputscheme) for f in getattr(obj, self.__attrname__)])
-        #else:
-        #    return
+        else:
+            raise NotImplementedError('still working on Attributematch.process')
+            return
 
 
             # return sep.join(['%s' % f if not self.__isdynamic__(f) else f.output(outputscheme=outputscheme) for f in getattr(obj, self.__attrname__)])

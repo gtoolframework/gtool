@@ -34,7 +34,6 @@ def registerClass(className, classObj):
 def namespace():
     return globals()[dynamicclass()]
 
-
 #--- initialize namespace
 globals()[dynamicclass()] = dict()
 
