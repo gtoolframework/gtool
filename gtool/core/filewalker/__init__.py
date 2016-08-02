@@ -252,50 +252,30 @@ class StructureFactory(object):
             #TODO make this recursive
             # TODO this would not be required in files inside cnode were turned into nodes
 
-            def __treestructure__(self):
+            def __treestructure__(obj=None , currentnode=None, dynamics=None):
+
                 _children = []
-                _currentnode = super().treestructure()
-                _retobject = self.dataasobject
-                # print(_retobject.__list_slots__)
-                # _props = _retobject.dynamicproperties
-                _missingoptional = _retobject.missingoptionalproperties  # we don't check missing mandatory properties because dataasobject would have thrown an error already
-                _dynamics = list(gtool.core.namespace.namespace().values())
-                # print(_dynamics)
-                for i in _retobject.dynamicproperties:
-                    if i not in _missingoptional:
-                        _x = _retobject.__list_slots__[i].__lazyloadclass__()
-                        if _x in _dynamics:
-                            # print('dynamic')
-                            _children.append(striptoclassname(_x))
+                _missingoptional = obj.missingoptionalproperties  # we don't check missing mandatory properties because dataasobject would have thrown an error already
 
-                return {_currentnode: _children} if len(_children) > 0 else _currentnode
-
-            """
-            _children = []
-            _currentnode = super().treestructure()
-            _retobject = self.dataasobject
-            #print(_retobject.__list_slots__)
-            #_props = _retobject.dynamicproperties
-            _missingoptional = _retobject.missingoptionalproperties # we don't check missing mandatory properties because dataasobject would have thrown an error already
-            _dynamics = list(gtool.core.namespace.namespace().values())
-            #print(_dynamics)
-            for i in _retobject.dynamicproperties:
-                if i not in _missingoptional:
-                    _x = _retobject.__list_slots__[i].__lazyloadclass__()
-                    if _x in _dynamics:
-                        #print('dynamic')
-                        _children.append(striptoclassname(_x))
-
-            print('CNODE TREESTRUCTURE')
-            print('_ret:', _ret)
-            print('_children:', _children)
-            print('#' * 20)
+                for dynamicproperty in obj.dynamicproperties:
+                    if dynamicproperty not in _missingoptional:
+                        _prop = obj.__list_slots__[dynamicproperty].__lazyloadclass__()
+                        if _prop in dynamics:
+                            # print('%s has %s:' % (type(obj), dynamicproperty), hasattr(obj, dynamicproperty))
+                            _obj = getattr(obj, dynamicproperty)
+                            if _obj is not None:
+                                for attribute in _obj:
+                                    _children.append(__treestructure__(currentnode=striptoclassname(_prop),
+                                                                        obj=attribute,
+                                                                        dynamics=dynamics))
 
 
-            return {_currentnode: _children} if len(_children) > 0 else _currentnode
-            """
+                return {currentnode: _children} if len(_children) > 0 else currentnode
 
-            return __treestructure__(self)
+            return __treestructure__(obj=self.dataasobject,
+                                     currentnode=super().treestructure(),
+                                     dynamics=list(gtool.core.namespace.namespace().values())
+                                     )
 
         @property
         @lru_cache() # caches results for when .treestructure calls

@@ -171,22 +171,3 @@ class attribute(object):
 
     def __context__(self):
         return '%s::%s' % (self.__parent__, self.__attributename__)
-
-    """
-    def aslist(self):
-        # TODO recurse
-        if not self.isdynamic:
-            return self.__storage__
-
-        _retlist = []
-        for f in self.__storage__:
-            _retlist.append(f.aslist())
-        return _retlist
-
-    def asdict(self):
-        # TODO recurse
-        return {self.__attributename__: self.__storage__}
-
-    def asmatrix(self):
-        pass
-    """

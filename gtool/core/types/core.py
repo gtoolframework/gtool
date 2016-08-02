@@ -282,6 +282,7 @@ class DynamicType(object):
     def output(self, outputscheme=None):
         return self.__output__(outputscheme=outputscheme)
 
+    """
     def outputaslist(self, outputscheme=None):
         # TODO make this more efficient - get an array from integrate instead of a string
         _integratedstring = self.__output__(outputscheme=outputscheme, separatoroverride="\n", listmode=True)
@@ -296,3 +297,4 @@ class DynamicType(object):
     def asdict(self):
         _retdict = {}
         _retdict[type(self)] = {}
+    """
