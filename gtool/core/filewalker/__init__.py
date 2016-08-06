@@ -54,7 +54,7 @@ class StructureFactory(object):
                 self.__parent__.addchild(self)
             else:
                 self.__parent__ = None
-            self.__children__ = []
+            #self.__children__ = []
 
         @property
         def parent(self):
@@ -191,9 +191,7 @@ class StructureFactory(object):
                 raise TypeError('Could not parse the data from %s into a %s class' % (self.path, type(_retobject)))
 
         def treestructure(self):
-            #_currentnodelist = '%s' % self.__objectmatch__() if self.__parent__ is not None else None
-            _currentnode = striptoclassname(self.__objectmatch__()) if self.__parent__ is not None else None
-            #print(len(self.children))
+            _currentnode = striptoclassname(self.__objectmatch__()) if self.__parent__ is not None else '*'
             if len(self.children) == 0:
                 return _currentnode
             else:
@@ -224,17 +222,23 @@ class StructureFactory(object):
             """
             _ret = str()
             _filelist = [f for f in self.fileobject.children if isinstance(f, StructureFactory.File)]
+            # iterate to find the core file --> _.txt
+            # TODO does not need to be a for loop - can just check if it exists
             _coredata = [f for f in _filelist if f.name == "_.txt"]
             if len(_coredata) == 1:
                 _ret += ''.join(_coredata[0].read())
             else:
                 raise FileNotFoundError('In %s the _.txt file was expected' % self.fileobject.path)
 
-            for _file in (f for f in _filelist if f.name is not "_.txt"):
+            # iterate files that contain a single attribute value
+            for _file in (f for f in _filelist if f.name != "_.txt"):
                 _data = ''.join(_file.read())
                 if '@' not in _data[0]:
                     _ret += '\n@%s: ' % _file.name.split('.')[:-1][0]
                     _ret += _data
+                else:
+                    # standalone attribute files should just contain data
+                    raise TypeError('Found an attribute declaration in %s but was not expecting one' % _file.path)
 
             for subdir in (f for f in self.fileobject.children if isinstance(f, StructureFactory.Directory)):
                 subfilelist = [subfile for subfile in subdir.children]
@@ -261,7 +265,6 @@ class StructureFactory(object):
                     if dynamicproperty not in _missingoptional:
                         _prop = obj.__list_slots__[dynamicproperty].__lazyloadclass__()
                         if _prop in dynamics:
-                            # print('%s has %s:' % (type(obj), dynamicproperty), hasattr(obj, dynamicproperty))
                             _obj = getattr(obj, dynamicproperty)
                             if _obj is not None:
                                 for attribute in _obj:
@@ -283,14 +286,16 @@ class StructureFactory(object):
             _retclass = self.__objectmatch__()
             _retobject = _retclass()
             _softload = True
+            # --- object initialization ---
             if not _retobject.loads(self.__data__, softload=_softload):  # True if loadstring works
                 raise TypeError('Could not parse the data from %s into a %s class' % (self.path, type(_retobject)))
             if len(_retobject.missingproperties) == 0 and len(_retobject.missingoptionalproperties) == 0:
                 return _retobject
 
+            # --- load missing elements from subfiles if needed
             _filelist = [f for f in self.fileobject.children if isinstance(f, StructureFactory.File)]
 
-            for _file in (f for f in _filelist if f.name != "_.txt"):
+            for _file in (f for f in _filelist if f.name != "_.txt"): # "_.txt" is already loadeded via self.__data__
                 _data = ''.join(_file.read())
                 if '@' in _data[0]:
                     # this is an attribute class object (not a common object)
@@ -309,17 +314,28 @@ class StructureFactory(object):
                         raise TypeError('Got an attribute file %s that is not part of the %s class at %s' %
                                          (_file.name, self.name, self.path))
 
+            # --- load missing elements from subdirs if needed
             for subdir in (f for f in self.fileobject.children if isinstance(f, StructureFactory.Directory)):
                 subfilelist = [subfile for subfile in subdir.children]
                 if '_.txt' in (subfile.name for subfile in subfilelist):
                     for subfile in subfilelist:
-                        _attrobj = StructureFactory.CNode(name=subfile.name, fileobject=subfile)
-                        _retobject[subfile.name] = _attrobj.dataasobject
-                    if subfile.name in _retobject.missingproperties:
-                        _retobject.__missing_dynamic_properties__.remove(subfile.name)
+                        objectname = getattr(_retobject, subfile.parent.name).attrtype.classfile()
+                        if any(os.path.isdir(os.path.join(subdir.path, f)) for f in os.listdir(subdir.path)):
+                            _attrobj = StructureFactory.CNode(name=objectname, fileobject=subfile) #subfile.parent.name
+                        else:
+                            _attrobj = StructureFactory.Node(name=objectname, fileobject=subfile)
+                        try:
+                            setattr(_retobject, subfile.parent.name, _attrobj.dataasobject)
+                            #_retobject[subfile.parent.name] = _attrobj.dataasobject #this will implicitly recurse if there are nested dynamic objects
+                        except Exception as err:
+                            raise Exception('While processing ', subfile.parent.name, 'the following error occured:', err)
+                    if subfile.parent.name in _retobject.missingproperties:
+                        _retobject.__missing_mandatory_properties__.remove(subfile.parent.name)
+                    elif subfile.parent.name in _retobject.missingoptionalproperties:
+                        _retobject.__missing_optional_properties__.remove(subfile.parent.name)
                     else:
                         raise TypeError('Got an attribute directory %s that is not part of the %s class at %s' %
-                                        (subfile.name, type(_retobject), self.path))
+                                        (subfile.parent.name, type(_retobject), self.path))
 
             if len(_retobject.missingproperties) > 0:
                 raise TypeError('The following mandatory attributes are missing %s for the %s class at %s' %

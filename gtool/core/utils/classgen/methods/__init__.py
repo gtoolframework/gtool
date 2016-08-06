@@ -119,7 +119,6 @@ def setattr(self, attr, item):
 def dynamicproperties(self):
     return self.__dynamic_properties__
 
-
 @property
 def mandatoryproperties(self):
     return self.__mandatory_properties__

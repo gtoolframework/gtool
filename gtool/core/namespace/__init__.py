@@ -25,7 +25,6 @@ def registerClass(className, classObj):
         """
         gtool.core.filewalker.registerFileMatcher(
             '%s' % classObj.classfile(),
-            #globals()[dynamicclass()][className]
             className
         )
 

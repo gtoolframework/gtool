@@ -501,18 +501,43 @@ def test18sub1():
 
 
 def test18():
+
+    def flatten(exp):
+
+        def sub(exp, res):
+            if type(exp) == dict:
+                for k, v in exp.items():
+                    yield from sub(v, res + [k])
+            elif type(exp) == list:
+                for v in exp:
+                    yield from sub(v, res)
+            else:
+                yield "/".join(res + [exp])
+
+        yield from sub(exp, [])
+
+
     outputscheme = 'output1'
     print('test 18 validates list generation works and excel/word outputs work')
     print('---- testing 18 begins ----')
 
     sf = projectloader('test\\test18', dbg=False, outputscheme=outputscheme)
 
-    print(sf.treestructure())
+    #print(sf.treestructure())
+
+    s = set()
+
+    for i in sorted(flatten(sf.treestructure())):
+        #print(i)
+        s.add(i)
+
+    print(s)
+
     print('--- explore results ---')
     for child in sf.children:
         print(child)
 
-        #print(child.treestructure())
+        print(child.treestructure())
         #_x = child.dataasobject
         #print(_x.output(outputscheme=outputscheme))
 

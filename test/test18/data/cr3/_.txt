@@ -1,2 +1,0 @@
-@testprop1: cr3 ipsum lorum horus
-@testprop3: 3.5
