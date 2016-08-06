@@ -236,9 +236,12 @@ class StructureFactory(object):
                 if '@' not in _data[0]:
                     _ret += '\n@%s: ' % _file.name.split('.')[:-1][0]
                     _ret += _data
+                #TODO find a way to reinstate this code block below (possibly move it into dataasobject)
+                """
                 else:
                     # standalone attribute files should just contain data
                     raise TypeError('Found an attribute declaration in %s but was not expecting one' % _file.path)
+                """
 
             for subdir in (f for f in self.fileobject.children if isinstance(f, StructureFactory.Directory)):
                 subfilelist = [subfile for subfile in subdir.children]
