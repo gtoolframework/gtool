@@ -518,7 +518,7 @@ def test18():
 
 
     outputscheme = 'output1'
-    print('test 18 validates list generation works and excel/word outputs work')
+    print('test 18 validates arbitrarily structured data folder structures work properly')
     print('---- testing 18 begins ----')
 
     sf = projectloader('test\\test18', dbg=False, outputscheme=outputscheme)
@@ -527,11 +527,12 @@ def test18():
 
     s = set()
 
-    for i in sorted(flatten(sf.treestructure())):
+    """for i in sorted(flatten(sf.treestructure())):
         #print(i)
         s.add(i)
 
     print(s)
+    """
 
     print('--- explore results ---')
     for child in sf.children:

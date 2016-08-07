@@ -245,10 +245,12 @@ class StructureFactory(object):
 
             for subdir in (f for f in self.fileobject.children if isinstance(f, StructureFactory.Directory)):
                 subfilelist = [subfile for subfile in subdir.children]
-                if '_.txt' not in (subfile.name for subfile in subfilelist):
+
+                if '_.txt' not in (subfile.name for subfile in subfilelist) and any('@' not in subfile.read()[0] for subfile in subfilelist):
                     for subfile in subfilelist:
-                        _ret += '\n@%s: ' % subdir.name
                         _data = ''.join(subfile.read())
+                        #if '@' not in _data[0]: #implemented above in the 'any' condition
+                        _ret += '\n@%s: ' % subdir.name
                         if not len(_data) > 0:
                             raise TypeError('The file %s has no data in it' % subfile.path)
                         _ret += _data
@@ -307,7 +309,8 @@ class StructureFactory(object):
 
                     _attrclassname = _attrclassobj.attrfilematch
                     _attrobj = StructureFactory.Node(name=_attrclassname, fileobject=_file)
-                    setattr(_retobject, _filenamewithoutext, _attrobj.dataasobject)
+                    #setattr(_retobject, _filenamewithoutext, _attrobj.dataasobject)
+                    getattr(_retobject, _filenamewithoutext).append(_attrobj.dataasobject)
 
                     if _filenamewithoutext in _retobject.missingproperties:
                         _retobject.__missing_mandatory_properties__.remove(_filenamewithoutext)
@@ -317,21 +320,45 @@ class StructureFactory(object):
                         raise TypeError('Got an attribute file %s that is not part of the %s class at %s' %
                                          (_file.name, self.name, self.path))
 
-            # --- load missing elements from subdirs if needed
+            # --- load missing elements from subdirs if needed (which are ignored by .__data__
             for subdir in (f for f in self.fileobject.children if isinstance(f, StructureFactory.Directory)):
                 subfilelist = [subfile for subfile in subdir.children]
+                #print('subfilelist:', subfilelist)
+
+                # handles subdirectories with root file
                 if '_.txt' in (subfile.name for subfile in subfilelist):
                     for subfile in subfilelist:
                         objectname = getattr(_retobject, subfile.parent.name).attrtype.classfile()
                         if any(os.path.isdir(os.path.join(subdir.path, f)) for f in os.listdir(subdir.path)):
-                            _attrobj = StructureFactory.CNode(name=objectname, fileobject=subfile) #subfile.parent.name
+                            _attrobj = StructureFactory.CNode(name=objectname, fileobject=subfile)
                         else:
                             _attrobj = StructureFactory.Node(name=objectname, fileobject=subfile)
                         try:
-                            setattr(_retobject, subfile.parent.name, _attrobj.dataasobject)
+                            getattr(_retobject, subfile.parent.name).append(_attrobj.dataasobject)
                             #_retobject[subfile.parent.name] = _attrobj.dataasobject #this will implicitly recurse if there are nested dynamic objects
                         except Exception as err:
                             raise Exception('While processing ', subfile.parent.name, 'the following error occured:', err)
+                    if subfile.parent.name in _retobject.missingproperties:
+                        _retobject.__missing_mandatory_properties__.remove(subfile.parent.name)
+                    elif subfile.parent.name in _retobject.missingoptionalproperties:
+                        _retobject.__missing_optional_properties__.remove(subfile.parent.name)
+                    else:
+                        raise TypeError('Got an attribute directory %s that is not part of the %s class at %s' %
+                                        (subfile.parent.name, type(_retobject), self.path))
+
+                # handles subdirectories without a root file
+                elif any('@' in subfile.read()[0] for subfile in subfilelist): #if False:
+                    for subfile in subfilelist:
+                        objectname = getattr(_retobject, subfile.parent.name).attrtype.classfile()
+                        if any(os.path.isdir(os.path.join(subdir.path, f)) for f in os.listdir(subdir.path)):
+                            _attrobj = StructureFactory.CNode(name=objectname, fileobject=subfile)
+                        else:
+                            _attrobj = StructureFactory.Node(name=objectname, fileobject=subfile)
+                        try:
+                            getattr(_retobject, subfile.parent.name).append(_attrobj.dataasobject)
+                        except Exception as err:
+                            raise Exception('While processing ', subfile.parent.name, 'the following error occured:',
+                                            err)
                     if subfile.parent.name in _retobject.missingproperties:
                         _retobject.__missing_mandatory_properties__.remove(subfile.parent.name)
                     elif subfile.parent.name in _retobject.missingoptionalproperties:
