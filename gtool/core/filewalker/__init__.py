@@ -327,8 +327,10 @@ class StructureFactory(object):
 
                 # handles subdirectories with root file
                 if '_.txt' in (subfile.name for subfile in subfilelist):
+                    """
                     for subfile in subfilelist:
                         objectname = getattr(_retobject, subfile.parent.name).attrtype.classfile()
+                        #TODO add conditions to check if directory has a _.txt ala condition1, condition2 above
                         if any(os.path.isdir(os.path.join(subdir.path, f)) for f in os.listdir(subdir.path)):
                             _attrobj = StructureFactory.CNode(name=objectname, fileobject=subfile)
                         else:
@@ -338,13 +340,29 @@ class StructureFactory(object):
                             #_retobject[subfile.parent.name] = _attrobj.dataasobject #this will implicitly recurse if there are nested dynamic objects
                         except Exception as err:
                             raise Exception('While processing ', subfile.parent.name, 'the following error occured:', err)
-                    if subfile.parent.name in _retobject.missingproperties:
-                        _retobject.__missing_mandatory_properties__.remove(subfile.parent.name)
-                    elif subfile.parent.name in _retobject.missingoptionalproperties:
-                        _retobject.__missing_optional_properties__.remove(subfile.parent.name)
+                    """
+                    objectname = getattr(_retobject, subdir.name).attrtype.classfile()
+                    # TODO add conditions to check if directory has a _.txt ala condition1, condition2 above
+                    #if any(os.path.isdir(os.path.join(subdir.path, f)) for f in os.listdir(subdir.path)):
+                    _attrobj = StructureFactory.CNode(name=objectname, fileobject=subdir)
+                    """
+                    else:
+                        _attrobj = StructureFactory.Node(name=objectname, fileobject=subdir)
+                    """
+                    try:
+                        getattr(_retobject, subdir.name).append(_attrobj.dataasobject)
+                        # _retobject[subfile.parent.name] = _attrobj.dataasobject #this will implicitly recurse if there are nested dynamic objects
+                    except Exception as err:
+                        raise Exception('While processing ', subdir.name, 'the following error occured:', err)
+                    #------
+                    _objectname = subdir.name #subfile.parent.name
+                    if _objectname in _retobject.missingproperties:
+                        _retobject.__missing_mandatory_properties__.remove(_objectname)
+                    elif _objectname in _retobject.missingoptionalproperties:
+                        _retobject.__missing_optional_properties__.remove(_objectname)
                     else:
                         raise TypeError('Got an attribute directory %s that is not part of the %s class at %s' %
-                                        (subfile.parent.name, type(_retobject), self.path))
+                                        (_objectname, type(_retobject), self.path))
 
                 # handles subdirectories without a root file
 
