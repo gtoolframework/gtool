@@ -300,6 +300,7 @@ class StructureFactory(object):
             # --- load missing elements from subfiles if needed
             _filelist = [f for f in self.fileobject.children if isinstance(f, StructureFactory.File)]
 
+            # TODO lots of spaghetti code in here, cleanup up and consolidate (Carefully)
             for _file in (f for f in _filelist if f.name != "_.txt"): # "_.txt" is already loadeded via self.__data__
                 _data = ''.join(_file.read())
                 if '@' in _data[0]:
@@ -370,13 +371,9 @@ class StructureFactory(object):
                     objectsInFiles = any('@' in subfile.read()[0] for subfile in subfilelist if
                         isinstance(subfile, StructureFactory.File))
                     objectsInDirectories = all(isinstance(subfile, StructureFactory.Directory) for subfile in subfilelist)
-                    """
-                    print('objectsInFiles:', objectsInFiles)
-                    print('objectsInDirectories', objectsInDirectories)
-                    if objectsInFiles and objectsInDirectories:
-                        raise Exception('A dynamic ')
-                    assert objectsInFiles != objectsInDirectories
-                    """
+                    # TODO True and True probably should not happen - make a check
+                    #print("objectsInDirectories:", objectsInDirectories)
+                    #print("objectsInFiles:", objectsInFiles)
                     if objectsInFiles or objectsInDirectories:
                         for subfile in subfilelist:
                             objectname = getattr(_retobject, subfile.parent.name).attrtype.classfile()

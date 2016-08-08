@@ -543,3 +543,26 @@ def test18():
         #print(_x.output(outputscheme=outputscheme))
 
     print('--- test 18 ends ---')
+
+
+def test19():
+
+    outputscheme = 'output1'
+    print('test 19 validates data output works')
+    print('---- testing 19 begins ----')
+
+    sf = projectloader('test\\test19', dbg=False, outputscheme=outputscheme)
+
+    print(sf.treestructure())
+
+    s = set()
+
+    print('--- explore results ---')
+    for child in sf.children:
+        print(child)
+
+        print(child.treestructure())
+        _x = child.dataasobject
+        print(_x.output(outputscheme=outputscheme))
+
+    print('--- test 19 ends ---')
