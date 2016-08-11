@@ -544,8 +544,55 @@ def test18():
 
     print('--- test 18 ends ---')
 
+    """
+    # expected output
+    --- explore results ---
+    dk1
+    objectsInDirectories: False
+    objectsInFiles: False
+    {'SUBA': ['TESTCLASSSFOURTEEN']}
+    dk2
+    SUBA
+    dk3
+    objectsInDirectories: False
+    objectsInFiles: False
+    {'SUBA': ['TESTCLASSSFOURTEEN']}
+    dk4
+    objectsInDirectories: False
+    objectsInFiles: False
+    objectsInDirectories: False
+    objectsInFiles: True
+    {'SUBA': ['TESTCLASSSFOURTEEN', 'TESTCLASSSFOURTEEN']}
+    dk5
+    objectsInDirectories: False
+    objectsInFiles: False
+    objectsInDirectories: True
+    objectsInFiles: False
+    {'SUBA': ['TESTCLASSSFOURTEEN', 'TESTCLASSSFOURTEEN']}
+    dk6
+    objectsInDirectories: False
+    objectsInFiles: False
+    {'SUBA': ['TESTCLASSSFOURTEEN']}
+    --- test 18 ends ---
+
+    """
+
 
 def test19():
+
+    def flatten(exp):
+
+        def sub(exp, res):
+            if type(exp) == dict:
+                for k, v in exp.items():
+                    yield from sub(v, res + [k])
+            elif type(exp) == list:
+                for v in exp:
+                    yield from sub(v, res)
+            else:
+                yield "/".join(res + [exp])
+
+        yield from sub(exp, [])
 
     outputscheme = 'output1'
     print('test 19 validates data output works')
@@ -557,12 +604,20 @@ def test19():
 
     s = set()
 
+    for i in sorted(flatten(sf.treestructure())):
+        # print(i)
+        s.add(i)
+
+    print(s)
+
     print('--- explore results ---')
     for child in sf.children:
         print(child)
 
-        print(child.treestructure())
+        #print(child.treestructure())
         _x = child.dataasobject
-        print(_x.output(outputscheme=outputscheme))
+        print(_x)
+
+        #print(_x.output(outputscheme=outputscheme))
 
     print('--- test 19 ends ---')

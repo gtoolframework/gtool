@@ -157,6 +157,10 @@ class DynamicType(object):
             return None
 
     @classmethod
+    def displayname(cls):
+        return cls.metas()['displayname'] if 'displayname' in cls.metas() else '%s' % cls
+
+    @classmethod
     def formatter(cls):
         _classname = '{}'.format(cls)[6:-2].split('.')[-1] #TODO this is hacky - removes '<class and >'
         #print('formatter: dynamic props', cls.__dynamic_properties__)
