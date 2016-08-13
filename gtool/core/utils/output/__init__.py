@@ -2,7 +2,50 @@ from gtool.core.types.matrix import Matrix
 import gtool.core.types.outputmanagers as om
 import pyparsing as p
 
-def flatten(matrix, sep=', '):
+
+def structureflatten(exp):
+    def sub(exp, res):
+        if type(exp) == dict:
+            for k, v in exp.items():
+                yield from sub(v, res + [k])
+        elif type(exp) == list:
+            for v in exp:
+                yield from sub(v, res)
+        else:
+            yield "/".join(res + [exp])
+
+    yield from sub(exp, [])
+
+def checkalignment(project):
+    s = set()
+
+    for i in sorted(structureflatten(project.treestructure())):
+        # print(i)
+        s.add(i)
+
+    #print(s)
+
+    _maxlen = 0
+    _longest = None
+    for i in s:
+        #print('length:', len(i))
+        if len(i) > _maxlen:
+            _longest = i
+            _maxlen = len(_longest)
+
+    #print(_longest)
+
+    for i in s:
+        if i not in _longest:
+            _exception = 'Found an object structure {0} that does not align with the longest object structure {1}'.format(i, _longest)
+            raise Exception(_exception)
+        else:
+            #print(i, 'is in', _longest)
+            pass
+
+    return True
+
+def matrixflatten(matrix, sep=', '):
     """
     Takes a matrix and flattens it into a list. Matrix must have contiguous vertical use.
     :param matrix: Matrix

@@ -5,6 +5,8 @@ import gtool.core.utils.classprocessor as conf
 #from gtool.namespace import namespace, registerClass
 #from gtool.filewalker import filematch, filematchspace, StructureFactory
 from gtool.core.utils import projectloader
+from gtool.core.utils.output import checkalignment
+import sys
 
 
 def debug(config):
@@ -502,21 +504,6 @@ def test18sub1():
 
 def test18():
 
-    def flatten(exp):
-
-        def sub(exp, res):
-            if type(exp) == dict:
-                for k, v in exp.items():
-                    yield from sub(v, res + [k])
-            elif type(exp) == list:
-                for v in exp:
-                    yield from sub(v, res)
-            else:
-                yield "/".join(res + [exp])
-
-        yield from sub(exp, [])
-
-
     outputscheme = 'output1'
     print('test 18 validates arbitrarily structured data folder structures work properly')
     print('---- testing 18 begins ----')
@@ -580,35 +567,17 @@ def test18():
 
 def test19():
 
-    def flatten(exp):
-
-        def sub(exp, res):
-            if type(exp) == dict:
-                for k, v in exp.items():
-                    yield from sub(v, res + [k])
-            elif type(exp) == list:
-                for v in exp:
-                    yield from sub(v, res)
-            else:
-                yield "/".join(res + [exp])
-
-        yield from sub(exp, [])
-
     outputscheme = 'output1'
     print('test 19 validates data output works')
     print('---- testing 19 begins ----')
 
     sf = projectloader('test\\test19', dbg=False, outputscheme=outputscheme)
 
-    print(sf.treestructure())
-
-    s = set()
-
-    for i in sorted(flatten(sf.treestructure())):
-        # print(i)
-        s.add(i)
-
-    print(s)
+    try:
+        checkalignment(sf)
+    except Exception as err:
+        print(err)
+        sys.exit()
 
     print('--- explore results ---')
     for child in sf.children:

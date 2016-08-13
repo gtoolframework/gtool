@@ -2,7 +2,7 @@ import pyparsing as p
 
 from gtool.core.utils.config import namespace as confignamespace
 from gtool.core.types.matrix import Matrix
-from gtool.core.utils.output import flatten, formatternamespace
+from gtool.core.utils.output import matrixflatten, formatternamespace
 from gtool.core.types.outputmanagers import Filler, AttributeMatch
 from gtool.core.filewalker import registerFileMatcher
 
