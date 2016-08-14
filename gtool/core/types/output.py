@@ -1,4 +1,4 @@
-from gtool.core.utils.output import checkalignment  #utils.output as uo
+from gtool.core.utils.output import checkalignment
 import sys
 
 class Output(object):
@@ -40,3 +40,37 @@ class Output(object):
         :return:
         """
         self.__output__(projectstructure)
+
+class GridOutput(Output):
+    """
+    Output subclass for output that has aligned columns.
+
+    Example
+    =======
+
+    x y z
+    x y
+    x
+    """
+
+    def __init__(self):
+        super(GridOutput, self).__init__(aligned=True)
+
+class TreeOutput(Output):
+    """
+    Output subclass for hierarchical output that may not be aligned.
+
+    Example
+    =======
+
+    a
+     b
+      b
+       c
+    c
+     b
+      a
+    """
+
+    def __init__(self):
+        super(TreeOutput, self).__init__(aligned=False)

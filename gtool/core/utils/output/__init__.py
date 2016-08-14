@@ -2,6 +2,9 @@ from gtool.core.types.matrix import Matrix
 import gtool.core.types.outputmanagers as om
 import pyparsing as p
 
+# TODO move this class to utility library (it's in lots of places)
+def striptoclassname(fullclassstring):
+    return '{0}'.format(fullclassstring)[7:-2].split('.')[-1]
 
 def structureflatten(exp):
     def sub(exp, res):
@@ -16,6 +19,38 @@ def structureflatten(exp):
 
     yield from sub(exp, [])
 
+def findlongest(flatstructure):
+    _maxlen = 0
+    _longest = None
+    for i in flatstructure:
+        # print('length:', len(i))
+        if len(i) > _maxlen:
+            _longest = i
+            _maxlen = len(_longest)
+
+    # print(_longest)
+    return _longest
+
+def reversematch(project=None, matchstring=None):
+
+    def __sub__(matchlist, node, result):
+        _class = striptoclassname(node.__objectmatch__())
+        if _class == matchlist[0] and len(matchlist) == 1:
+            result.append(node.fileobject.path)
+        elif _class == matchlist[0] and len(matchlist) > 1 and len(node.children) > 0:
+            for child in node.children:
+                __sub__(matchlist[1:], child, result)
+
+
+    matchlist = matchstring.split('/')
+    _matches = []
+    for child in project.children:
+        __sub__(matchlist[1:], child, _matches)
+
+    return _matches
+
+
+
 def checkalignment(project):
     s = set()
 
@@ -24,20 +59,15 @@ def checkalignment(project):
         s.add(i)
 
     #print(s)
-
-    _maxlen = 0
-    _longest = None
-    for i in s:
-        #print('length:', len(i))
-        if len(i) > _maxlen:
-            _longest = i
-            _maxlen = len(_longest)
-
-    #print(_longest)
+    _longest = findlongest(s)
 
     for i in s:
         if i not in _longest:
-            _exception = 'Found an object structure {0} that does not align with the longest object structure {1}'.format(i, _longest)
+            _nonmatching = '\n'.join(reversematch(project=project, matchstring=i))
+            _exception = 'Found an object structure {0} ' \
+                         'that does not align with the longest object structure {1}. ' \
+                         'The non-aligned objects can be found at:\n{2}'.format(i, _longest, _nonmatching)
+
             raise Exception(_exception)
         else:
             #print(i, 'is in', _longest)

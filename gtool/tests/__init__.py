@@ -577,7 +577,7 @@ def test19():
         checkalignment(sf)
     except Exception as err:
         print(err)
-        sys.exit()
+        sys.exit(1)
 
     print('--- explore results ---')
     for child in sf.children:

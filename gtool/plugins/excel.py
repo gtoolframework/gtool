@@ -1,9 +1,7 @@
-from gtool.core.types.output import Output
+from gtool.core.types.output import GridOutput
 
-class Exceloutput(Output):
 
-    def __init__(self):
-        super(Exceloutput, self).__init__(aligned=True)
+class Exceloutput(GridOutput):
 
     def __output__(self):
         pass
