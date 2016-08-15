@@ -3,6 +3,10 @@ import gtool.core.types.outputmanagers as om
 import pyparsing as p
 from gtool.core.filewalker import StructureFactory
 from gtool.core.utils.misc import striptoclassname
+from gtool.core.utils.runtime import runtimenamespace
+from gtool.core.utils.config import partialnamespace
+from gtool.core.plugin import pluginnamespace
+#import gtool.core.types.output as outputtypes
 
 def structureflatten(exp):
     """
@@ -52,11 +56,14 @@ def reversematch(project=None, matchstring=None):
     :return: list of paths
     """
 
-    def __sub__(matchlist, node, result):
+    def __sub__(matchlist, node, result, numbering=True):
         #returns results via list reference
         _class = striptoclassname(node.__objectmatch__())
         if _class == matchlist[0] and len(matchlist) == 1:
-            result.append(node.fileobject.path)
+            if numbering:
+                result.append('({0}) {1}'.format(len(result)+1, node.fileobject.path))
+            else:
+                result.append(node.fileobject.path)
         elif _class == matchlist[0] and len(matchlist) > 1 and len(node.children) > 0:
             for child in node.children:
                 __sub__(matchlist[1:], child, result)
@@ -78,6 +85,7 @@ def reversematch(project=None, matchstring=None):
     return _matches
 
 
+# TODO move checkalignment and supporting funcs over to type.output and embedded in Output class
 def checkalignment(project):
 
     if not isinstance(project, StructureFactory.Container):
@@ -94,10 +102,17 @@ def checkalignment(project):
 
     for i in s:
         if i not in _longest:
-            _nonmatching = '\n'.join(reversematch(project=project, matchstring=i))
+            _nonmatching = '\n '.join(reversematch(project=project, matchstring=i))
+            _outputplugin = partialnamespace('output')[runtimenamespace()['outputscheme']]['plugin']
+            # have to compare strings instead of using isinstance to avoid circular imports
+            _treeoutputplugins = '* ' + '\n *'.join(['%s' % k for k,v in pluginnamespace().items() if 'TreeOutput' in str(v.__bases__)])
             _exception = 'Found an object structure {0} ' \
                          'that does not align with the longest object structure {1}. ' \
-                         'The non-aligned objects can be found at:\n{2}'.format(i, _longest, _nonmatching)
+                         'The non-aligned objects can be found at:\n{2}. ' \
+                         '\n\nThis error occured because the output plugin, {3}, requires aligned output. ' \
+                         'If you do not want to align your data structure, please use an output plugin ' \
+                         'that does not require aligned data. Available plugins that do not require ' \
+                         'aligned data include:\n\n{4}'.format(i, _longest, _nonmatching, _outputplugin, _treeoutputplugins)
 
             raise ValueError(_exception)
         else:

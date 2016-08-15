@@ -56,6 +56,9 @@ class GridOutput(Output):
     def __init__(self):
         super(GridOutput, self).__init__(aligned=True)
 
+# WARNING DO NOT RENAME THIS CLASS - there is a static text value in
+# core.utils.output.checkalignment that is used to determine class lineage
+# without a circular import occuring
 class TreeOutput(Output):
     """
     Output subclass for hierarchical output that may not be aligned. Must override self.__output__

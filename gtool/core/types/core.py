@@ -288,7 +288,7 @@ class DynamicType(object):
         return self.integrate(formatlist=formatlist, outputscheme=outputscheme, separator=separator)
     """
 
-    def __outputscheme__(self):
+    def __classoutputscheme__(self):
         return formatternamespace()[striptoclassname(self.__class__)]
 
     def output(self):
