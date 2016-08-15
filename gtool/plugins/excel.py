@@ -1,7 +1,7 @@
 from gtool.core.types.output import GridOutput
 
 
-class Exceloutput(GridOutput):
+class Excel(GridOutput):
 
     def __output__(self):
         pass
@@ -10,4 +10,4 @@ class Exceloutput(GridOutput):
         pass
 
 def load():
-    return Exceloutput
+    return Excel

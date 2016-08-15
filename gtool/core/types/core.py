@@ -5,6 +5,9 @@ from gtool.core.types.matrix import Matrix
 from gtool.core.utils.output import matrixflatten, formatternamespace
 from gtool.core.types.outputmanagers import Filler, AttributeMatch
 from gtool.core.filewalker import registerFileMatcher
+from gtool.core.utils.misc import striptoclassname
+from gtool.core.utils.runtime import runtimenamespace
+from gtool.core.utils.config import partialnamespace
 
 
 class CoreType(object):
@@ -252,6 +255,7 @@ class DynamicType(object):
         _formatlist = self.formatter()
         return self.integrate(formatlist=_formatlist, outputscheme=outputscheme, separator=separator)
 
+    """
     def __output2__(self, outputscheme=None, separatoroverride=None, matrix=None):
         #--- validation section ---
         if not 'output' in confignamespace():
@@ -282,9 +286,17 @@ class DynamicType(object):
         #print(confignamespace()['output'][outputscheme])
         formatlist = self.formatter()
         return self.integrate(formatlist=formatlist, outputscheme=outputscheme, separator=separator)
+    """
 
-    def output(self, outputscheme=None):
-        return self.__output__(outputscheme=outputscheme)
+    def __outputscheme__(self):
+        return formatternamespace()[striptoclassname(self.__class__)]
+
+    def output(self):
+        #print(self.__outputscheme__())
+        #return self.__output__()
+        #print(runtimenamespace()['outputscheme'])
+        print(partialnamespace('output')[runtimenamespace()['outputscheme']])
+        pass
 
     """
     def outputaslist(self, outputscheme=None):

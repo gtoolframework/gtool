@@ -7,6 +7,7 @@ from .classprocessor import readClass, processClass, debugClass
 from .config import configloader
 from gtool.core.namespace import namespace
 from gtool.core.utils.output import parseformat, registerFormatter
+from gtool.core.utils.runtime import registerruntimeoption
 
 def projectloader(projectroot, dbg=False, outputscheme=None):
 
@@ -23,8 +24,14 @@ def projectloader(projectroot, dbg=False, outputscheme=None):
     loadplugins(projectpluginroot)
     configloader(projectconfigpath)
 
+    if outputscheme is not None:
+        registerruntimeoption('outputscheme', outputscheme)
+    if dbg:
+        registerruntimeoption('debug', dbg)
+
     __loadclasses(projectclassroot, dbg=dbg)
     # loading output parser can only occur after all classes are loaded
+
     __outputparser(namespace(), outputscheme=outputscheme) #TODO make this a functional style call <-- return namespace from __loadclasses
     return StructureFactory.treewalk(projectdataroot) # returns the project data
 
@@ -41,7 +48,17 @@ def __outputparser(globalnamespace, outputscheme=None):
     #print('Namespace:...')
     for k, v in globalnamespace.items():
         #print(k, ':', v.metas()[outputscheme])
-        registerFormatter(k, parseformat(classname=k, formatstring=v.metas()[outputscheme]))
+
+        outputbasename = 'output'
+        outputschemeseparator = '.'
+        # use the specified outscheme but if not available use the default
+        _outputscheme = outputbasename + outputschemeseparator + outputscheme
+        formatstring = v.metas()[_outputscheme] if _outputscheme in v.metas() else v.metas()[outputbasename]
+        _formatter = parseformat(classname=k, formatstring=formatstring)
+        registerFormatter(k, _formatter)
+
+        #print(k, ':', _formatter)
+
         #print(parseformat(v.metas()[outputscheme]))
 
 def __loadclass(classpath, dbg=False):

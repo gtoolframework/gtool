@@ -26,7 +26,7 @@ class Output(object):
         if self.__aligned__:
             try:
                 checkalignment(projectstructure)
-            except Exception as err:
+            except ValueError as err:
                 print(err)
                 sys.exit()
 
@@ -43,7 +43,7 @@ class Output(object):
 
 class GridOutput(Output):
     """
-    Output subclass for output that has aligned columns.
+    Output subclass for output that has aligned columns. Must override self.__output__
 
     Example
     =======
@@ -58,7 +58,7 @@ class GridOutput(Output):
 
 class TreeOutput(Output):
     """
-    Output subclass for hierarchical output that may not be aligned.
+    Output subclass for hierarchical output that may not be aligned. Must override self.__output__
 
     Example
     =======

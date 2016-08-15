@@ -1,12 +1,15 @@
 from gtool.core.types.matrix import Matrix
 import gtool.core.types.outputmanagers as om
 import pyparsing as p
-
-# TODO move this class to utility library (it's in lots of places)
-def striptoclassname(fullclassstring):
-    return '{0}'.format(fullclassstring)[7:-2].split('.')[-1]
+from gtool.core.filewalker import StructureFactory
+from gtool.core.utils.misc import striptoclassname
 
 def structureflatten(exp):
+    """
+    flattens a list or dict in strings
+    :param exp: list or dict
+    :return: list of strings
+    """
     def sub(exp, res):
         if type(exp) == dict:
             for k, v in exp.items():
@@ -20,8 +23,18 @@ def structureflatten(exp):
     yield from sub(exp, [])
 
 def findlongest(flatstructure):
+    """
+    From a set of unique strings returns the longest
+    :param flatstructure: set of strings
+    :return: longest string
+    """
+    if not isinstance(flatstructure, set):
+        raise TypeError('findlongest function expected an arg'
+                         'that is of type set but got a %s' % type(flatstructure))
+
     _maxlen = 0
     _longest = None
+
     for i in flatstructure:
         # print('length:', len(i))
         if len(i) > _maxlen:
@@ -32,8 +45,15 @@ def findlongest(flatstructure):
     return _longest
 
 def reversematch(project=None, matchstring=None):
+    """
+    Finds objects that meet the structure in the matchstring
+    :param project: structurefactory object
+    :param matchstring: string from structureflatten
+    :return: list of paths
+    """
 
     def __sub__(matchlist, node, result):
+        #returns results via list reference
         _class = striptoclassname(node.__objectmatch__())
         if _class == matchlist[0] and len(matchlist) == 1:
             result.append(node.fileobject.path)
@@ -41,6 +61,14 @@ def reversematch(project=None, matchstring=None):
             for child in node.children:
                 __sub__(matchlist[1:], child, result)
 
+
+    if not isinstance(project, StructureFactory.Container):
+        raise TypeError('function reversematch expected a project kwarg of type'
+                        'StructureFactory.Container but received an object of type %s' % type(project))
+
+    if not isinstance(matchstring, str):
+        raise TypeError('function reversematch expected a matchstring kwarg of'
+                        'type str but got a %s', type(matchstring))
 
     matchlist = matchstring.split('/')
     _matches = []
@@ -50,8 +78,11 @@ def reversematch(project=None, matchstring=None):
     return _matches
 
 
-
 def checkalignment(project):
+
+    if not isinstance(project, StructureFactory.Container):
+        raise TypeError('function checkalignment expected an arg of type StructureFactory.Container but received an object of type %s' % type(project))
+
     s = set()
 
     for i in sorted(structureflatten(project.treestructure())):
@@ -68,12 +99,13 @@ def checkalignment(project):
                          'that does not align with the longest object structure {1}. ' \
                          'The non-aligned objects can be found at:\n{2}'.format(i, _longest, _nonmatching)
 
-            raise Exception(_exception)
+            raise ValueError(_exception)
         else:
             #print(i, 'is in', _longest)
             pass
 
     return True
+
 
 def matrixflatten(matrix, sep=', '):
     """

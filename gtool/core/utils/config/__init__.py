@@ -34,6 +34,15 @@ def configloader(configpath):
         #else:
         #    print('%s config section registered' % section)
 
+def partialnamespace(prefix):
+    """
+    returns a subset of the namespace that contains keys starting with the provided prefix
+    :param prefix: string containing prefix
+    :return: dict that is a subset of the config namespace
+    """
+    sep = '.' #TODO move constant to central library
+    return {k[len(prefix + sep):]: v for k, v in namespace().items() if k.startswith(prefix + sep)}
+
 #--- initialize namespace
 
 globals()[namespacename()] = dict()

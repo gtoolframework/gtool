@@ -567,15 +567,15 @@ def test18():
 
 def test19():
 
-    outputscheme = 'output1'
-    print('test 19 validates data output works')
+    outputscheme = '1'
+    print('test 19 validates data alignment works')
     print('---- testing 19 begins ----')
 
     sf = projectloader('test\\test19', dbg=False, outputscheme=outputscheme)
 
     try:
         checkalignment(sf)
-    except Exception as err:
+    except ValueError as err:
         print(err)
         sys.exit(1)
 
@@ -587,6 +587,33 @@ def test19():
         _x = child.dataasobject
         print(_x)
 
-        #print(_x.output(outputscheme=outputscheme))
+        print(_x.output())
 
     print('--- test 19 ends ---')
+
+
+def test20():
+
+    outputscheme = '1'
+    print('test 20 validates data alignment works')
+    print('---- testing 20 begins ----')
+
+    sf = projectloader('test\\test20', dbg=False, outputscheme=outputscheme)
+
+    try:
+        checkalignment(sf)
+    except ValueError as err:
+        print(err)
+        sys.exit(1)
+
+    print('--- explore results ---')
+    for child in sf.children:
+        print(child)
+
+        #print(child.treestructure())
+        _x = child.dataasobject
+        #print(_x)
+
+        print(_x.output())
+
+    print('--- test 20 ends ---')
