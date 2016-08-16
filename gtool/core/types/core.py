@@ -11,6 +11,9 @@ from gtool.core.utils.config import partialnamespace
 
 
 class CoreType(object):
+    """
+    CoreType is the base object for all attribute types
+    """
 
     def __init__(self, *args, **kwargs):
         self.__valuetype__ = kwargs.pop('valuetype', None)
@@ -137,6 +140,9 @@ class CoreType(object):
     """
 
 class DynamicType(object):
+    """
+    base object for dynamically generated classes
+    """
 
     @classmethod
     def classfile(cls):
@@ -165,7 +171,7 @@ class DynamicType(object):
 
     @classmethod
     def formatter(cls):
-        _classname = '{}'.format(cls)[6:-2].split('.')[-1] #TODO this is hacky - removes '<class and >'
+        _classname = '{}'.format(cls)[6:-2].split('.')[-1] #TODO this is hacky - removes '<class and >' - use striptoclassname
         #print('formatter: dynamic props', cls.__dynamic_properties__)
         #print('formatter: list slots:', cls.__list_slots__)
         #for k, v in cls.__list_slots__.items():
@@ -196,6 +202,7 @@ class DynamicType(object):
             #print(outstring)
         return outstring
 
+    """
     def _integrate(self, formatlist=None, separator=" ", outputscheme=None):
         #print('integrate seperator: *%s*' % separator)
 
@@ -222,6 +229,7 @@ class DynamicType(object):
             _retmatrix.insert(cursor=(0,0),datalist=[_outstring])
 
         return _retmatrix
+    """
 
     def __output__(self, outputscheme=None, separatoroverride=None, listmode=False):
         #--- validation section ---
@@ -295,7 +303,8 @@ class DynamicType(object):
         #print(self.__outputscheme__())
         #return self.__output__()
         #print(runtimenamespace()['outputscheme'])
-        print(partialnamespace('output')[runtimenamespace()['outputscheme']])
+        #print(partialnamespace('output')[runtimenamespace()['outputscheme']])
+        print(self.__classoutputscheme__())
         pass
 
     """

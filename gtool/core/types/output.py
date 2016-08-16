@@ -1,5 +1,6 @@
 from gtool.core.utils.output import checkalignment
 import sys
+from gtool.core.filewalker import StructureFactory
 
 class Output(object):
 
@@ -11,6 +12,20 @@ class Output(object):
         if aligned is None:
             raise NotImplemented('Output classes must explicitly see aligned as True or False')
         self.__aligned__ = aligned
+
+    def output(self, projectstructure):
+        """
+        Final output generator, should not be overriden without a call to isaligned() and __output__()
+        :param projectstructure: a structurefactory object
+        :return:
+        """
+
+        if not isinstance(projectstructure, StructureFactory.Container):
+            raise TypeError('Expected StructureFactory.Container as argument but got %s' % type(projectstructure))
+
+        self.isaligned(projectstructure)
+
+        self.__output__(projectstructure)
 
     def isaligned(self, projectstructure):
         """
@@ -32,14 +47,6 @@ class Output(object):
 
     def __output__(self, projectstructure):
         raise NotImplementedError('Output classes must implement __output__')
-
-    def output(self, projectstructure):
-        """
-        Final output generator, should not be overriden without a call to __output__()
-        :param projectstructure: a structurefactory object
-        :return:
-        """
-        self.__output__(projectstructure)
 
 class GridOutput(Output):
     """

@@ -205,6 +205,11 @@ class StructureFactory(object):
         """
 
         @property
+        def dataasobject(self):
+            # TODO is this right?
+            return [child.dataasobject for child in self.children]
+
+        @property
         def __data__(self):
             return '%s' % self.__name__
 

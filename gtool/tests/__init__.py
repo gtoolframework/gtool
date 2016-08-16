@@ -6,6 +6,7 @@ import gtool.core.utils.classprocessor as conf
 #from gtool.filewalker import filematch, filematchspace, StructureFactory
 from gtool.core.utils import projectloader
 from gtool.core.utils.output import checkalignment
+from gtool.core.plugin import pluginnamespace
 import sys
 
 
@@ -587,8 +588,6 @@ def test19():
         _x = child.dataasobject
         print(_x)
 
-        print(_x.output())
-
     print('--- test 19 ends ---')
 
 
@@ -607,13 +606,20 @@ def test20():
         sys.exit(1)
 
     print('--- explore results ---')
+
+    o = pluginnamespace()['EXCEL']()
+
+    o.output(sf)
+
+    """
     for child in sf.children:
-        print(child)
+        #print(child)
 
         #print(child.treestructure())
         _x = child.dataasobject
         #print(_x)
-
-        print(_x.output())
+        _x.output()
+        #print(_x.output()
+    """
 
     print('--- test 20 ends ---')

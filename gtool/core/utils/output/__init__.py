@@ -84,8 +84,7 @@ def reversematch(project=None, matchstring=None):
 
     return _matches
 
-
-# TODO move checkalignment and supporting funcs over to type.output and embedded in Output class
+# TODO move checkalignment and supporting funcs over to type.output and embedded in Output class (may cause problems due to import of pluginnamespace
 def checkalignment(project):
 
     if not isinstance(project, StructureFactory.Container):
