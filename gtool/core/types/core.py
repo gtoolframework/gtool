@@ -169,6 +169,7 @@ class DynamicType(object):
     def displayname(cls):
         return cls.metas()['displayname'] if 'displayname' in cls.metas() else '%s' % cls
 
+    """
     @classmethod
     def formatter(cls):
         _classname = '{}'.format(cls)[6:-2].split('.')[-1] #TODO this is hacky - removes '<class and >' - use striptoclassname
@@ -178,9 +179,11 @@ class DynamicType(object):
         #    print(k, ':', v.isdynamic) # isinstance(v.__lazyloadclass__()(), DynamicType))
 
         return formatternamespace()[_classname]
+    """
 
     # TODO determine which methods from utils.classgen.methods can be moved in here
 
+    """"
     def integrate(self, formatlist=None, separator=" ", outputscheme=None):
         #print('integrate seperator: *%s*' % separator)
         outstring = ""
@@ -201,6 +204,7 @@ class DynamicType(object):
                 outstring += '||'
             #print(outstring)
         return outstring
+    """
 
     """
     def _integrate(self, formatlist=None, separator=" ", outputscheme=None):
@@ -231,6 +235,7 @@ class DynamicType(object):
         return _retmatrix
     """
 
+    """
     def __output__(self, outputscheme=None, separatoroverride=None, listmode=False):
         #--- validation section ---
         if not 'output' in confignamespace():
@@ -262,6 +267,7 @@ class DynamicType(object):
 
         _formatlist = self.formatter()
         return self.integrate(formatlist=_formatlist, outputscheme=outputscheme, separator=separator)
+    """
 
     """
     def __output2__(self, outputscheme=None, separatoroverride=None, matrix=None):
