@@ -178,6 +178,14 @@ class Matrix(object):
             yield row
 
     def insert(self, cursor=(0,0), datalist=None, healthcheck=True):
+        """
+        Inserts datalist at location specified by cursor.
+        If no cursor if provided, default cursor of 0,0 will be assumed
+        :param cursor: tuple (x,y)
+        :param datalist: list
+        :param healthcheck: Boolean
+        :return: string
+        """
         x, y = cursor
         if datalist is None or not isinstance(datalist, list):
             raise ValueError('Was expecting to insert a list but got a %s' % type(datalist))
@@ -211,11 +219,11 @@ class Matrix(object):
         try:
             self.__storage__[y][x:_x_end] = datalist
         except:
-            raise Exception('An error occured when attempting to insert a row into the matrix')
+            raise Exception('An error occured when attempting to insert data into the matrix')
 
-        #TODO update cursor
+        # update cursor
         self.__current_row__ = y
-        self.__current_col__ = x + len(datalist) + 1
+        self.__current_col__ = x + len(datalist) # + 1
 
         if healthcheck is True:
             self.healthcheck()

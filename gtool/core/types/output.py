@@ -93,7 +93,7 @@ class GridOutput(Output):
     def fillerprocess(self, fillerobj):
         return '%s' % fillerobj.__fillertext__
 
-    def attribprocess(self, attribobj, obj=None, sep=" ", outputscheme=None, flat=False):
+    def attribprocess(self, attribobj, obj=None, sep=" ", outputscheme=None, flat=False, result=Matrix()):
         if obj is None:
             raise TypeError('Expected an object in obj kwarg')
         # TODO type check object
@@ -109,24 +109,39 @@ class GridOutput(Output):
             #raise NotImplementedError('still working on Attributematch.process')
             return 'monkey'
 
-    def integrate(self, obj, formatlist=None, separator=" ", outputscheme=None):
+    def integrate(self, obj, result=Matrix(), formatlist=None, separator=" ", outputscheme=None):
         #print('integrate seperator: *%s*' % separator)
         outstring = ""
 
         _obj = obj
 
+        print(result.cursor)
+
+        c = result.cursor
+
         for i, cell in enumerate(formatlist):
+            _outstring = ""
             for element in cell:
                 if isinstance(element, Filler):
-                    outstring += self.fillerprocess(element)
+                    _outstring += self.fillerprocess(element)
 
                 if isinstance(element, AttributeMatch):
-                    outstring += self.attribprocess(element, obj=_obj, sep=separator, outputscheme=outputscheme)
+                    _outstring += self.attribprocess(element, obj=_obj, sep=separator, outputscheme=outputscheme)
+
+            _x = []
+            _x.append(_outstring)
+            result.insert(datalist=_x, cursor=c)
+            c = result.cursor
+
+            outstring += _outstring
+
+
 
             if (i + 1) == len(formatlist):
                 pass
             else:
                 outstring += '||'
+
             #print(outstring)
         return outstring
 
@@ -153,7 +168,12 @@ class GridOutput(Output):
 
             #_formatlist = self.formatter()
             _formatlist = obj.__classoutputscheme__()
-            return self.integrate(obj, formatlist=_formatlist, outputscheme=outputscheme, separator=separator)
+            # TODO add a len() method to dynamic class type to help with matrix width sizing
+            _result = Matrix(startheight=10, startwidth=10)
+            _ret = self.integrate(obj, formatlist=_formatlist, outputscheme=outputscheme, separator=separator, result=_result)
+            for row in _result:
+                print(row)
+            return _ret
 
         if isinstance(obj, list):
             return [sub(self, _obj, separatoroverride=separatoroverride, listmode=listmode) for _obj in obj]
