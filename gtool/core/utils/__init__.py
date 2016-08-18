@@ -25,7 +25,7 @@ def projectloader(projectroot, dbg=False, outputscheme=None):
     configloader(projectconfigpath)
 
     if outputscheme is not None:
-        registerruntimeoption('outputscheme', outputscheme)
+        registerruntimeoption('outputscheme', outputscheme) # TODO confirm outputscheme exists
     if dbg:
         registerruntimeoption('debug', dbg)
 

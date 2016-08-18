@@ -1,9 +1,9 @@
 import pyparsing as p
 
-from gtool.core.utils.config import namespace as confignamespace
+#from gtool.core.utils.config import namespace as confignamespace
 from gtool.core.types.matrix import Matrix
 from gtool.core.utils.output import matrixflatten, formatternamespace
-from gtool.core.types.outputmanagers import Filler, AttributeMatch
+#from gtool.core.types.outputmanagers import Filler, AttributeMatch
 from gtool.core.filewalker import registerFileMatcher
 from gtool.core.utils.misc import striptoclassname
 from gtool.core.utils.runtime import runtimenamespace
@@ -305,6 +305,7 @@ class DynamicType(object):
     def __classoutputscheme__(self):
         return formatternamespace()[striptoclassname(self.__class__)]
 
+    """
     def output(self):
         #print(self.__outputscheme__())
         #return self.__output__()
@@ -312,6 +313,7 @@ class DynamicType(object):
         #print(partialnamespace('output')[runtimenamespace()['outputscheme']])
         print(self.__classoutputscheme__())
         pass
+    """
 
     """
     def outputaslist(self, outputscheme=None):

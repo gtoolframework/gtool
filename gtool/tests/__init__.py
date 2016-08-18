@@ -609,7 +609,7 @@ def test20():
 
     o = pluginnamespace()['EXCEL']()
 
-    o.output(sf)
+    print(o.output(sf))
 
     """
     for child in sf.children:

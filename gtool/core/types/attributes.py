@@ -69,7 +69,7 @@ class attribute(object):
 
     @property
     def isdynamic(self):
-        #print('isdynamic:', self.__init__)
+        # do a lazy load and initialize the object otherwise type returns type
         return isinstance(self.__lazyloadclass__()(), DynamicType)
 
     def __convert__(self, value):

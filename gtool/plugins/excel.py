@@ -6,8 +6,9 @@ class Excel(GridOutput):
     def __output__(self, projectstructure):
         # TODO call Super and use results
         x = projectstructure.dataasobject
-        for i in x:
-            print(i)
+        #for i in x:
+        #    print(i)
+        return self.__xoutput__(x)
 
 def load():
     return Excel

@@ -8,6 +8,9 @@ from gtool.core.utils.config import partialnamespace
 from gtool.core.plugin import pluginnamespace
 #import gtool.core.types.output as outputtypes
 
+def outputconfigname(outputscheme=str()):
+    return 'output.' + outputscheme
+
 def structureflatten(exp):
     """
     flattens a list or dict in strings
