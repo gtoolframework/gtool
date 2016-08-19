@@ -93,7 +93,7 @@ class GridOutput(Output):
     def fillerprocess(self, fillerobj):
         return '%s' % fillerobj.__fillertext__
 
-    def attribprocess(self, attribobj, obj=None, sep=" ", outputscheme=None, flat=False, result=Matrix()):
+    def attribprocess(self, attribobj, obj=None, sep=" ", outputscheme=None, flat=False):
         if obj is None:
             raise TypeError('Expected an object in obj kwarg')
         # TODO type check object
@@ -102,7 +102,9 @@ class GridOutput(Output):
                 obj.__class__, attribobj.__attrname__))
 
         if not getattr(obj, attribobj.__attrname__).isdynamic:
-            return sep.join(['%s' % f for f in getattr(obj, attribobj.__attrname__)])
+            _ret = sep.join(['%s' % f for f in getattr(obj, attribobj.__attrname__)])
+
+            return _ret
         #elif flat:
         #    return sep.join([f.output(outputscheme=outputscheme) for f in getattr(obj, self.__attrname__)])
         else:
@@ -115,22 +117,29 @@ class GridOutput(Output):
 
         _obj = obj
 
-        print(result.cursor)
-
+        #print(result.cursor)
+        q = []
         c = result.cursor
 
         for i, cell in enumerate(formatlist):
             _outstring = ""
             for element in cell:
                 if isinstance(element, Filler):
-                    _outstring += self.fillerprocess(element)
+                    _x = self.fillerprocess(element)
+                    q.append(_x)
+                    _outstring += _x
 
                 if isinstance(element, AttributeMatch):
-                    _outstring += self.attribprocess(element, obj=_obj, sep=separator, outputscheme=outputscheme)
+                    if getattr(obj, element.__attrname__).isdynamic:
+                        for dynobj in getattr(obj, element.__attrname__):
+                            _x = self.__xoutput__(dynobj) #, grid=result)
+                            q.append(_x)
+                    else:
+                        _x = self.attribprocess(element, obj=_obj, sep=separator, outputscheme=outputscheme)
+                        q.append(_x)
+                        _outstring += _x
 
-            _x = []
-            _x.append(_outstring)
-            result.insert(datalist=_x, cursor=c)
+            result.insert(datalist=[_outstring], cursor=c)
             c = result.cursor
 
             outstring += _outstring
@@ -141,13 +150,18 @@ class GridOutput(Output):
                 pass
             else:
                 outstring += '||'
+                q.append('**')
 
             #print(outstring)
+
+
+        print('q:', q)
+        result.carriagereturn()
         return outstring
 
-    def __xoutput__(self, obj, separatoroverride=None, listmode=False): #outputscheme=None,
+    def __xoutput__(self, obj, separatoroverride=None, listmode=False, grid=Matrix(startheight=10, startwidth=20)): #outputscheme=None,
 
-        def sub(self, obj, separatoroverride=None, listmode=False):
+        def sub(self, obj, separatoroverride=None, listmode=False, results=Matrix()):
             outputscheme_id = runtimenamespace()['outputscheme']
             outputscheme = outputconfigname(outputscheme_id)
             outputconfig = confignamespace()[outputconfigname(outputscheme_id)]
@@ -169,16 +183,22 @@ class GridOutput(Output):
             #_formatlist = self.formatter()
             _formatlist = obj.__classoutputscheme__()
             # TODO add a len() method to dynamic class type to help with matrix width sizing
-            _result = Matrix(startheight=10, startwidth=10)
-            _ret = self.integrate(obj, formatlist=_formatlist, outputscheme=outputscheme, separator=separator, result=_result)
-            for row in _result:
-                print(row)
+            #_result = Matrix(startheight=10, startwidth=10)
+            _ret = self.integrate(obj, formatlist=_formatlist, outputscheme=outputscheme, separator=separator, result=results)
+            #for row in results:
+            #    print(row)
             return _ret
 
+        #grid = Matrix(startheight=40, startwidth=20)
         if isinstance(obj, list):
-            return [sub(self, _obj, separatoroverride=separatoroverride, listmode=listmode) for _obj in obj]
+            _ret = [sub(self, _obj, separatoroverride=separatoroverride, listmode=listmode, results=grid) for _obj in obj]
         else:
-            return sub(self, obj, separatoroverride=separatoroverride, listmode=listmode)
+            _ret = sub(self, obj, separatoroverride=separatoroverride, listmode=listmode, results=grid)
+
+        #for row in grid:
+        #    print(row)
+
+        return grid #_ret
 
 # WARNING DO NOT RENAME THIS CLASS - there is a static text value in
 # core.utils.output.checkalignment that is used to determine class lineage

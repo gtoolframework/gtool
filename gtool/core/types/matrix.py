@@ -266,6 +266,28 @@ class Matrix(object):
             raise TypeError('Was expecting an integer but got a', type(y))
         return self.__storage__[y]
 
+    def nextrow(self):
+        """
+        Go to the next row, same column (syntactic sugar)
+        :return:
+        """
+        self.__current_row__ += 1
+
+    def returntofirst(self):
+        """
+        Go to first column but stay in current row (syntactic sugar)
+        :return:
+        """
+        self.__current_col__ = 0
+
+    def carriagereturn(self):
+        """
+        Go to first column, next row (synactic sugar)
+        :return:
+        """
+        self.nextrow()
+        self.returntofirst()
+
     def __matrixmap__(self, trim=True):
         # returns a matrix of the same size but shows how much data is
         _retmatrix = Matrix(startwidth=self.__h_utilization__(), startheight=self.__v_utilization__())
