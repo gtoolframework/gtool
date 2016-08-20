@@ -90,6 +90,11 @@ class GridOutput(Output):
         return formatternamespace()[_classname]
     """
 
+    class Separator(object):
+
+        def __repr__(self):
+            return '||'
+
     def fillerprocess(self, fillerobj):
         return '%s' % fillerobj.__fillertext__
 
@@ -150,7 +155,7 @@ class GridOutput(Output):
                 pass
             else:
                 outstring += '||'
-                q.append('**')
+                q.append(self.Separator())
 
             #print(outstring)
 

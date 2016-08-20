@@ -180,15 +180,22 @@ def parseformat(classname=None, formatstring=None):
             start = match[1]
             end = match[2]
 
-            _templist.append(om.Filler(cell[prestart:start]))
+            _start = cell[prestart:start]
+            if len(_start) > 0:
+                # avoids empty leading output cells
+                _templist.append(om.Filler(_start))
             _templist.append(om.AttributeMatch(cell[start + 1:end], classname=classname))
             prestart = end
             # print('templist:', _templist)
-        _templist.append(om.Filler(cell[end:]))
+        _end = cell[end:]
+        if len(_end) > 0:
+            # avoids empty trailing output cells
+            _templist.append(om.Filler(cell[end:]))
         cells.append(_templist)
 
     return cells
 
+"""
 def descend(rootclass=None, recursionlist=[], recursionmembers=[], recusionlimit=0):
     if rootclass is None:
         raise ValueError('rootclass argument required but not provided')
@@ -198,7 +205,7 @@ def descend(rootclass=None, recursionlist=[], recursionmembers=[], recusionlimit
     recursionlist.append(rootclass)
 
     return
-
+"""
 # --- static ---
 
 def formatters():
