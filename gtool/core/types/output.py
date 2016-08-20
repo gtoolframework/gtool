@@ -136,9 +136,11 @@ class GridOutput(Output):
 
                 if isinstance(element, AttributeMatch):
                     if getattr(obj, element.__attrname__).isdynamic:
+                        _startrow = result.currentrow
                         for dynobj in getattr(obj, element.__attrname__):
                             _x = self.__xoutput__(dynobj) #, grid=result)
                             q.append(_x)
+                        result.currentrow = _startrow
                     else:
                         _x = self.attribprocess(element, obj=_obj, sep=separator, outputscheme=outputscheme)
                         q.append(_x)
@@ -148,9 +150,6 @@ class GridOutput(Output):
             c = result.cursor
 
             #outstring += _outstring
-
-
-
             if (i + 1) == len(formatlist):
                 pass
             else:
@@ -158,8 +157,6 @@ class GridOutput(Output):
                 q.append(self.Separator())
 
             #print(outstring)
-
-
         #print('q:', q)
         result.carriagereturn()
         return q
@@ -189,16 +186,26 @@ class GridOutput(Output):
             _formatlist = obj.__classoutputscheme__()
             # TODO add a len() method to dynamic class type to help with matrix width sizing
             #_result = Matrix(startheight=10, startwidth=10)
-            _ret = self.integrate(obj, formatlist=_formatlist, outputscheme=outputscheme, separator=separator, result=results)
+            _ret = self.integrate(obj,
+                                  formatlist=_formatlist,
+                                  outputscheme=outputscheme,
+                                  separator=separator,
+                                  result=results)
             #for row in results:
             #    print(row)
             return _ret
 
         #grid = Matrix(startheight=40, startwidth=20)
         if isinstance(obj, list):
-            _ret = [sub(self, _obj, separatoroverride=separatoroverride, listmode=listmode, results=grid) for _obj in obj]
+            _ret = [sub(self, _obj,
+                        separatoroverride=separatoroverride,
+                        listmode=listmode,
+                        results=grid) for _obj in obj]
         else:
-            _ret = sub(self, obj, separatoroverride=separatoroverride, listmode=listmode, results=grid)
+            _ret = sub(self, obj,
+                        separatoroverride=separatoroverride,
+                        listmode=listmode,
+                        results=grid)
 
         print(_ret)
         #for row in grid:

@@ -11,13 +11,31 @@ class Matrix(object):
         # x,y position
         return (self.__current_col__, self.__current_row__)
 
-    @property
-    def currentrow(self):
+    def get_currentrow(self):
         return self.__current_row__
 
-    @property
-    def currentcol(self):
+    def set_currentrow(self, y):
+        if not isinstance(y, int):
+            raise TypeError('y arg to set current cursor row must be an int but got a', type(y))
+        if y > self.__height__() - 1:
+            raise IndexError('y is outside of matrix vertical bounds')
+        self.__current_row__ = y
+
+    currentrow = property(get_currentrow, set_currentrow)
+    y = property(get_currentrow, set_currentrow)
+
+    def get_currentcol(self):
         return self.__current_col__
+
+    def set_currentcol(self, x):
+        if not isinstance(x, int):
+            raise TypeError('x arg to set current cursor column must be an int but got a', type(x))
+        if x > self.__width__() - 1:
+            raise IndexError('x is outside of matrix horizontal bounds')
+        self.__current_row__ = x
+
+    currentcol = property(get_currentcol, set_currentcol)
+    x = property(get_currentcol, set_currentcol)
 
     def __height__(self):
         return len(self.__storage__)
