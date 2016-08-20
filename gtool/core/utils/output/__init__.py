@@ -182,14 +182,14 @@ def parseformat(classname=None, formatstring=None):
 
             _start = cell[prestart:start]
             if len(_start) > 0:
-                # avoids empty leading output cells
+                # conditional logic avoids empty leading output cells
                 _templist.append(om.Filler(_start))
-            _templist.append(om.AttributeMatch(cell[start + 1:end], classname=classname))
+            _templist.append(om.AttributeMatch(cell[start + 1:end])) #, classname=classname))
             prestart = end
             # print('templist:', _templist)
         _end = cell[end:]
         if len(_end) > 0:
-            # avoids empty trailing output cells
+            # conditional logic avoids empty trailing output cells
             _templist.append(om.Filler(cell[end:]))
         cells.append(_templist)
 

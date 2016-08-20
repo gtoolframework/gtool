@@ -19,7 +19,7 @@ class Filler(object):
 
 
 class AttributeMatch(object):
-    def __init__(self, attrname, classname=""):
+    def __init__(self, attrname): #, classname=""):
         self.__concatmode__ = True if attrname[0] == '+' else False
         self.__attrname__ = attrname[1:] if self.__concatmode__ is True else attrname
         # print('__AttributeMatch:', self.__attrname__, 'concat mode:', self.__concatmode__)

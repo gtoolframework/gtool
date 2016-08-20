@@ -54,7 +54,7 @@ def __outputparser(globalnamespace, outputscheme=None):
         # use the specified outscheme but if not available use the default
         _outputscheme = outputbasename + outputschemeseparator + outputscheme
         formatstring = v.metas()[_outputscheme] if _outputscheme in v.metas() else v.metas()[outputbasename]
-        _formatter = parseformat(classname=k, formatstring=formatstring)
+        _formatter = parseformat(formatstring=formatstring) #, classname=k)
         registerFormatter(k, _formatter)
 
         #print(k, ':', _formatter)
