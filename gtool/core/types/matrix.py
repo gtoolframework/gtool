@@ -28,7 +28,10 @@ class Matrix(object):
 
     def __width__(self):
         #assumes matrix is uniformly sized
-        return len(self.__storage__[0])
+        if len(self.__storage__) > 0:
+            return len(self.__storage__[0])
+        else:
+            return 0
 
     @property
     def width(self):
@@ -59,13 +62,16 @@ class Matrix(object):
     def __v_utilization__(self):
         colheight = len(self.__storage__)
         for i, row in enumerate(self.__storage__):
-            if any(x is not None for x in self.__storage__[-i+1]):
+            if any(x is not None for x in self.__storage__[-(i+1)]):
                 return colheight - (i+1)
         return 0 #default if no utilization
 
     def __v_utilization_percentage__(self):
         colheight = self.__v_utilization__()
-        return round(colheight/ colheight, 2)
+        if colheight == 0:
+            return 0
+        else:
+            return round(colheight/ colheight, 2)
 
     def utilization(self):
         # return x,y utilization
@@ -90,7 +96,8 @@ class Matrix(object):
 
     def trim(self):
         """
-        Trims unused space from the right (highest X coord) and bottom (highest Y coord) sides of the matrix
+        Trims unused space from the right (highest X coord) and bottom (highest Y coord) sides of the matrix.
+        Will prevent the matrix from being destroyed by trimming to zero width and length
         :return: True if trimming occurred.
         """
 
@@ -113,12 +120,22 @@ class Matrix(object):
                 except:
                     raise Exception('Could not delete columns in row %s from the matrix' % i)
 
+        # check that Matrix still exists and if not rebuild
+        if not self.__height__() > 0:
+            self.__storage__ = [[None]]
+
+        # make sure cursor is back in Y bounds
+        if self.__height__() - 1 < self.__current_row__:
+            self.__current_row__ = self.__height__() - 1
+
+        # make sure cursor is back in X bounds
+        if self.__width__() -1 < self.__current_col__:
+            self.__current_col__ = self.__width__()
+
         #TODO check if self.cursor is out of bounds
 
         return _ret
-
-
-
+    
     def append_cols(self, cols=10):
         rowlength = self.__width__()
         for i, row in enumerate(self.__storage__):
@@ -298,3 +315,7 @@ class Matrix(object):
             _retmatrix.trim()
             _retmatrix.trim()
         return _retmatrix
+
+    def __repr__(self):
+        return '<Matrix> Height: {0}, Width: {1}'.format(
+            self.__height__(), self.__width__())

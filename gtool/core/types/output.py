@@ -118,7 +118,7 @@ class GridOutput(Output):
 
     def integrate(self, obj, result=Matrix(), formatlist=None, separator=" ", outputscheme=None):
         #print('integrate seperator: *%s*' % separator)
-        outstring = ""
+        #outstring = ""
 
         _obj = obj
 
@@ -132,7 +132,7 @@ class GridOutput(Output):
                 if isinstance(element, Filler):
                     _x = self.fillerprocess(element)
                     q.append(_x)
-                    _outstring += _x
+                    #_outstring += _x
 
                 if isinstance(element, AttributeMatch):
                     if getattr(obj, element.__attrname__).isdynamic:
@@ -142,27 +142,27 @@ class GridOutput(Output):
                     else:
                         _x = self.attribprocess(element, obj=_obj, sep=separator, outputscheme=outputscheme)
                         q.append(_x)
-                        _outstring += _x
+                        #_outstring += _x
 
             result.insert(datalist=[_outstring], cursor=c)
             c = result.cursor
 
-            outstring += _outstring
+            #outstring += _outstring
 
 
 
             if (i + 1) == len(formatlist):
                 pass
             else:
-                outstring += '||'
+                #outstring += '||'
                 q.append(self.Separator())
 
             #print(outstring)
 
 
-        print('q:', q)
+        #print('q:', q)
         result.carriagereturn()
-        return outstring
+        return q
 
     def __xoutput__(self, obj, separatoroverride=None, listmode=False, grid=Matrix(startheight=10, startwidth=20)): #outputscheme=None,
 
@@ -200,9 +200,11 @@ class GridOutput(Output):
         else:
             _ret = sub(self, obj, separatoroverride=separatoroverride, listmode=listmode, results=grid)
 
+        print(_ret)
         #for row in grid:
         #    print(row)
 
+        grid.trim()
         return grid #_ret
 
 # WARNING DO NOT RENAME THIS CLASS - there is a static text value in
