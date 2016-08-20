@@ -204,7 +204,8 @@ class GridOutput(Output):
         #for row in grid:
         #    print(row)
 
-        grid.trim()
+        if not grid.isempty:
+            grid.trim()
         return grid #_ret
 
 # WARNING DO NOT RENAME THIS CLASS - there is a static text value in

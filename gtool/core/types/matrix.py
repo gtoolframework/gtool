@@ -105,12 +105,15 @@ class Matrix(object):
         v_use = self.__v_utilization__()
         _ret = False #default return value
 
+        if v_use == 0:
+            raise IndexError('Cannot trim an empty matrix. Use delete instead.')
+
         if v_use < self.__height__():
             _ret = True
             try:
                 del self.__storage__[v_use:]
             except:
-                raise Exception('Could not delete row %s from the matrix' % v_use)
+                raise IndexError('Could not delete row %s from the matrix' % v_use)
 
         if h_use < self.__width__():
             _ret = True
@@ -118,11 +121,14 @@ class Matrix(object):
                 try:
                     del row[h_use+1:]
                 except:
-                    raise Exception('Could not delete columns in row %s from the matrix' % i)
+                    raise IndexError('Could not delete columns in row %s from the matrix' % i)
 
-        # check that Matrix still exists and if not rebuild
+        """
+        # check that Matrix still exists and if not rebuild it to a single column and cell
+        # TODO this is a possible edge case, perhaps should through an error if trim called on empty matrix
         if not self.__height__() > 0:
             self.__storage__ = [[None]]
+        """
 
         # make sure cursor is back in Y bounds
         if self.__height__() - 1 < self.__current_row__:
@@ -135,7 +141,7 @@ class Matrix(object):
         #TODO check if self.cursor is out of bounds
 
         return _ret
-    
+
     def append_cols(self, cols=10):
         rowlength = self.__width__()
         for i, row in enumerate(self.__storage__):
@@ -319,3 +325,7 @@ class Matrix(object):
     def __repr__(self):
         return '<Matrix> Height: {0}, Width: {1}'.format(
             self.__height__(), self.__width__())
+
+    @property
+    def isempty(self):
+        return True if self.__v_utilization__() == 0 else False
