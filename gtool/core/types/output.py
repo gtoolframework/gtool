@@ -110,20 +110,78 @@ class GridOutput(Output):
             _ret = sep.join(['%s' % f for f in getattr(obj, attribobj.__attrname__)])
 
             return _ret
-        #elif flat:
-        #    return sep.join([f.output(outputscheme=outputscheme) for f in getattr(obj, self.__attrname__)])
         else:
-            #raise NotImplementedError('still working on Attributematch.process')
-            return 'monkey'
+            # TODO make this raise assert
+            raise AttributeError('attribprocess should not process dynamic properties')
 
     def integrate(self, obj, grid=Matrix(), formatlist=None, separator=" "): #, outputscheme=None, flat=False):
-        #print('integrate seperator: *%s*' % separator)
-        #outstring = ""
+
+        def __integratemultiple__(cell, obj):
+
+            q = []
+
+            for element in cell:
+
+                if isinstance(element, Filler):
+                    _x = self.fillerprocess(element)
+                    q.append(_x)
+
+                if isinstance(element, AttributeMatch):
+                    if getattr(obj, element.__attrname__).isdynamic:
+                        _startrow = grid.currentrow
+                        if len(getattr(obj, element.__attrname__)) > 0:
+                            outputconfig = self.__outputconfig__()
+                            mergekey = 'merge'
+                            mergeconstant = '\n\n'
+                            mergeseparator = self.__separatorstrip__(outputconfig[mergekey]) if mergekey in outputconfig else mergeconstant
+
+                            for i, dynobj in enumerate(getattr(obj, element.__attrname__)):
+                                _grid = self.__xoutput__(dynobj) #, grid=result)
+                                _grid.trim()
+                                if _grid.height > 1:
+                                    # TODO make this an assert
+                                    raise ValueError('dynamic object should only return a matrix with a height of 1')
+
+                                if (i+1) < len(getattr(obj, element.__attrname__)) > 1:
+                                    # prevent trailing merge separators
+                                    _x = '\n'.join(_grid.row(0)) + mergeseparator
+                                else:
+                                    _x = '\n'.join(_grid.row(0))
+                                q.append(_x)
+                        else:
+                            # an empty dynamic attribute
+                            q.append("")
+                        grid.currentrow = _startrow
+                    else:
+                        _x = self.attribprocess(element, obj=_obj, sep=separator)
+                        q.append(_x)
+
+            return q
+
+        def __integratesingle__(element, obj, grid):
+            print('in __integratesingle__')
+            _startrow = grid.currentrow
+
+            c = grid.cursor
+            for i, dynobj in enumerate(getattr(obj, element.__attrname__)):
+                _grid = self.__xoutput__(dynobj)  # , grid=result)
+                _grid.trim()
+                if _grid.height > 1:
+                    # TODO make this an assert
+                    raise ValueError('dynamic object should only return a matrix with a height of 1')
+
+                _x = '\n'.join(_grid.row(0))
+                grid.insert(datalist=[_x], cursor=c)
+                grid.nextrow()
+                c =grid.cursor
+                # insert
+                # pop
+                # move grid cursor
+                # print('here!!:', cell)
+
+            return True
 
         _obj = obj
-
-        #print(result.cursor)
-
         c = grid.cursor
         """
         Design Note
@@ -133,74 +191,89 @@ class GridOutput(Output):
         If the complex object attribute is in a cell that contain other attributes it will be concatenated in
         To create multiple discrete cells, create an monster object that contains all the required attributes (at some point we'll introduce inheritance in dynamic objects... maybe)
         """
+        _depth = 1
         for i, cell in enumerate(formatlist):
-            #_outstring = ""
-            q = []
-            for element in cell:
-                if isinstance(element, Filler):
-                    _x = self.fillerprocess(element)
-                    q.append(_x)
-                    #_outstring += _x
 
-                if isinstance(element, AttributeMatch):
-                    if getattr(obj, element.__attrname__).isdynamic:
-                        _startrow = grid.currentrow
-                        #print('current row:', _startrow)
-                        if len(getattr(obj, element.__attrname__)) > 0:
-                            outputconfig = self.__outputconfig__()
-                            mergekey = 'merge'
-                            mergeconstant = '\n\n'
-                            mergeseparator = outputconfig[mergekey] if mergekey in outputconfig else mergeconstant
+            #q = []
 
-                            for dynobj in getattr(obj, element.__attrname__):
-                                _grid = self.__xoutput__(dynobj) #, grid=result)
-                                _grid.trim()
-                                #print(_x.__v_utilization__())
-                                #for row in _grid:
-                                #    print(row)
-                                #print(_grid.row(0))
-                                if _grid.height > 1:
-                                    # TODO make this an assert
-                                    raise ValueError('dynamic object should only return a matrix with a height of 1')
-                                _x = '\n'.join(_grid.row(0)) + mergeseparator
-                                q.append(_x)
+            # if dynamic attribute is by itself (and is not zero length) then we stack otherwise we merge
 
-                                # if by itself, layer cells verticals
-                                # also set a next row
-                        else:
-                            print('empty dynamic')
-                        #print('height', grid.height)
-                        grid.currentrow = _startrow
-                    else:
-                        _x = self.attribprocess(element, obj=_obj, sep=separator) #, outputscheme=outputscheme)
-                        q.append(_x)
-                        #_outstring += _x
-
-            _q = ''.join(q)
-            grid.insert(datalist=[_q], cursor=c)
-
-            c = grid.cursor
-
-            #outstring += _outstring
-            """
-            if (i + 1) == len(formatlist):
-                pass
+            if len(cell) == 1 \
+                    and isinstance(cell[0], AttributeMatch) \
+                    and getattr(getattr(obj, cell[0].__attrname__, None), 'isdynamic', False) \
+                    and len(getattr(obj, cell[0].__attrname__)) > 0:
+                _depth = __integratesingle__(cell[0], obj, grid)
             else:
-                #outstring += '||'
-                q.append(self.Separator())
-            """
+                q = __integratemultiple__(cell, obj)
+                """
+                for element in cell:
 
-            #print(outstring)
-        #print('q:', q)
-        grid.carriagereturn()
-        #return q
+                    if isinstance(element, Filler):
+                        _x = self.fillerprocess(element)
+                        q.append(_x)
+
+                    if isinstance(element, AttributeMatch):
+                        if getattr(obj, element.__attrname__).isdynamic:
+                            _startrow = grid.currentrow
+                            if len(getattr(obj, element.__attrname__)) > 0:
+                                outputconfig = self.__outputconfig__()
+                                mergekey = 'merge'
+                                mergeconstant = '\n\n'
+                                mergeseparator = outputconfig[mergekey] if mergekey in outputconfig else mergeconstant
+
+                                for dynobj in getattr(obj, element.__attrname__):
+                                    _grid = self.__xoutput__(dynobj) #, grid=result)
+                                    _grid.trim()
+                                    if _grid.height > 1:
+                                        # TODO make this an assert
+                                        raise ValueError('dynamic object should only return a matrix with a height of 1')
+
+                                    # TODO check here if this dynamic is by itself
+
+                                    # if dynamic is by itself then we stack otherwise we merge
+                                    if len(cell) == 1: #contains only this element in the cell
+                                        _x = '\n'.join(_grid.row(0))
+                                        # push
+                                        grid.insert(datalist=[_x], cursor=c) #<-- this won't work - need to make _q a grid or work directly in grid
+                                        # insert
+                                        # pop
+                                        # move grid cursor
+                                        #print('here!!:', cell)
+                                        pass
+                                    else:
+                                        _x = '\n'.join(_grid.row(0)) + mergeseparator
+                                        q.append(_x)
+
+                                    # if by itself, layer cells verticals
+                                    # also set a next row
+                            else:
+                                # an empty dynamic attribute
+                                q.append("")
+                            grid.currentrow = _startrow
+                        else:
+                            _x = self.attribprocess(element, obj=_obj, sep=separator) #, outputscheme=outputscheme)
+                            q.append(_x)
+                """
+
+                _q = ''.join(q)
+                grid.insert(datalist=[_q], cursor=c)
+
+                c = grid.cursor
+
+        grid.carriagereturn(_depth)
 
     def __outputconfig__(self):
         outputscheme_id = runtimenamespace()['outputscheme']
-        #outputscheme = outputconfigname(outputscheme_id)
         outputconfig = confignamespace()[outputconfigname(outputscheme_id)]
 
         return outputconfig
+
+    def __separatorstrip__(self, separator):
+        if (separator.startswith('"') and separator.endswith('"')) or (separator.startswith("'") and separator.endswith("'")):
+            _separator = bytes('%s' % separator[1:-1], "utf-8").decode("unicode_escape")  # prevent escaping
+        else:
+            _separator = bytes('%s' % separator, "utf-8").decode("unicode_escape")  # prevent escaping
+        return _separator
 
     def __xoutput__(self, obj, separatoroverride=None, grid=None): #outputscheme=None, flat=False,
 
@@ -214,60 +287,39 @@ class GridOutput(Output):
         :return:
         """
         def sub(self, obj, separatoroverride=None, grid=None): #, flat=False):
-            """
-            outputscheme_id = runtimenamespace()['outputscheme']
-            outputscheme = outputconfigname(outputscheme_id)
-            outputconfig = confignamespace()[outputconfigname(outputscheme_id)]
-            """
             outputconfig = self.__outputconfig__()
 
             separatorname = 'separator'
 
             if separatorname in outputconfig and separatoroverride is None:
-                separator = outputconfig[separatorname]
+                separator = self.__separatorstrip__(outputconfig[separatorname])
+                """
                 if separator.startswith('"') and separator.endswith('"'):
                     #separator = '%s' % separator [1:-1]
                     separator = bytes('%s' % separator [1:-1], "utf-8").decode("unicode_escape") # prevent escaping
                     #print('in output: *%s*' % separator)
+                """
             else:
                 separator = separatoroverride
 
-            #if flat:
-            #    pass
-
-            #_formatlist = self.formatter()
             _formatlist = obj.__classoutputscheme__()
             # TODO add a len() method to dynamic class type to help with matrix width sizing
-            #_result = Matrix(startheight=10, startwidth=10)
             _ret = self.integrate(obj,
                                   formatlist=_formatlist,
-                                  #outputscheme=outputscheme,
                                   separator=separator,
-                                  grid=grid)#,
-                                  #flat=flat)
-            #for row in results:
-            #    print(row)
-            #return _ret
+                                  grid=grid)
 
         if grid is None:
             grid = Matrix(startheight=20, startwidth=20)
         if isinstance(obj, list):
             _ret = [sub(self, _obj,
                         separatoroverride=separatoroverride,
-                        #flat=flat,
                         grid=grid) for _obj in obj]
         else:
             _ret = sub(self, obj,
                        separatoroverride=separatoroverride,
-                       #flat=flat,
                        grid=grid)
 
-        #print(_ret)
-        #for row in grid:
-        #    print(row)
-
-        #if not grid.isempty:
-        #    grid.trim()
         return grid #_ret
 
 # WARNING DO NOT RENAME THIS CLASS - there is a static text value in

@@ -6,10 +6,24 @@ class Matrix(object):
         self.__current_col__ = 0
         self.__utilization_threshold__ = threshold
 
-    @property
-    def cursor(self):
+    def get_cursor(self):
         # x,y position
         return (self.__current_col__, self.__current_row__)
+
+    def set_cursor(self, x, y):
+        if x < 0 or y < 0:
+            raise IndexError('coordinates cannot be less than zero')
+        if x + 1 > self.__width__():
+            raise IndexError('X coordinates cannot be outside width of table')
+        if y + 1 > self.__height__():
+            raise IndexError('Y coordinates cannot be outside height of table')
+
+        self.x = x
+        self.y = y
+
+        return (self.x, self.y)
+
+    cursor = property(get_cursor, set_cursor)
 
     def get_currentrow(self):
         return self.__current_row__
@@ -322,13 +336,20 @@ class Matrix(object):
         """
         self.__current_col__ = 0
 
-    def carriagereturn(self):
+    def carriagereturn(self, depth=1):
         """
         Go to first column, next row (synactic sugar)
         :return:
         """
-        self.nextrow()
+
+        if depth < 1:
+            raise ValueError('carriagereturn depth arg must be 1 or more')
+        if depth == 1:
+            self.nextrow()
+        else:
+            self.y += depth
         self.returntofirst()
+        return self.cursor
 
     def __matrixmap__(self, trim=True):
         # returns a matrix of the same size but shows how much data is
