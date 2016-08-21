@@ -116,18 +116,26 @@ class GridOutput(Output):
             #raise NotImplementedError('still working on Attributematch.process')
             return 'monkey'
 
-    def integrate(self, obj, result=Matrix(), formatlist=None, separator=" ", outputscheme=None):
+    def integrate(self, obj, grid=Matrix(), formatlist=None, separator=" "): #, outputscheme=None, flat=False):
         #print('integrate seperator: *%s*' % separator)
         #outstring = ""
 
         _obj = obj
 
         #print(result.cursor)
-        q = []
-        c = result.cursor
 
+        c = grid.cursor
+        """
+        Design Note
+        ===========
+        In grid output mode there is an assumption that attributes which are complex object will be represented as a single cell in the grid.
+        If the complex object attribute is alone in its output cell it will separate multiples in to a new cell beneath it
+        If the complex object attribute is in a cell that contain other attributes it will be concatenated in
+        To create multiple discrete cells, create an monster object that contains all the required attributes (at some point we'll introduce inheritance in dynamic objects... maybe)
+        """
         for i, cell in enumerate(formatlist):
-            _outstring = ""
+            #_outstring = ""
+            q = []
             for element in cell:
                 if isinstance(element, Filler):
                     _x = self.fillerprocess(element)
@@ -136,37 +144,82 @@ class GridOutput(Output):
 
                 if isinstance(element, AttributeMatch):
                     if getattr(obj, element.__attrname__).isdynamic:
-                        _startrow = result.currentrow
-                        for dynobj in getattr(obj, element.__attrname__):
-                            _x = self.__xoutput__(dynobj) #, grid=result)
-                            q.append(_x)
-                        result.currentrow = _startrow
+                        _startrow = grid.currentrow
+                        #print('current row:', _startrow)
+                        if len(getattr(obj, element.__attrname__)) > 0:
+                            outputconfig = self.__outputconfig__()
+                            mergekey = 'merge'
+                            mergeconstant = '\n\n'
+                            mergeseparator = outputconfig[mergekey] if mergekey in outputconfig else mergeconstant
+
+                            for dynobj in getattr(obj, element.__attrname__):
+                                _grid = self.__xoutput__(dynobj) #, grid=result)
+                                _grid.trim()
+                                #print(_x.__v_utilization__())
+                                #for row in _grid:
+                                #    print(row)
+                                #print(_grid.row(0))
+                                if _grid.height > 1:
+                                    # TODO make this an assert
+                                    raise ValueError('dynamic object should only return a matrix with a height of 1')
+                                _x = '\n'.join(_grid.row(0)) + mergeseparator
+                                q.append(_x)
+
+                                # if by itself, layer cells verticals
+                                # also set a next row
+                        else:
+                            print('empty dynamic')
+                        #print('height', grid.height)
+                        grid.currentrow = _startrow
                     else:
-                        _x = self.attribprocess(element, obj=_obj, sep=separator, outputscheme=outputscheme)
+                        _x = self.attribprocess(element, obj=_obj, sep=separator) #, outputscheme=outputscheme)
                         q.append(_x)
                         #_outstring += _x
 
-            result.insert(datalist=[_outstring], cursor=c)
-            c = result.cursor
+            _q = ''.join(q)
+            grid.insert(datalist=[_q], cursor=c)
+
+            c = grid.cursor
 
             #outstring += _outstring
+            """
             if (i + 1) == len(formatlist):
                 pass
             else:
                 #outstring += '||'
                 q.append(self.Separator())
+            """
 
             #print(outstring)
         #print('q:', q)
-        result.carriagereturn()
-        return q
+        grid.carriagereturn()
+        #return q
 
-    def __xoutput__(self, obj, separatoroverride=None, listmode=False, grid=Matrix(startheight=10, startwidth=20)): #outputscheme=None,
+    def __outputconfig__(self):
+        outputscheme_id = runtimenamespace()['outputscheme']
+        #outputscheme = outputconfigname(outputscheme_id)
+        outputconfig = confignamespace()[outputconfigname(outputscheme_id)]
 
-        def sub(self, obj, separatoroverride=None, listmode=False, results=Matrix()):
+        return outputconfig
+
+    def __xoutput__(self, obj, separatoroverride=None, grid=None): #outputscheme=None, flat=False,
+
+        """
+        Processes data into a grid. Returns data via reference.
+
+        :param obj: a DynamicType object that will be processed for output
+        :param separatoroverride: string to use for separating output
+        :param flat: Boolean; merge the output
+        :param grid: Matrix object to write results into
+        :return:
+        """
+        def sub(self, obj, separatoroverride=None, grid=None): #, flat=False):
+            """
             outputscheme_id = runtimenamespace()['outputscheme']
             outputscheme = outputconfigname(outputscheme_id)
             outputconfig = confignamespace()[outputconfigname(outputscheme_id)]
+            """
+            outputconfig = self.__outputconfig__()
 
             separatorname = 'separator'
 
@@ -179,8 +232,8 @@ class GridOutput(Output):
             else:
                 separator = separatoroverride
 
-            if listmode:
-                pass
+            #if flat:
+            #    pass
 
             #_formatlist = self.formatter()
             _formatlist = obj.__classoutputscheme__()
@@ -188,31 +241,33 @@ class GridOutput(Output):
             #_result = Matrix(startheight=10, startwidth=10)
             _ret = self.integrate(obj,
                                   formatlist=_formatlist,
-                                  outputscheme=outputscheme,
+                                  #outputscheme=outputscheme,
                                   separator=separator,
-                                  result=results)
+                                  grid=grid)#,
+                                  #flat=flat)
             #for row in results:
             #    print(row)
-            return _ret
+            #return _ret
 
-        #grid = Matrix(startheight=40, startwidth=20)
+        if grid is None:
+            grid = Matrix(startheight=20, startwidth=20)
         if isinstance(obj, list):
             _ret = [sub(self, _obj,
                         separatoroverride=separatoroverride,
-                        listmode=listmode,
-                        results=grid) for _obj in obj]
+                        #flat=flat,
+                        grid=grid) for _obj in obj]
         else:
             _ret = sub(self, obj,
-                        separatoroverride=separatoroverride,
-                        listmode=listmode,
-                        results=grid)
+                       separatoroverride=separatoroverride,
+                       #flat=flat,
+                       grid=grid)
 
-        print(_ret)
+        #print(_ret)
         #for row in grid:
         #    print(row)
 
-        if not grid.isempty:
-            grid.trim()
+        #if not grid.isempty:
+        #    grid.trim()
         return grid #_ret
 
 # WARNING DO NOT RENAME THIS CLASS - there is a static text value in

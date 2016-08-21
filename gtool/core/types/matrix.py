@@ -18,7 +18,7 @@ class Matrix(object):
         if not isinstance(y, int):
             raise TypeError('y arg to set current cursor row must be an int but got a', type(y))
         if y > self.__height__() - 1:
-            raise IndexError('y is outside of matrix vertical bounds')
+            raise IndexError('y, %s, is outside of matrix vertical bounds of %s' % (y,self.__height__()))
         self.__current_row__ = y
 
     currentrow = property(get_currentrow, set_currentrow)
@@ -79,9 +79,10 @@ class Matrix(object):
 
     def __v_utilization__(self):
         colheight = len(self.__storage__)
-        for i, row in enumerate(self.__storage__):
-            if any(x is not None for x in self.__storage__[-(i+1)]):
-                return colheight - (i+1)
+        for i, row in enumerate(reversed(self.__storage__)):
+            if any(x is not None for x in row): #self.__storage__[-(i+1)]):
+                #print('colheight:', colheight - (i+1), 'i:', -(i+1))
+                return colheight - i
         return 0 #default if no utilization
 
     def __v_utilization_percentage__(self):
@@ -129,7 +130,7 @@ class Matrix(object):
         if v_use < self.__height__():
             _ret = True
             try:
-                del self.__storage__[v_use:]
+                del self.__storage__[v_use:] #+1:]
             except:
                 raise IndexError('Could not delete row %s from the matrix' % v_use)
 
