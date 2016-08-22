@@ -95,14 +95,17 @@ class GridOutput(Output):
         def __repr__(self):
             return '||'
 
-    def __getheaders__(self, obj, formatlist=None):
+    def __getheaders__(self, formatlist):
+        """
+        Generates headers from a formatlist (non-resursive)
+        :param formatlist: list of output managers
+        :return: list of header strings
+        """
         _retlist = []
         for cell in formatlist:
             for element in cell:
-                if isinstance(element, AttributeError):
-                    element.__attrname__
-            _retlist.append([])
-            pass
+                if isinstance(element, AttributeMatch):
+                    _retlist.append(element.__attrname__)
         return _retlist
 
     def fillerprocess(self, fillerobj):
@@ -140,7 +143,7 @@ class GridOutput(Output):
                 outputconfig[mergekey]) if mergekey in outputconfig else mergeconstant
 
             for i, dynobj in enumerate(getattr(obj, element.__attrname__)):
-                _grid = self.__gridoutput__(dynobj)  # , grid=result)
+                _grid = self.__gridoutput__(dynobj, headers=False)  # , grid=result)
                 _grid.trim()
                 if _grid.height > 1:
                     # TODO make this an assert
@@ -204,7 +207,7 @@ class GridOutput(Output):
             _obj = getattr(obj, element.__attrname__)
 
             for i, dynobj in enumerate(_obj):
-                _grid = self.__gridoutput__(dynobj)  # , grid=result)
+                _grid = self.__gridoutput__(dynobj, headers=False)  # , grid=result)
                 _grid.trim()
                 if _grid.height > 1:
                     # TODO make this an assert
@@ -259,7 +262,7 @@ class GridOutput(Output):
             _separator = bytes('%s' % separator, "utf-8").decode("unicode_escape")  # prevent escaping
         return _separator
 
-    def __gridoutput__(self, obj, separatoroverride=None, grid=None): #TODO is grid kwarg needed?
+    def __gridoutput__(self, obj, separatoroverride=None, grid=None, headers=True): #TODO is grid kwarg needed?
 
         """
         Processes data into a grid. Returns data via reference.
@@ -286,6 +289,14 @@ class GridOutput(Output):
 
         if grid is None:
             grid = Matrix(startheight=20, startwidth=20)
+
+        if isinstance(obj, list) and headers:
+                grid.insert(datalist=self.__getheaders__(obj[0].__classoutputscheme__()))
+                grid.carriagereturn()
+        elif headers:
+                grid.insert(datalist=self.__getheaders__(obj.__classoutputscheme__()))
+                grid.carriagereturn()
+
         if isinstance(obj, list):
             for _obj in obj:
                 sub(self, _obj, separatoroverride=separatoroverride, grid=grid)

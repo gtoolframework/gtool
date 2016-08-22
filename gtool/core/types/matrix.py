@@ -242,7 +242,11 @@ class Matrix(object):
         :param healthcheck: Boolean
         :return: string
         """
-        x, y = cursor
+        if cursor is None:
+            x = 0
+            y = 0
+        else:
+            x, y = cursor
         if datalist is None or not isinstance(datalist, list):
             raise ValueError('Was expecting to insert a list but got a %s' % type(datalist))
         if not len(datalist) > 0:
