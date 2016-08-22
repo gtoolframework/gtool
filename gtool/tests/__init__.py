@@ -631,4 +631,27 @@ def test20():
 
 #TODO test trailing simple attribs in format string after dynamic attrib
 def test21():
-    pass
+    outputscheme = '1'
+    print('test 21 validates data alignment works with trailing non-dynamic attributes')
+    print('---- testing 21 begins ----')
+
+    sf = projectloader('test\\test21', dbg=False, outputscheme=outputscheme)
+
+    try:
+        checkalignment(sf)
+    except ValueError as err:
+        print(err)
+        sys.exit(1)
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['EXCEL']()
+
+    _ret = o.output(sf)
+
+    _ret.trim()
+
+    for row in _ret:
+        print(row)
+
+    print('--- test 21 ends ---')

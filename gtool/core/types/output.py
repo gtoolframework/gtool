@@ -195,7 +195,7 @@ class GridOutput(Output):
                     grid.x -= 1
                 c = grid.cursor
 
-            return True
+            return True #TODO should we return depth of stacking as an int?
 
         #_obj = obj
         c = grid.cursor
@@ -207,7 +207,8 @@ class GridOutput(Output):
                     and isinstance(cell[0], AttributeMatch) \
                     and getattr(getattr(obj, cell[0].__attrname__, None), 'isdynamic', False) \
                     and len(getattr(obj, cell[0].__attrname__)) > 0:
-                _depth = __integratesingle__(cell[0], obj, grid)
+                __integratesingle__(cell[0], obj, grid) # TODO reimplement _depth?
+                c = grid.cursor
             else:
                 q = __integratemultiple__(cell, obj)
                 _q = ''.join(q)
