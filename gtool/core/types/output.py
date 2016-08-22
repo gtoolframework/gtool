@@ -114,7 +114,25 @@ class GridOutput(Output):
             # TODO make this raise assert
             raise AttributeError('attribprocess should not process dynamic properties')
 
-    def integrate(self, obj, grid=Matrix(), formatlist=None, separator=" "): #, outputscheme=None, flat=False):
+    def integrate(self, obj, grid=Matrix(), formatlist=None, separator=" "):
+        """
+        Process an object into
+
+        :param obj:
+        :param grid:
+        :param formatlist:
+        :param separator:
+        :return:
+        """
+
+        """
+        Design Note
+        ===========
+        In grid output mode there is an assumption that attributes which are complex object will be represented as a single cell in the grid.
+        If the complex object attribute is alone in its output cell it will separate multiples in to a new cell beneath it
+        If the complex object attribute is in a cell that contain other attributes it will be concatenated in
+        To create multiple discrete cells, create an monster object that contains all the required attributes (at some point we'll introduce inheritance in dynamic objects... maybe)
+        """
 
         def __integratemultiple__(cell, obj):
 
@@ -153,13 +171,12 @@ class GridOutput(Output):
                             q.append("")
                         grid.currentrow = _startrow
                     else:
-                        _x = self.attribprocess(element, obj=_obj, sep=separator)
+                        _x = self.attribprocess(element, obj=_obj, sep=separator) # TODO <-- fix use of separator
                         q.append(_x)
 
             return q
 
         def __integratesingle__(element, obj, grid):
-            print('in __integratesingle__')
             _startrow = grid.currentrow
 
             c = grid.cursor
@@ -169,35 +186,22 @@ class GridOutput(Output):
                 if _grid.height > 1:
                     # TODO make this an assert
                     raise ValueError('dynamic object should only return a matrix with a height of 1')
-
                 _x = '\n'.join(_grid.row(0))
                 grid.insert(datalist=[_x], cursor=c)
                 grid.nextrow()
-                c =grid.cursor
-                # insert
-                # pop
-                # move grid cursor
-                # print('here!!:', cell)
+                print(grid.x)
+                grid.x -= 1
+                print(grid.x)
+                c = grid.cursor
 
             return True
 
         _obj = obj
         c = grid.cursor
-        """
-        Design Note
-        ===========
-        In grid output mode there is an assumption that attributes which are complex object will be represented as a single cell in the grid.
-        If the complex object attribute is alone in its output cell it will separate multiples in to a new cell beneath it
-        If the complex object attribute is in a cell that contain other attributes it will be concatenated in
-        To create multiple discrete cells, create an monster object that contains all the required attributes (at some point we'll introduce inheritance in dynamic objects... maybe)
-        """
+
         _depth = 1
         for i, cell in enumerate(formatlist):
-
-            #q = []
-
             # if dynamic attribute is by itself (and is not zero length) then we stack otherwise we merge
-
             if len(cell) == 1 \
                     and isinstance(cell[0], AttributeMatch) \
                     and getattr(getattr(obj, cell[0].__attrname__, None), 'isdynamic', False) \
@@ -254,7 +258,6 @@ class GridOutput(Output):
                             _x = self.attribprocess(element, obj=_obj, sep=separator) #, outputscheme=outputscheme)
                             q.append(_x)
                 """
-
                 _q = ''.join(q)
                 grid.insert(datalist=[_q], cursor=c)
 
@@ -275,7 +278,7 @@ class GridOutput(Output):
             _separator = bytes('%s' % separator, "utf-8").decode("unicode_escape")  # prevent escaping
         return _separator
 
-    def __xoutput__(self, obj, separatoroverride=None, grid=None): #outputscheme=None, flat=False,
+    def __xoutput__(self, obj, separatoroverride=None, grid=None):
 
         """
         Processes data into a grid. Returns data via reference.
@@ -286,7 +289,7 @@ class GridOutput(Output):
         :param grid: Matrix object to write results into
         :return:
         """
-        def sub(self, obj, separatoroverride=None, grid=None): #, flat=False):
+        def sub(self, obj, separatoroverride=None, grid=None):
             outputconfig = self.__outputconfig__()
 
             separatorname = 'separator'
@@ -304,23 +307,17 @@ class GridOutput(Output):
 
             _formatlist = obj.__classoutputscheme__()
             # TODO add a len() method to dynamic class type to help with matrix width sizing
-            _ret = self.integrate(obj,
-                                  formatlist=_formatlist,
-                                  separator=separator,
-                                  grid=grid)
+            self.integrate(obj, formatlist=_formatlist, separator=separator, grid=grid)
 
         if grid is None:
             grid = Matrix(startheight=20, startwidth=20)
         if isinstance(obj, list):
-            _ret = [sub(self, _obj,
-                        separatoroverride=separatoroverride,
-                        grid=grid) for _obj in obj]
+            for _obj in obj:
+                sub(self, _obj, separatoroverride=separatoroverride, grid=grid)
         else:
-            _ret = sub(self, obj,
-                       separatoroverride=separatoroverride,
-                       grid=grid)
+            sub(self, obj, separatoroverride=separatoroverride, grid=grid)
 
-        return grid #_ret
+        return grid
 
 # WARNING DO NOT RENAME THIS CLASS - there is a static text value in
 # core.utils.output.checkalignment that is used to determine class lineage

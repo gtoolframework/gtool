@@ -46,7 +46,7 @@ class Matrix(object):
             raise TypeError('x arg to set current cursor column must be an int but got a', type(x))
         if x > self.__width__() - 1:
             raise IndexError('x is outside of matrix horizontal bounds')
-        self.__current_row__ = x
+        self.__current_col__ = x
 
     currentcol = property(get_currentcol, set_currentcol)
     x = property(get_currentcol, set_currentcol)
