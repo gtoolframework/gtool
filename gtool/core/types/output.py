@@ -95,17 +95,29 @@ class GridOutput(Output):
         def __repr__(self):
             return '||'
 
-    def __getheaders__(self, formatlist):
+    def __getheaders__(self, obj):
         """
         Generates headers from a formatlist (non-resursive)
         :param formatlist: list of output managers
         :return: list of header strings
         """
+
+        formatlist = obj.__classoutputscheme__()
+
         _retlist = []
         for cell in formatlist:
             for element in cell:
                 if isinstance(element, AttributeMatch):
-                    _retlist.append(element.__attrname__)
+                    if not element.isconcatter and getattr(getattr(obj, element.__attrname__, None), 'isdynamic', False):
+                        attr = getattr(obj, element.__attrname__, None)
+                        _attrtype = attr.attrtype()
+                        #_formatlist = _attrtype.__classoutputscheme__()
+                        _retlist.extend(self.__getheaders__(_attrtype))
+                    else:
+                        _retlist.append(element.__attrname__)
+                elif isinstance(element, Filler) and len(cell) == 1:
+                    # handle formatting cells that only contain static Filler text
+                    _retlist.append('')
         return _retlist
 
     def fillerprocess(self, fillerobj):
@@ -217,7 +229,7 @@ class GridOutput(Output):
                 grid.insert(datalist=_x, cursor=c) #[_x]
                 if (i+1) < len(_obj): # and len(_obj) > 1
                     grid.nextrow()
-                    grid.x -= 1
+                    grid.x -= len(_x)
                 c = grid.cursor
 
             _endrow = grid.y
@@ -305,10 +317,10 @@ class GridOutput(Output):
             grid = Matrix(startheight=20, startwidth=20)
 
         if isinstance(obj, list) and headers:
-                grid.insert(datalist=self.__getheaders__(obj[0].__classoutputscheme__()))
+                grid.insert(datalist=self.__getheaders__(obj[0]))
                 grid.carriagereturn()
         elif headers:
-                grid.insert(datalist=self.__getheaders__(obj.__classoutputscheme__()))
+                grid.insert(datalist=self.__getheaders__(obj))
                 grid.carriagereturn()
 
         if isinstance(obj, list):
