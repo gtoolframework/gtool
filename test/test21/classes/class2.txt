@@ -1,0 +1,7 @@
+SUBA::
+*file = dk
+*displayname = test1
+*output = dk (@testpropd1) dn|| @testpropd2 || @+testpropd3
+@testpropd1:: single: String (required = True)
+@testpropd2:: multiple: String (required = True)
+@testpropd3:: multiple: TESTCLASSSFOURTEEN (required = False)
