@@ -5,7 +5,7 @@ from gtool.core.utils.misc import striptoclassname
 
 class CoreType(object):
     """
-    CoreType is the base object for all attribute types
+    CoreType is the base object for all attribute types (except user created classes)
     """
 
     def __init__(self, *args, **kwargs):
@@ -43,94 +43,6 @@ class CoreType(object):
         except ValueError:
             raise ValueError('cannot convert %s to type %s' %(item, cls.__convertor__()))
 
-    # ==== MAGIC METHODS OVERRIDE ====
-    """
-    def append(self, item):
-        print('append should not be a supported operation on types - attribute should handle lists of types')
-        if self.issingleton() and len(self) > 0:
-            raise TypeError('cannot add another item to a singleton')
-        if self.listtype == None:
-            raise NotImplementedError('You need to init self.listtype')
-        if not isinstance(item, self.listtype):
-            raise TypeError('item is not of type %s' % self.listtype)
-        try:
-            self.__validate__(item)
-        except ValueError as err:
-            raise ValueError(err)
-        self.__list.append(item)  # append the item to itself (the list)
-
-    # TODO implement other magic methods (if needed)
-
-
-    def __getitem__(self, index):
-        #print('index: ', index)
-        if type(index) is not int:
-            #print(tb.print_exc())
-            curframe = inspect.currentframe()
-            calframe = inspect.getouterframes(curframe, 2)
-            #print('caller name:', calframe[1][3])
-            raise TypeError('indices must be integers or slides, not %s' % type(index))
-        if not index + 1 < self.__len__():
-            raise IndexError('index out of range')
-        return self.__list[index]
-
-    def __len__(self):
-        return len(self.__list)
-
-    def __add__(self, other):
-        if not isinstance(other, type(self)):
-            raise TypeError('cannot add an other of type %s to a %s' % (type(other), type(self)))
-        try:
-            _ = iter(other)
-        except TypeError:
-            raise TypeError('In %s: %s is not iterable (contents: "%s")' % (type(other), other))
-        if self.listtype == None:
-            raise NotImplementedError('You need to init self.listtype')
-        for i, item in enumerate(other):
-            if not isinstance(item, self.listtype):
-                raise TypeError('item %s in other list is not of type %s' % (i, self.listtype))
-        _templist = copy(self.__list)
-        _templist.extend(other)
-        return type(self)(_templist)
-
-        # TODO investigate if this is pattern is correct
-        temp = copy(self)
-        for item in other:
-            temp.append(item)
-        return temp
-
-    def __radd__(self, other):
-        if not isinstance(other, type(self)):
-            raise TypeError('cannot add a %s to other of type %s to' % (type(self), type(other)))
-        try:
-            _ = iter(other)
-        except TypeError:
-            raise TypeError('In %s: %s is not iterable (contents: "%s")' % (type(other), other))
-        if self.listtype == None:
-            raise NotImplementedError('You need to init self.listtype')
-        for i, item in enumerate(other):
-            if not isinstance(item, self.listtype):
-                raise TypeError('item %s in other list is not of type %s' % (i, self.listtype))
-        # TODO investigate if this is pattern is correct
-        _templist = copy(other.__list) #
-        _templist.extend(self.__list)
-        return type(self)(_templist)
-
-    def __iadd__(self, other):
-        if not isinstance(other, type(self)):
-            raise TypeError('cannot add an other of type %s to a %s' % (type(other), type(self)))
-        try:
-            _ = iter(other)
-        except TypeError:
-            raise TypeError('In %s: %s is not iterable (contents: "%s")' % (type(other), other))
-        if self.listtype == None:
-            raise NotImplementedError('You need to init self.listtype')
-        for i, item in enumerate(other):
-            if not isinstance(item, self.listtype):
-                raise TypeError('item %s in other list is not of type %s' % (i, self.listtype))
-        self.__list.extend(other.__list)
-        return self
-    """
 
 class DynamicType(object):
     """
@@ -149,6 +61,8 @@ class DynamicType(object):
         # only register if a file prefix is provided
         if cls.classfile() is not None:
             registerFileMatcher(cls.classfile(), classname)
+        else:
+            raise AttributeError('%s does not have a *file attribute defined' % classname)
 
     @classmethod
     def metas(cls):

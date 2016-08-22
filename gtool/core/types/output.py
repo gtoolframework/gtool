@@ -16,7 +16,7 @@ class Output(ABC):
 
     def __init__(self, aligned=None):
         if aligned is None:
-            raise NotImplemented('Output classes must explicitly see aligned as True or False')
+            raise NotImplemented('Output classes must explicitly set keyword arg aligned as True or False')
         self.__aligned__ = aligned
 
     def output(self, projectstructure):
@@ -95,6 +95,16 @@ class GridOutput(Output):
         def __repr__(self):
             return '||'
 
+    def __getheaders__(self, obj, formatlist=None):
+        _retlist = []
+        for cell in formatlist:
+            for element in cell:
+                if isinstance(element, AttributeError):
+                    element.__attrname__
+            _retlist.append([])
+            pass
+        return _retlist
+
     def fillerprocess(self, fillerobj):
         return '%s' % fillerobj.__fillertext__
 
@@ -114,13 +124,40 @@ class GridOutput(Output):
             # TODO make this raise assert
             raise AttributeError('attribprocess should not process dynamic properties')
 
+    def dynattribprocess(self, obj, element):
+        q = []
+        if len(getattr(obj, element.__attrname__)) > 0:
+            outputconfig = self.__outputconfig__()
+            mergekey = 'merge'
+            mergeconstant = '\n\n'
+            mergeseparator = self.__separatorstrip__(
+                outputconfig[mergekey]) if mergekey in outputconfig else mergeconstant
+
+            for i, dynobj in enumerate(getattr(obj, element.__attrname__)):
+                _grid = self.__gridoutput__(dynobj)  # , grid=result)
+                _grid.trim()
+                if _grid.height > 1:
+                    # TODO make this an assert
+                    raise ValueError('dynamic object should only return a matrix with a height of 1')
+
+                if (i + 1) < len(getattr(obj, element.__attrname__)):  # > 1:
+                    # prevent trailing merge separators
+                    _x = '\n'.join(_grid.row(0)) + mergeseparator
+                else:
+                    _x = '\n'.join(_grid.row(0))
+                q.append(_x)
+        else:
+            # an empty dynamic attribute
+            q.append("")
+        return q
+
     def integrate(self, obj, grid=Matrix(), formatlist=None, separator=" "):
         """
         Process an object into grid structure
 
-        :param obj:
-        :param grid:
-        :param formatlist:
+        :param obj: the input object, must from StructureFactory
+        :param grid: Maxtrix object, where the results are written
+        :param formatlist: A list of lists containing outmanagers
         :param separator:
         :return:
         """
@@ -146,7 +183,8 @@ class GridOutput(Output):
 
                 if isinstance(element, AttributeMatch):
                     if getattr(obj, element.__attrname__).isdynamic:
-                        _startrow = grid.currentrow
+                        _x = self.dynattribprocess(obj, element)
+                        """
                         if len(getattr(obj, element.__attrname__)) > 0:
                             outputconfig = self.__outputconfig__()
                             mergekey = 'merge'
@@ -169,7 +207,7 @@ class GridOutput(Output):
                         else:
                             # an empty dynamic attribute
                             q.append("")
-                        #grid.currentrow = _startrow
+                        """
                     else:
                         _x = self.attribprocess(element, obj=obj, sep=separator) # TODO <-- fix use of separator
                         q.append(_x)
@@ -196,16 +234,13 @@ class GridOutput(Output):
                 c = grid.cursor
 
             _endrow = grid.y
-
             depth = _endrow - _startrow
-
             return depth
 
         #_obj = obj
         c = grid.cursor
-
         _depth = 1
-        for i, cell in enumerate(formatlist):
+        for cell in formatlist:
             # if dynamic attribute is by itself (and is not zero length) then we stack otherwise we merge
             if len(cell) == 1 \
                     and isinstance(cell[0], AttributeMatch) \
@@ -226,7 +261,6 @@ class GridOutput(Output):
                 c = grid.cursor
 
         grid.carriagereturn(_depth)
-        #grid.returntofirst()
         return True
 
     def __outputconfig__(self):
