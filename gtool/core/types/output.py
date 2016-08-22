@@ -212,8 +212,9 @@ class GridOutput(Output):
                 if _grid.height > 1:
                     # TODO make this an assert
                     raise ValueError('dynamic object should only return a matrix with a height of 1')
-                _x = '\n'.join(_grid.row(0))
-                grid.insert(datalist=[_x], cursor=c)
+                #_x = '\n'.join(_grid.row(0))
+                _x = _grid.row(0)
+                grid.insert(datalist=_x, cursor=c) #[_x]
                 if (i+1) < len(_obj): # and len(_obj) > 1
                     grid.nextrow()
                     grid.x -= 1
@@ -223,6 +224,17 @@ class GridOutput(Output):
             depth = _endrow - _startrow
             return depth
 
+        def __integrateemptysingle__(element, obj, grid):
+            count = 0
+            c = grid.cursor
+            _obj = getattr(obj, element.__attrname__)
+            _attrtype = _obj.attrtype()
+            _formatlist = _attrtype.__classoutputscheme__()
+            for _element in _formatlist:
+                count += 1
+            _x = [''] * count
+            grid.insert(datalist=_x, cursor=c)
+
         #_obj = obj
         c = grid.cursor
         _depth = 1
@@ -230,14 +242,16 @@ class GridOutput(Output):
             # if dynamic attribute is by itself (and is not zero length) then we stack otherwise we merge
             if len(cell) == 1 \
                     and isinstance(cell[0], AttributeMatch) \
-                    and getattr(getattr(obj, cell[0].__attrname__, None), 'isdynamic', False) \
-                    and len(getattr(obj, cell[0].__attrname__)) > 0:
-                _depth = __integratesingle__(cell[0], obj, grid)
-                if _depth > 0:
-                    grid.y -= _depth
-                    _depth *= 2
+                    and getattr(getattr(obj, cell[0].__attrname__, None), 'isdynamic', False):
+                if len(getattr(obj, cell[0].__attrname__)) > 0:
+                    _depth = __integratesingle__(cell[0], obj, grid)
+                    if _depth > 0:
+                        grid.y -= _depth
+                        _depth *= 2
+                    else:
+                        _depth = 1
                 else:
-                    _depth = 1
+                    __integrateemptysingle__(cell[0], obj, grid)
                 c = grid.cursor
             else:
                 q = __integratemultiple__(cell, obj)
