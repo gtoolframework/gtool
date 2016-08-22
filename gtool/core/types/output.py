@@ -171,7 +171,7 @@ class GridOutput(Output):
                             q.append("")
                         #grid.currentrow = _startrow
                     else:
-                        _x = self.attribprocess(element, obj=_obj, sep=separator) # TODO <-- fix use of separator
+                        _x = self.attribprocess(element, obj=obj, sep=separator) # TODO <-- fix use of separator
                         q.append(_x)
 
             return q
@@ -197,7 +197,7 @@ class GridOutput(Output):
 
             return True
 
-        _obj = obj
+        #_obj = obj
         c = grid.cursor
 
         _depth = 1
@@ -217,6 +217,7 @@ class GridOutput(Output):
 
         grid.carriagereturn(_depth)
         #grid.returntofirst()
+        return True
 
     def __outputconfig__(self):
         outputscheme_id = runtimenamespace()['outputscheme']
@@ -231,7 +232,7 @@ class GridOutput(Output):
             _separator = bytes('%s' % separator, "utf-8").decode("unicode_escape")  # prevent escaping
         return _separator
 
-    def __xoutput__(self, obj, separatoroverride=None, grid=None):
+    def __xoutput__(self, obj, separatoroverride=None, grid=None): #TODO is grid kwarg needed?
 
         """
         Processes data into a grid. Returns data via reference.
@@ -249,12 +250,6 @@ class GridOutput(Output):
 
             if separatorname in outputconfig and separatoroverride is None:
                 separator = self.__separatorstrip__(outputconfig[separatorname])
-                """
-                if separator.startswith('"') and separator.endswith('"'):
-                    #separator = '%s' % separator [1:-1]
-                    separator = bytes('%s' % separator [1:-1], "utf-8").decode("unicode_escape") # prevent escaping
-                    #print('in output: *%s*' % separator)
-                """
             else:
                 separator = separatoroverride
 
