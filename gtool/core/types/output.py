@@ -180,7 +180,9 @@ class GridOutput(Output):
             _startrow = grid.currentrow
 
             c = grid.cursor
-            for i, dynobj in enumerate(getattr(obj, element.__attrname__)):
+            _obj = getattr(obj, element.__attrname__)
+
+            for i, dynobj in enumerate(_obj):
                 _grid = self.__xoutput__(dynobj)  # , grid=result)
                 _grid.trim()
                 if _grid.height > 1:
@@ -188,8 +190,9 @@ class GridOutput(Output):
                     raise ValueError('dynamic object should only return a matrix with a height of 1')
                 _x = '\n'.join(_grid.row(0))
                 grid.insert(datalist=[_x], cursor=c)
-                grid.nextrow()
-                grid.x -= 1
+                if (i+1) < len(_obj): # and len(_obj) > 1
+                    grid.nextrow()
+                    grid.x -= 1
                 c = grid.cursor
 
             return True
@@ -212,8 +215,8 @@ class GridOutput(Output):
 
                 c = grid.cursor
 
-        #grid.carriagereturn(_depth)
-        grid.returntofirst()
+        grid.carriagereturn(_depth)
+        #grid.returntofirst()
 
     def __outputconfig__(self):
         outputscheme_id = runtimenamespace()['outputscheme']
