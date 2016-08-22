@@ -630,3 +630,5 @@ def test20():
     print('--- test 20 ends ---')
 
 #TODO test trailing simple attribs in format string after dynamic attrib
+def test21():
+    pass
