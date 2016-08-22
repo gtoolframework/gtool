@@ -116,7 +116,7 @@ class GridOutput(Output):
 
     def integrate(self, obj, grid=Matrix(), formatlist=None, separator=" "):
         """
-        Process an object into
+        Process an object into grid structure
 
         :param obj:
         :param grid:
@@ -160,7 +160,7 @@ class GridOutput(Output):
                                     # TODO make this an assert
                                     raise ValueError('dynamic object should only return a matrix with a height of 1')
 
-                                if (i+1) < len(getattr(obj, element.__attrname__)) > 1:
+                                if (i+1) < len(getattr(obj, element.__attrname__)):# > 1:
                                     # prevent trailing merge separators
                                     _x = '\n'.join(_grid.row(0)) + mergeseparator
                                 else:
@@ -169,7 +169,7 @@ class GridOutput(Output):
                         else:
                             # an empty dynamic attribute
                             q.append("")
-                        grid.currentrow = _startrow
+                        #grid.currentrow = _startrow
                     else:
                         _x = self.attribprocess(element, obj=_obj, sep=separator) # TODO <-- fix use of separator
                         q.append(_x)
@@ -189,9 +189,7 @@ class GridOutput(Output):
                 _x = '\n'.join(_grid.row(0))
                 grid.insert(datalist=[_x], cursor=c)
                 grid.nextrow()
-                print(grid.x)
                 grid.x -= 1
-                print(grid.x)
                 c = grid.cursor
 
             return True
@@ -209,61 +207,13 @@ class GridOutput(Output):
                 _depth = __integratesingle__(cell[0], obj, grid)
             else:
                 q = __integratemultiple__(cell, obj)
-                """
-                for element in cell:
-
-                    if isinstance(element, Filler):
-                        _x = self.fillerprocess(element)
-                        q.append(_x)
-
-                    if isinstance(element, AttributeMatch):
-                        if getattr(obj, element.__attrname__).isdynamic:
-                            _startrow = grid.currentrow
-                            if len(getattr(obj, element.__attrname__)) > 0:
-                                outputconfig = self.__outputconfig__()
-                                mergekey = 'merge'
-                                mergeconstant = '\n\n'
-                                mergeseparator = outputconfig[mergekey] if mergekey in outputconfig else mergeconstant
-
-                                for dynobj in getattr(obj, element.__attrname__):
-                                    _grid = self.__xoutput__(dynobj) #, grid=result)
-                                    _grid.trim()
-                                    if _grid.height > 1:
-                                        # TODO make this an assert
-                                        raise ValueError('dynamic object should only return a matrix with a height of 1')
-
-                                    # TODO check here if this dynamic is by itself
-
-                                    # if dynamic is by itself then we stack otherwise we merge
-                                    if len(cell) == 1: #contains only this element in the cell
-                                        _x = '\n'.join(_grid.row(0))
-                                        # push
-                                        grid.insert(datalist=[_x], cursor=c) #<-- this won't work - need to make _q a grid or work directly in grid
-                                        # insert
-                                        # pop
-                                        # move grid cursor
-                                        #print('here!!:', cell)
-                                        pass
-                                    else:
-                                        _x = '\n'.join(_grid.row(0)) + mergeseparator
-                                        q.append(_x)
-
-                                    # if by itself, layer cells verticals
-                                    # also set a next row
-                            else:
-                                # an empty dynamic attribute
-                                q.append("")
-                            grid.currentrow = _startrow
-                        else:
-                            _x = self.attribprocess(element, obj=_obj, sep=separator) #, outputscheme=outputscheme)
-                            q.append(_x)
-                """
                 _q = ''.join(q)
                 grid.insert(datalist=[_q], cursor=c)
 
                 c = grid.cursor
 
-        grid.carriagereturn(_depth)
+        #grid.carriagereturn(_depth)
+        grid.returntofirst()
 
     def __outputconfig__(self):
         outputscheme_id = runtimenamespace()['outputscheme']
