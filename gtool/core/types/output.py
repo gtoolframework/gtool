@@ -218,6 +218,7 @@ class GridOutput(Output):
             c = grid.cursor
             _obj = getattr(obj, element.__attrname__)
 
+
             for i, dynobj in enumerate(_obj):
                 _grid = self.__gridoutput__(dynobj, headers=False)  # , grid=result)
                 _grid.trim()
@@ -225,7 +226,10 @@ class GridOutput(Output):
                     # TODO make this an assert
                     raise ValueError('dynamic object should only return a matrix with a height of 1')
                 #_x = '\n'.join(_grid.row(0))
-                _x = _grid.row(0)
+                if element.isconcatter:
+                    _x = ['\n'.join(_grid.row(0))]
+                else:
+                    _x = _grid.row(0)
                 grid.insert(datalist=_x, cursor=c) #[_x]
                 if (i+1) < len(_obj): # and len(_obj) > 1
                     grid.nextrow()
@@ -239,12 +243,15 @@ class GridOutput(Output):
         def __integrateemptysingle__(element, obj, grid):
             count = 0
             c = grid.cursor
-            _obj = getattr(obj, element.__attrname__)
-            _attrtype = _obj.attrtype()
-            _formatlist = _attrtype.__classoutputscheme__()
-            for _element in _formatlist:
-                count += 1
-            _x = [''] * count
+            if element.isconcatter:
+                _x = ['']
+            else:
+                _obj = getattr(obj, element.__attrname__)
+                _attrtype = _obj.attrtype()
+                _formatlist = _attrtype.__classoutputscheme__()
+                for _element in _formatlist:
+                    count += 1
+                _x = [''] * count
             grid.insert(datalist=_x, cursor=c)
 
         #_obj = obj
