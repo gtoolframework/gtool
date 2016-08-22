@@ -154,7 +154,7 @@ class GridOutput(Output):
                             mergeseparator = self.__separatorstrip__(outputconfig[mergekey]) if mergekey in outputconfig else mergeconstant
 
                             for i, dynobj in enumerate(getattr(obj, element.__attrname__)):
-                                _grid = self.__xoutput__(dynobj) #, grid=result)
+                                _grid = self.__gridoutput__(dynobj) #, grid=result)
                                 _grid.trim()
                                 if _grid.height > 1:
                                     # TODO make this an assert
@@ -183,7 +183,7 @@ class GridOutput(Output):
             _obj = getattr(obj, element.__attrname__)
 
             for i, dynobj in enumerate(_obj):
-                _grid = self.__xoutput__(dynobj)  # , grid=result)
+                _grid = self.__gridoutput__(dynobj)  # , grid=result)
                 _grid.trim()
                 if _grid.height > 1:
                     # TODO make this an assert
@@ -242,7 +242,7 @@ class GridOutput(Output):
             _separator = bytes('%s' % separator, "utf-8").decode("unicode_escape")  # prevent escaping
         return _separator
 
-    def __xoutput__(self, obj, separatoroverride=None, grid=None): #TODO is grid kwarg needed?
+    def __gridoutput__(self, obj, separatoroverride=None, grid=None): #TODO is grid kwarg needed?
 
         """
         Processes data into a grid. Returns data via reference.

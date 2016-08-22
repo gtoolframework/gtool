@@ -1,13 +1,12 @@
-import pyparsing as p
-
+#import pyparsing as p
 #from gtool.core.utils.config import namespace as confignamespace
-from gtool.core.types.matrix import Matrix
-from gtool.core.utils.output import matrixflatten, formatternamespace
+#from gtool.core.types.matrix import Matrix
+from gtool.core.utils.output import formatternamespace
 #from gtool.core.types.outputmanagers import Filler, AttributeMatch
 from gtool.core.filewalker import registerFileMatcher
 from gtool.core.utils.misc import striptoclassname
-from gtool.core.utils.runtime import runtimenamespace
-from gtool.core.utils.config import partialnamespace
+#from gtool.core.utils.runtime import runtimenamespace
+#from gtool.core.utils.config import partialnamespace
 
 
 class CoreType(object):

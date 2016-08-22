@@ -607,7 +607,7 @@ def test20():
 
     print('--- explore results ---')
 
-    o = pluginnamespace()['EXCEL']()
+    o = pluginnamespace()['GRID']()
 
     _ret = o.output(sf)
 
@@ -615,6 +615,18 @@ def test20():
 
     for row in _ret:
         print(row)
+
+    #Correct output
+    """
+    ['dk (d1 ipsum lorum horus) dn', 'dk1 test 123\nhello world', 'defaulttdk1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    ['dk (d2 ipsum lorum horus) dn', 'test 123', '']
+    ['dk (d3 ipsum lorum horus) dn', 'test 123\nhello world', 'defaulttdk3-1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    ['dk (d4 ipsum lorum horus) dn', 'test 123\nhello world', 'defaulttdk4-1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    [None, None, 'defaulttdk4-2 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    ['dk (d5 ipsum lorum horus) dn', 'test 123\nhello world', 'defaulttdk5-1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    [None, None, 'defaulttdk5-2 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    ['dk (d6 ipsum lorum horus) dn', 'test 123\nhello world', 'defaulttdk6 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    """
 
     """
     for child in sf.children:
@@ -645,7 +657,7 @@ def test21():
 
     print('--- explore results ---')
 
-    o = pluginnamespace()['EXCEL']()
+    o = pluginnamespace()['GRID']()
 
     _ret = o.output(sf)
 
@@ -653,5 +665,17 @@ def test21():
 
     for row in _ret:
         print(row)
+
+    # correct output
+    """
+    ['dk (d1 ipsum lorum horus) dn', 'defaulttdk1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0', 'dk1 test 123\nhello world']
+    ['dk (d2 ipsum lorum horus) dn', '', 'test 123']
+    ['dk (d3 ipsum lorum horus) dn', 'defaulttdk3 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0', 'test 123\nhello world']
+    ['dk (d4 ipsum lorum horus) dn', 'defaulttdk4-1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0', 'test 123\nhello world']
+    [None, 'defaulttdk4-2 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0', None]
+    ['dk (d5 ipsum lorum horus) dn', 'defaulttdk5-1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0', 'test 123\nhello world']
+    [None, 'defaulttdk5-2 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0', None]
+    ['dk (d6 ipsum lorum horus) dn', 'defaulttdk6 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0', 'test 123\nhello world']
+    """
 
     print('--- test 21 ends ---')
