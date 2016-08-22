@@ -1,4 +1,4 @@
-@testprop1: tdk3-1 ipsum lorum horus
+@testprop1: tdk3 ipsum lorum horus
 @testprop2: alpha beta
 @testprop2: ipsum lorum horus rictum
 @testprop3: 4
