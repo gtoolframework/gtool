@@ -641,7 +641,6 @@ def test20():
 
     print('--- test 20 ends ---')
 
-#TODO test trailing simple attribs in format string after dynamic attrib
 def test21():
     outputscheme = '1'
     print('test 21 validates data alignment works with trailing non-dynamic attributes')
@@ -679,3 +678,81 @@ def test21():
     """
 
     print('--- test 21 ends ---')
+
+def test22():
+    outputscheme = '1'
+    print('test 22 validates data alignment of non-concatted dynamic with trailing non-dynamic attributes')
+    print('---- testing 22 begins ----')
+
+    sf = projectloader('test\\test22', dbg=False, outputscheme=outputscheme)
+
+    try:
+        checkalignment(sf)
+    except ValueError as err:
+        print(err)
+        sys.exit(1)
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['GRID']()
+
+    _ret = o.output(sf)
+
+    _ret.trim()
+
+    for row in _ret:
+        print(row)
+
+    # correct output
+    """
+    ['testpropd1', 'testprop1', 'testprop2', 'testprop3', 'testpropd2']
+    ['d1 ipsum lorum horus', 'tdk1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0', 'dk1 test 123\nhello world']
+    ['d2 ipsum lorum horus', '', '', '', 'test 123']
+    ['d3 ipsum lorum horus', 'tdk3 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0', 'test 123\nhello world']
+    ['d4 ipsum lorum horus', 'tdk4-1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0', 'test 123\nhello world']
+    [None, 'tdk4-2 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0', None]
+    ['d5 ipsum lorum horus', 'tdk5-1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0', 'test 123\nhello world']
+    [None, 'tdk5-2 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0', None]
+    ['d6 ipsum lorum horus', 'tdk6 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0', 'test 123\nhello world']
+    """
+
+    print('--- test 22 ends ---')
+
+def test23():
+    outputscheme = '1'
+    print('test 23 validates data alignment of trailing non-concatted dynamic attributes')
+    print('---- testing 23 begins ----')
+
+    sf = projectloader('test\\test23', dbg=False, outputscheme=outputscheme)
+
+    try:
+        checkalignment(sf)
+    except ValueError as err:
+        print(err)
+        sys.exit(1)
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['GRID']()
+
+    _ret = o.output(sf)
+
+    _ret.trim()
+
+    for row in _ret:
+        print(row)
+
+    # correct output
+    """
+    ['testpropd1', 'testpropd2', 'testprop1', 'testprop2', 'testprop3']
+    ['d1 ipsum lorum horus', 'dk1 test 123\nhello world', 'tdk1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    ['d2 ipsum lorum horus', 'test 123', '', '', '']
+    ['d3 ipsum lorum horus', 'test 123\nhello world', 'tdk3-1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    ['d4 ipsum lorum horus', 'test 123\nhello world', 'tdk4-1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    [None, None, 'tdk4-2 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    ['d5 ipsum lorum horus', 'test 123\nhello world', 'tdk5-1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    [None, None, 'tdk5-2 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    ['d6 ipsum lorum horus', 'test 123\nhello world', 'tdk6 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    """
+
+    print('--- test 23 ends ---')
