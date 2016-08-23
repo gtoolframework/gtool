@@ -30,7 +30,7 @@ def structureflatten(exp):
     yield from sub(exp, [])
 
 
-def structureflatten2(exp):
+def structureflattentolist(exp):
     """
     flattens a list or dict in strings
     :param exp: list or dict
@@ -110,7 +110,6 @@ def reversematch(project=None, matchstring=None):
 
 
     matchlist = ['{0}'.format(k).strip() for k in ''.join([a for a in matchstring[1:-1] if a is not "'"]).split(',')]
-
     #matchlist = matchstring.split('/')
     _matches = []
     for child in project.children:
@@ -124,33 +123,32 @@ def checkalignment(project):
     if not isinstance(project, StructureFactory.Container):
         raise TypeError('function checkalignment expected an arg of type StructureFactory.Container but received an object of type %s' % type(project))
 
-    s = set()
-    t = set()
+    #s = set()
+    uniqueleaves = set()
 
     _tree = project.treestructure()
     #print('tree:', _tree)
 
-    for i in structureflatten2(_tree):
+    for i in structureflattentolist(_tree):
         #_c = '{0}'.format(i)[1:-1]
         #print(['{0}'.format(k).strip() for k in ''.join([a for a in _c if a is not "'"]).split(',')])
-        t.add('%s' % i) #cheap hack to make list hashable
+        uniqueleaves.add('%s' % i) #cheap hack to make list hashable
 
-    #print(t)
+    #print(uniqueleaves)
 
-    flattened = structureflatten(_tree)
+    #flattened = structureflatten(_tree)
     #for i in flattened:
     #    print(i)
-    for i in sorted(flattened):
-        #print(i)
-        s.add(i)
+    #for i in sorted(flattened):
+    #    s.add(i)
 
     #print(s)
-    _longest = findlongest(t) #(s)
+    _longest = findlongest(uniqueleaves) #(s)
 
-    if len(t) == 1:
+    if len(uniqueleaves) == 1:
         return True
 
-    for i in t: #s:
+    for i in uniqueleaves: #s:
         #print(i[1:-1])
         #print(_longest[1:-1])
         if i[1:-1] not in _longest[1:-1]:
