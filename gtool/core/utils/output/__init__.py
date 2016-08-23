@@ -29,6 +29,33 @@ def structureflatten(exp):
 
     yield from sub(exp, [])
 
+
+def structureflatten2(exp):
+    """
+    flattens a list or dict in strings
+    :param exp: list or dict
+    :return: list of strings
+    """
+
+    def sub(exp, res):
+        if type(exp) == dict:
+            for k, v in exp.items():
+                yield from sub(v, res + [k])
+        elif type(exp) == list:
+            if all(not isinstance(v, dict) and not isinstance(v, list) for v in exp):
+                _exp = list(set(exp)) # make unique
+                if len(_exp) > 1:
+                    yield res + [sorted(_exp, key=str.lower)]
+                else:
+                    yield res + _exp
+            else:
+                for v in exp:
+                    yield from sub(v, res)
+        else:
+            yield res + [exp]
+
+    yield from sub(exp, [])
+
 def findlongest(flatstructure):
     """
     From a set of unique strings returns the longest
@@ -80,7 +107,11 @@ def reversematch(project=None, matchstring=None):
         raise TypeError('function reversematch expected a matchstring kwarg of'
                         'type str but got a %s', type(matchstring))
 
-    matchlist = matchstring.split('/')
+
+
+    matchlist = ['{0}'.format(k).strip() for k in ''.join([a for a in matchstring[1:-1] if a is not "'"]).split(',')]
+
+    #matchlist = matchstring.split('/')
     _matches = []
     for child in project.children:
         __sub__(matchlist[1:], child, _matches)
@@ -94,16 +125,35 @@ def checkalignment(project):
         raise TypeError('function checkalignment expected an arg of type StructureFactory.Container but received an object of type %s' % type(project))
 
     s = set()
+    t = set()
 
-    for i in sorted(structureflatten(project.treestructure())):
-        # print(i)
+    _tree = project.treestructure()
+    #print('tree:', _tree)
+
+    for i in structureflatten2(_tree):
+        #_c = '{0}'.format(i)[1:-1]
+        #print(['{0}'.format(k).strip() for k in ''.join([a for a in _c if a is not "'"]).split(',')])
+        t.add('%s' % i) #cheap hack to make list hashable
+
+    #print(t)
+
+    flattened = structureflatten(_tree)
+    #for i in flattened:
+    #    print(i)
+    for i in sorted(flattened):
+        #print(i)
         s.add(i)
 
     #print(s)
-    _longest = findlongest(s)
+    _longest = findlongest(t) #(s)
 
-    for i in s:
-        if i not in _longest:
+    if len(t) == 1:
+        return True
+
+    for i in t: #s:
+        #print(i[1:-1])
+        #print(_longest[1:-1])
+        if i[1:-1] not in _longest[1:-1]:
             _nonmatching = '\n '.join(reversematch(project=project, matchstring=i))
             _outputplugin = partialnamespace('output')[runtimenamespace()['outputscheme']]['plugin']
             # have to compare strings instead of using isinstance to avoid circular imports

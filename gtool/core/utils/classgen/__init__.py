@@ -70,7 +70,7 @@ class factory(object):
         attribsDict['__mandatory_properties__'] = []
         #attribsDict['__missing_mandatory_properties__'] = []
         #attribsDict['__missing_optional_properties__'] = []
-        print('*' * 30)
+        #print('*' * 30)
         for attributeName, attributeValues in classDict['attributes'].items():
             paramDict = {}
             if attributeValues['list']:
@@ -141,5 +141,6 @@ class factory(object):
 def generateClass(className, classDict):
     _newclass = factory.generate(className, classDict)
     registerClass(className, _newclass)
+    print('Registering Dynamic Class:', className)
     # TODO no need to return the new class ist if registers correctly
     return _newclass

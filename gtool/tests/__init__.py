@@ -599,11 +599,13 @@ def test20():
 
     sf = projectloader('test\\test20', dbg=False, outputscheme=outputscheme)
 
+    """
     try:
         checkalignment(sf)
     except ValueError as err:
         print(err)
         sys.exit(1)
+    """
 
     print('--- explore results ---')
 
@@ -648,11 +650,13 @@ def test21():
 
     sf = projectloader('test\\test21', dbg=False, outputscheme=outputscheme)
 
+    """
     try:
         checkalignment(sf)
     except ValueError as err:
         print(err)
         sys.exit(1)
+    """
 
     print('--- explore results ---')
 
@@ -686,11 +690,13 @@ def test22():
 
     sf = projectloader('test\\test22', dbg=False, outputscheme=outputscheme)
 
+    """
     try:
         checkalignment(sf)
     except ValueError as err:
         print(err)
         sys.exit(1)
+    """
 
     print('--- explore results ---')
 
@@ -725,12 +731,13 @@ def test23():
 
     sf = projectloader('test\\test23', dbg=False, outputscheme=outputscheme)
 
+    """
     try:
         checkalignment(sf)
     except ValueError as err:
         print(err)
         sys.exit(1)
-
+    """
     print('--- explore results ---')
 
     o = pluginnamespace()['GRID']()
@@ -756,3 +763,43 @@ def test23():
     """
 
     print('--- test 23 ends ---')
+
+def test24():
+    outputscheme = '1'
+    print('test 24 validates data alignment of trailing non-concatted dynamic attributes')
+    print('---- testing 24 begins ----')
+
+    sf = projectloader('test\\test24', dbg=False, outputscheme=outputscheme)
+
+    """
+    try:
+        checkalignment(sf)
+    except ValueError as err:
+        print(err)
+        sys.exit(1)
+    """
+    print('--- explore results ---')
+
+    o = pluginnamespace()['GRID']()
+
+    _ret = o.output(sf)
+
+    _ret.trim()
+
+    for row in _ret:
+        print(row)
+
+    # correct output
+    """
+    ['testpropd1', 'testpropd2', 'testprop1', 'testprop2', 'testprop3']
+    ['d1 ipsum lorum horus', 'dk1 test 123\nhello world', 'tdk1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    ['d2 ipsum lorum horus', 'test 123', '', '', '']
+    ['d3 ipsum lorum horus', 'test 123\nhello world', 'tdk3-1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    ['d4 ipsum lorum horus', 'test 123\nhello world', 'tdk4-1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    [None, None, 'tdk4-2 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    ['d5 ipsum lorum horus', 'test 123\nhello world', 'tdk5-1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    [None, None, 'tdk5-2 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    ['d6 ipsum lorum horus', 'test 123\nhello world', 'tdk6 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    """
+
+    print('--- test 24 ends ---')
