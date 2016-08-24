@@ -817,22 +817,33 @@ def test25():
 
     _ret = o.output(sf)
 
-    _ret.trim()
-
-    for row in _ret:
-        print(row)
-
     # correct output
     """
-    ['testpropd1', 'testpropd2', 'testprop1', 'testprop2', 'testprop3']
-    ['d1 ipsum lorum horus', 'dk1 test 123\nhello world', 'tdk1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
-    ['d2 ipsum lorum horus', 'test 123', '', '', '']
-    ['d3 ipsum lorum horus', 'test 123\nhello world', 'tdk3-1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
-    ['d4 ipsum lorum horus', 'test 123\nhello world', 'tdk4-1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
-    [None, None, 'tdk4-2 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
-    ['d5 ipsum lorum horus', 'test 123\nhello world', 'tdk5-1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
-    [None, None, 'tdk5-2 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
-    ['d6 ipsum lorum horus', 'test 123\nhello world', 'tdk6 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    A recursive loop has been detected in */CLASSONE/CLASSONE.
+    The class CLASSONE is seen twice in the same path.
+    Make sure that one class does not call itself, either directly or indirectly.
     """
 
     print('--- test 25 ends ---')
+
+def test26():
+    outputscheme = '1'
+    print('test 26 validates indirect recursion check works')
+    print('---- testing 26 begins ----')
+
+    sf = projectloader('test\\test26', dbg=False, outputscheme=outputscheme)
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['GRID']()
+
+    _ret = o.output(sf)
+
+    # correct output
+    """
+    A recursive loop has been detected in */CLASSONE/CLASSTWO/CLASSONE.
+    The class CLASSONE is seen twice in the same path.
+    Make sure that one class does not call itself, either directly or indirectly.
+    """
+
+    print('--- test 26 ends ---')

@@ -1,0 +1,7 @@
+CLASSTWO::
+*file = d
+*moo = 1
+*displayname = Blah2
+*output = @prop1 || @prop2
+@prop1:: single: String (required = False)
+@prop2:: single: CLASSONE (required = False)
