@@ -86,7 +86,7 @@ def reversematch(project=None, matchstring=None):
     :return: list of paths
     """
 
-    def __sub__(matchlist, node, result, numbering=True):
+    def sub(matchlist, node, result, numbering=True):
         #returns results via list reference
         _class = striptoclassname(node.__objectmatch__())
         if _class == matchlist[0] and len(matchlist) == 1:
@@ -96,7 +96,7 @@ def reversematch(project=None, matchstring=None):
                 result.append(node.fileobject.path)
         elif _class == matchlist[0] and len(matchlist) > 1 and len(node.children) > 0:
             for child in node.children:
-                __sub__(matchlist[1:], child, result)
+                sub(matchlist[1:], child, result)
 
 
     if not isinstance(project, StructureFactory.Container):
@@ -108,14 +108,51 @@ def reversematch(project=None, matchstring=None):
                         'type str but got a %s', type(matchstring))
 
 
-
+    # remove quotes and brackets from this stringified list and convert it back into a list
     matchlist = ['{0}'.format(k).strip() for k in ''.join([a for a in matchstring[1:-1] if a is not "'"]).split(',')]
     #matchlist = matchstring.split('/')
     _matches = []
     for child in project.children:
-        __sub__(matchlist[1:], child, _matches)
+        sub(matchlist[1:], child, _matches)
 
     return _matches
+
+def recursioncheck(project):
+
+    def flatten(pathlist):
+        result = []
+        for i in pathlist:
+            if isinstance(i, list):
+                result.append('[{0}]'.format(flatten(i)))
+            else:
+                result.append(i)
+        return result
+
+    def sub(currentbranch, seen):
+        for i in currentbranch:
+            if isinstance(i, list):
+                sub(i, seen)
+            else:
+                if i in seen:
+                    _longbranch = '/'.join(flatten(currentbranch))
+                    _exception = 'A recursive loop has been detected in {0}. ' \
+                                 'The class {1} is seen twice in the same path. ' \
+                                 'Make sure that one class does not call itself, ' \
+                                 'either directly or indirectly.'.format(_longbranch, i)
+                    raise ValueError(_exception)
+                else:
+                    seen.append(i)
+
+    if not isinstance(project, StructureFactory.Container):
+        raise TypeError('function recursioncheck expected an arg of type StructureFactory.Container but received an object of type %s' % type(project))
+
+    _tree = project.treestructure()
+
+    for branch in structureflattentolist(_tree):
+        sub(branch, [])
+
+    return True
+
 
 # TODO move checkalignment and supporting funcs over to type.output and embedded in Output class (may cause problems due to import of pluginnamespace
 def checkalignment(project):
@@ -123,34 +160,18 @@ def checkalignment(project):
     if not isinstance(project, StructureFactory.Container):
         raise TypeError('function checkalignment expected an arg of type StructureFactory.Container but received an object of type %s' % type(project))
 
-    #s = set()
-    uniqueleaves = set()
-
+    uniquebranches = set()
     _tree = project.treestructure()
-    #print('tree:', _tree)
 
     for i in structureflattentolist(_tree):
-        #_c = '{0}'.format(i)[1:-1]
-        #print(['{0}'.format(k).strip() for k in ''.join([a for a in _c if a is not "'"]).split(',')])
-        uniqueleaves.add('%s' % i) #cheap hack to make list hashable
+        uniquebranches.add('%s' % i) #cheap hack to make list hashable
 
-    #print(uniqueleaves)
+    _longest = findlongest(uniquebranches) #(s)
 
-    #flattened = structureflatten(_tree)
-    #for i in flattened:
-    #    print(i)
-    #for i in sorted(flattened):
-    #    s.add(i)
-
-    #print(s)
-    _longest = findlongest(uniqueleaves) #(s)
-
-    if len(uniqueleaves) == 1:
+    if len(uniquebranches) == 1:
         return True
 
-    for i in uniqueleaves: #s:
-        #print(i[1:-1])
-        #print(_longest[1:-1])
+    for i in uniquebranches: #s:
         if i[1:-1] not in _longest[1:-1]:
             _nonmatching = '\n '.join(reversematch(project=project, matchstring=i))
             _outputplugin = partialnamespace('output')[runtimenamespace()['outputscheme']]['plugin']
@@ -165,9 +186,6 @@ def checkalignment(project):
                          'aligned data include:\n\n{4}'.format(i, _longest, _nonmatching, _outputplugin, _treeoutputplugins)
 
             raise ValueError(_exception)
-        else:
-            #print(i, 'is in', _longest)
-            pass
 
     return True
 

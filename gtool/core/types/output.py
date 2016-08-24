@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from gtool.core.utils.output import checkalignment
+from gtool.core.utils.output import checkalignment, recursioncheck
 import sys
 from gtool.core.filewalker import StructureFactory
 from gtool.core.utils.output import outputconfigname #, formatternamespace
@@ -29,9 +29,17 @@ class Output(ABC):
         if not isinstance(projectstructure, StructureFactory.Container):
             raise TypeError('Expected StructureFactory.Container as argument but got %s' % type(projectstructure))
 
+        self.isnotrecursive(projectstructure)
         self.isaligned(projectstructure)
 
         return self.__output__(projectstructure)
+
+    def isnotrecursive(self, projectstructure):
+        try:
+            recursioncheck(projectstructure)
+        except ValueError as err:
+            print(err)
+            sys.exit()
 
     def isaligned(self, projectstructure):
         """
@@ -42,7 +50,7 @@ class Output(ABC):
         Aligned output is useful for grid like output, such as excel.
         Unaligned output is useful for graph like outputs, such as json.
         :param projectstructure: a structurefactory object
-        :return:
+        :return: None
         """
         if self.__aligned__:
             try:
