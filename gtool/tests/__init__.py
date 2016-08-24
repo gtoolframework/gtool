@@ -847,3 +847,31 @@ def test26():
     """
 
     print('--- test 26 ends ---')
+
+def test26():
+    outputscheme = '1'
+    print('test 26 checks simple output to excel')
+    print('---- testing 26 begins ----')
+
+    sf = projectloader('test\\test24', dbg=False, outputscheme=outputscheme)
+
+    """
+    try:
+        checkalignment(sf)
+    except ValueError as err:
+        print(err)
+        sys.exit(1)
+    """
+    print('--- explore results ---')
+
+    o = pluginnamespace()['EXCEL']()
+
+    _ret = o.output(sf)
+
+    print(_ret)
+    # correct output
+    """
+    True
+    """
+
+    print('--- test 26 ends ---')

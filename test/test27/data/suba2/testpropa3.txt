@@ -1,0 +1,4 @@
+@testpropb1: subc1 ipsum lorum horus
+@testpropb2: alpha beta
+@testpropb2: ipsum lorum horus rictum
+@testpropb3: 4
