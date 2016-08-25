@@ -848,25 +848,19 @@ def test26():
 
     print('--- test 26 ends ---')
 
-def test26():
+def test27():
     outputscheme = '1'
-    print('test 26 checks simple output to excel')
-    print('---- testing 26 begins ----')
+    print('test 27 checks simple output to excel')
+    print('---- testing 27 begins ----')
 
     sf = projectloader('test\\test24', dbg=False, outputscheme=outputscheme)
 
-    """
-    try:
-        checkalignment(sf)
-    except ValueError as err:
-        print(err)
-        sys.exit(1)
-    """
+
     print('--- explore results ---')
 
     o = pluginnamespace()['EXCEL']()
 
-    _ret = o.output(sf, output='..\\test26.xlsx')
+    _ret = o.output(sf, output='..\\test27.xlsx')
 
     print(_ret)
     # correct output
@@ -874,4 +868,4 @@ def test26():
     True
     """
 
-    print('--- test 26 ends ---')
+    print('--- test 27 ends ---')

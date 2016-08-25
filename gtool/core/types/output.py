@@ -61,7 +61,7 @@ class Output(ABC):
                 sys.exit()
 
     @abstractmethod
-    def __output__(self, projectstructure, outputfile=None):
+    def __output__(self, projectstructure, output=None):
         """
         transforms projectstructure into final format.
         Should use output format string to process data object
@@ -88,7 +88,7 @@ class GridOutput(Output):
         super(GridOutput, self).__init__(aligned=True)
 
     @abstractmethod
-    def __output__(self, projectstructure, outputfile=None):
+    def __output__(self, projectstructure, output=None):
         """
         transforms projectstructure into final format.
         Should use output format string to process data object
