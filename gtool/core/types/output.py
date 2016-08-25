@@ -19,10 +19,11 @@ class Output(ABC):
             raise NotImplemented('Output classes must explicitly set keyword arg aligned as True or False')
         self.__aligned__ = aligned
 
-    def output(self, projectstructure):
+    def output(self, projectstructure, output=None):
         """
         Final output generator, should not be overriden without a call to isaligned() and __output__()
         :param projectstructure: a structurefactory object
+        :param outputfile: destination file
         :return:
         """
 
@@ -32,7 +33,7 @@ class Output(ABC):
         self.isnotrecursive(projectstructure)
         self.isaligned(projectstructure)
 
-        return self.__output__(projectstructure)
+        return self.__output__(projectstructure, output=output)
 
     def isnotrecursive(self, projectstructure):
         try:
@@ -60,11 +61,12 @@ class Output(ABC):
                 sys.exit()
 
     @abstractmethod
-    def __output__(self, projectstructure):
+    def __output__(self, projectstructure, outputfile=None):
         """
         transforms projectstructure into final format.
         Should use output format string to process data object
         :param projectstructure: StructureFactory.Container
+        :param outputfile: destination file
         :return: data in desired final format
         """
         # TODO call formatter, integrater and __output__ from DynamicType (moving it over first)
@@ -84,6 +86,20 @@ class GridOutput(Output):
 
     def __init__(self):
         super(GridOutput, self).__init__(aligned=True)
+
+    @abstractmethod
+    def __output__(self, projectstructure, outputfile=None):
+        """
+        transforms projectstructure into final format.
+        Should use output format string to process data object
+        :param projectstructure: StructureFactory.Container
+        :param outputfile: destination file
+        :return: data in desired final format
+        """
+        structure = projectstructure.dataasobject
+        _grid = self.__gridoutput__(structure)
+        _grid.trim()
+        return _grid
 
     """
     @classmethod

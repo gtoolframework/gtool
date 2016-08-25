@@ -866,7 +866,7 @@ def test26():
 
     o = pluginnamespace()['EXCEL']()
 
-    _ret = o.output(sf)
+    _ret = o.output(sf, output='..\\test26.xlsx')
 
     print(_ret)
     # correct output
