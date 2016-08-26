@@ -88,7 +88,10 @@ def reversematch(project=None, matchstring=None):
 
     def sub(matchlist, node, result, numbering=True):
         #returns results via list reference
-        _class = striptoclassname(node.__objectmatch__())
+        if isinstance(node, StructureFactory.Container):
+            _class = 'container'
+        else:
+            _class = striptoclassname(node.__objectmatch__())
         if _class == matchlist[0] and len(matchlist) == 1:
             if numbering:
                 result.append('({0}) {1}'.format(len(result)+1, node.fileobject.path))

@@ -191,7 +191,13 @@ class StructureFactory(object):
                 raise TypeError('Could not parse the data from %s into a %s class' % (self.path, type(_retobject)))
 
         def treestructure(self):
-            _currentnode = striptoclassname(self.__objectmatch__()) if self.__parent__ is not None else '*'
+            if self.__parent__ is None:
+                _currentnode = '*'
+            elif self.__parent__ is not None and isinstance(self, StructureFactory.Container):
+                _currentnode = 'container' #self.name
+            else:
+                _currentnode = striptoclassname(self.__objectmatch__()) # if self.__parent__ is not None else '*'
+
             if len(self.children) == 0:
                 return _currentnode
             else:
