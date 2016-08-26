@@ -853,7 +853,7 @@ def test27():
     print('test 27 checks simple output to excel')
     print('---- testing 27 begins ----')
 
-    sf = projectloader('test\\test24', dbg=False, outputscheme=outputscheme)
+    sf = projectloader('test\\test27', dbg=False, outputscheme=outputscheme)
 
 
     print('--- explore results ---')
@@ -869,3 +869,25 @@ def test27():
     """
 
     print('--- test 27 ends ---')
+
+def test28():
+    outputscheme = '1'
+    print('test 28 checks split output to excel')
+    print('---- testing 28 begins ----')
+
+    sf = projectloader('test\\test28', dbg=False, outputscheme=outputscheme)
+
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['EXCEL']()
+
+    _ret = o.output(sf, output='..\\test28.xlsx')
+
+    print(_ret)
+    # correct output
+    """
+    True
+    """
+
+    print('--- test 28 ends ---')
