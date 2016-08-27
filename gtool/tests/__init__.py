@@ -437,7 +437,7 @@ def test16():
     print('--- test 16 ends ---')
 
 def test17():
-    outputscheme = 'output1'
+    outputscheme = '1' #TODO fix test17 config file's output scheme
     print('test 17 validates output format strings and config works')
     print('---- testing 17 begins ----')
 
@@ -505,7 +505,7 @@ def test18sub1():
 
 def test18():
 
-    outputscheme = 'output1'
+    outputscheme = '1' #TODO fix test18 config file's output scheme
     print('test 18 validates arbitrarily structured data folder structures work properly')
     print('---- testing 18 begins ----')
 

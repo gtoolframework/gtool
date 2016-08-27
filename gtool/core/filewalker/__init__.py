@@ -194,7 +194,7 @@ class StructureFactory(object):
             if self.__parent__ is None:
                 _currentnode = '*'
             elif self.__parent__ is not None and isinstance(self, StructureFactory.Container):
-                _currentnode = 'container' #self.name
+                _currentnode = 'container directory' #can't use self.name
             else:
                 _currentnode = striptoclassname(self.__objectmatch__()) # if self.__parent__ is not None else '*'
 

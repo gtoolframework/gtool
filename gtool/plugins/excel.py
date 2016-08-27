@@ -49,8 +49,8 @@ class Excel(GridOutput):
 
         workbook = xlsxwriter.Workbook(filename)
 
-        for sheet, grid in outputdict.items():
-            worksheet = workbook.add_worksheet(name=sheet)
+        for sheet, grid in sorted(outputdict.items()):
+            worksheet = workbook.add_worksheet(name=sheet[:32]) #worksheet name cannot be more than 32 chars long
             if not isinstance(grid, Matrix):
                 raise TypeError('Expected a Matrix but got a %s' % type(grid))
             for i, row in enumerate(grid):
