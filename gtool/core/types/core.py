@@ -100,3 +100,7 @@ class DynamicType(object):
         for item in self.__list_slots__.keys():
             _value = self.__list_slots__[item]
             yield (item, _value) # self.__list_slots__[item])
+
+
+class FunctionType(object):
+    pass
