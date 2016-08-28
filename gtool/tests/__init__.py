@@ -892,10 +892,10 @@ def test28():
 
     print('--- test 28 ends ---')
 
-def test29():
+def test29a():
     outputscheme = 'json'
-    print('test 29 tests json output')
-    print('---- testing 29 begins ----')
+    print('test 29a tests json output to screen')
+    print('---- testing 29a begins ----')
 
     sf = projectloader('test\\test29', dbg=False, outputscheme=outputscheme)
 
@@ -904,7 +904,106 @@ def test29():
 
     o = pluginnamespace()['JSON']() #TODO read engine from config
 
-    _ret = o.output(sf) #, output='..\\test29.json')
+    _ret = o.output(sf)
+
+    print(_ret)
+    # correct output
+    """
+    [
+        {
+            "suba1": {
+                "testpropa1": [
+                    "d1 ipsum lorum horus"
+                ],
+                "testpropa2": [
+                    "hello world"
+                ],
+                "testpropa3": [
+                    {
+                        "testpropb1": [
+                            "subc1 ipsum lorum horus"
+                        ],
+                        "testpropb2": [
+                            "alpha beta",
+                            "ipsum lorum horus rictum"
+                        ],
+                        "testpropb3": [
+                            4.0
+                        ]
+                    }
+                ],
+                "testpropa4": [
+                    {
+                        "testpropc1": [
+                            "subb1 ipsum lorum horus"
+                        ],
+                        "testpropc2": [
+                            "alpha beta",
+                            "ipsum lorum horus rictum"
+                        ],
+                        "testpropc3": [
+                            4.0
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "suba2": {
+                "testpropa1": [
+                    "d1 ipsum lorum horus"
+                ],
+                "testpropa2": [
+                    "hello world"
+                ],
+                "testpropa3": [
+                    {
+                        "testpropb1": [
+                            "subc1 ipsum lorum horus"
+                        ],
+                        "testpropb2": [
+                            "alpha beta",
+                            "ipsum lorum horus rictum"
+                        ],
+                        "testpropb3": [
+                            4.0
+                        ]
+                    }
+                ],
+                "testpropa4": [
+                    {
+                        "testpropc1": [
+                            "subb1 ipsum lorum horus"
+                        ],
+                        "testpropc2": [
+                            "alpha beta",
+                            "ipsum lorum horus rictum"
+                        ],
+                        "testpropc3": [
+                            4.0
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+    """
+
+    print('--- test 29a ends ---')
+
+def test29b():
+    outputscheme = 'json'
+    print('test 29b tests json output to file')
+    print('---- testing 29b begins ----')
+
+    sf = projectloader('test\\test29', dbg=False, outputscheme=outputscheme)
+
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['JSON']() #TODO read engine from config
+
+    _ret = o.output(sf, output='..\\test29b.json')
 
     print(_ret)
     # correct output
@@ -912,4 +1011,4 @@ def test29():
     True
     """
 
-    print('--- test 29 ends ---')
+    print('--- test 29b ends ---')

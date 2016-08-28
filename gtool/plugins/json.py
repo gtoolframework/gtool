@@ -5,8 +5,16 @@ import json
 class Json(TreeOutput):
 
     def __output__(self, projectstructure, output=None):
-        #projectstructure = StructureFactory.Container()
-        return json.dumps(self.__jsonoutput__(projectstructure))
+
+        _jsonoutput = self.__jsonoutput__(projectstructure)
+
+        if output is None:
+            return _jsonoutput
+        else:
+            with open(output,mode='w') as f:
+                f.write(_jsonoutput)
+                f.close()
+            return True #TODO inconsistent return json object vs true
 
     def __jsonoutput__(self, projectstructure):
 
@@ -14,11 +22,10 @@ class Json(TreeOutput):
             if tree.haschildren:
                 return [sub(child) for child in tree.children]
             else:
-                return tree.dataasobject.asdict()
-
+                return {tree.name: tree.dataasobject.asdict()}
 
         _ret = sub(projectstructure)
-        return _ret
+        return json.dumps(_ret, sort_keys=True, indent=4)
 
 
 def load():

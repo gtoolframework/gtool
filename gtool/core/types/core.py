@@ -23,7 +23,12 @@ class CoreType(object):
 
     # TODO valid alternative repr requirements (if any)
     def __repr__(self):
-        return '%s' % self.__value__
+        #return '%s' % self.__value__
+        #return '{0}: {1}'.format(striptoclassname(type(self)), self.__value__)
+        return  '%s' % self.__convert__(self.__value__)
+
+    def raw(self):
+        return self.__convert__(self.__value__)
 
     def __str__(self):
         return '%s' % self.__value__
@@ -39,9 +44,9 @@ class CoreType(object):
     @classmethod
     def __convert__(cls, item):
         try:
-            return cls.__convertor__()(item)
+            return cls.__converter__()(item)
         except ValueError:
-            raise ValueError('cannot convert %s to type %s' %(item, cls.__convertor__()))
+            raise ValueError('cannot convert %s to type %s' %(item, cls.__converter__()))
 
 
 class DynamicType(object):
@@ -85,7 +90,7 @@ class DynamicType(object):
         _retdict = {}
         for k, v in self:
             if not v.isdynamic:
-                _v = ['%s' % i for i in v]
+                _v = [i.raw() for i in v]
             else:
                 _v = [i.asdict() for i in v]
             _retdict[k] = _v
@@ -93,4 +98,5 @@ class DynamicType(object):
 
     def __iter__(self):
         for item in self.__list_slots__.keys():
-            yield (item, self.__list_slots__[item])
+            _value = self.__list_slots__[item]
+            yield (item, _value) # self.__list_slots__[item])
