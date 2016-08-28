@@ -1,0 +1,5 @@
+CLASSONE::
+*file = tf
+*output = @num || @test
+@num:: single: Number (required = False)
+@test:: single: Testfunc (required = True)
