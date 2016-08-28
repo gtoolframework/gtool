@@ -46,6 +46,7 @@ class factory(object):
     @staticmethod
     def methodbinder():
         methodsDict = {}
+        """
         methodsDict['__createattrs__'] = createattrs
         methodsDict['__init__'] = init
         # magic methods override = http://www.rafekettler.com/magicmethods.html
@@ -59,6 +60,7 @@ class factory(object):
         methodsDict['load'] = load
         methodsDict['__repr__'] = repr
         methodsDict['__str__'] = str
+        """
         return methodsDict
 
     @staticmethod
