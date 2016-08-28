@@ -1012,3 +1012,68 @@ def test29b():
     """
 
     print('--- test 29b ends ---')
+
+def test29c():
+    outputscheme = 'yaml'
+    print('test 29c tests yaml output to screen')
+    print('---- testing 29c begins ----')
+
+    sf = projectloader('test\\test29', dbg=False, outputscheme=outputscheme)
+
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['YAML']() #TODO read engine from config
+
+    _ret = o.output(sf)
+
+    print(_ret)
+    # correct output
+    """
+    -   suba1:
+        testpropa1: [d1 ipsum lorum horus]
+        testpropa2: [hello world]
+        testpropa3:
+        -   testpropb1: [subc1 ipsum lorum horus]
+            testpropb2: [alpha beta, ipsum lorum horus rictum]
+            testpropb3: [4.0]
+        testpropa4:
+        -   testpropc1: [subb1 ipsum lorum horus]
+            testpropc2: [alpha beta, ipsum lorum horus rictum]
+            testpropc3: [4.0]
+    -   suba2:
+            testpropa1: [d1 ipsum lorum horus]
+            testpropa2: [hello world]
+            testpropa3:
+            -   testpropb1: [subc1 ipsum lorum horus]
+                testpropb2: [alpha beta, ipsum lorum horus rictum]
+                testpropb3: [4.0]
+            testpropa4:
+            -   testpropc1: [subb1 ipsum lorum horus]
+                testpropc2: [alpha beta, ipsum lorum horus rictum]
+                testpropc3: [4.0]
+    """
+
+    print('--- test 29c ends ---')
+
+def test29d():
+    outputscheme = 'yaml'
+    print('test 29d tests yaml output to file')
+    print('---- testing 29d begins ----')
+
+    sf = projectloader('test\\test29', dbg=False, outputscheme=outputscheme)
+
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['YAML']() #TODO read engine from config
+
+    _ret = o.output(sf, output='..\\test29d.yaml')
+
+    print(_ret)
+    # correct output
+    """
+    True
+    """
+
+    print('--- test 29d ends ---')
