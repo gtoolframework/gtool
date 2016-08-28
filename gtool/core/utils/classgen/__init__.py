@@ -2,8 +2,8 @@ from distutils.util import strtobool
 
 from gtool.core.namespace import registerClass
 from gtool.core.types.attributes import attribute
-from .methods import * # TODO move as many methods in DynamicType
-
+#from .methods import * # TODO already moved methods into DynamicType
+from gtool.core.types.core import DynamicType
 
 class factory(object):
     """
@@ -42,10 +42,10 @@ class factory(object):
 
 
     # --- static methods use by class factory to generate new classes
-    # TODO can all there methods be encapsulated to make this tidier?
     @staticmethod
     def methodbinder():
         methodsDict = {}
+        # TODO remove methodbinder, it may not be needed anymore
         """
         methodsDict['__createattrs__'] = createattrs
         methodsDict['__init__'] = init
