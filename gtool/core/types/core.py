@@ -80,3 +80,17 @@ class DynamicType(object):
 
     def __classoutputscheme__(self):
         return formatternamespace()[striptoclassname(self.__class__)]
+
+    def asdict(self):
+        _retdict = {}
+        for k, v in self:
+            if not v.isdynamic:
+                _v = ['%s' % i for i in v]
+            else:
+                _v = [i.asdict() for i in v]
+            _retdict[k] = _v
+        return _retdict
+
+    def __iter__(self):
+        for item in self.__list_slots__.keys():
+            yield (item, self.__list_slots__[item])

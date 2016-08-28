@@ -891,3 +891,25 @@ def test28():
     """
 
     print('--- test 28 ends ---')
+
+def test29():
+    outputscheme = 'json'
+    print('test 29 tests json output')
+    print('---- testing 29 begins ----')
+
+    sf = projectloader('test\\test29', dbg=False, outputscheme=outputscheme)
+
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['JSON']() #TODO read engine from config
+
+    _ret = o.output(sf) #, output='..\\test29.json')
+
+    print(_ret)
+    # correct output
+    """
+    True
+    """
+
+    print('--- test 29 ends ---')

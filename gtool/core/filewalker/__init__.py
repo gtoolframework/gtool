@@ -151,6 +151,13 @@ class StructureFactory(object):
             return self.__children__
 
         @property
+        def haschildren(self):
+            if len(self.__children__) > 0:
+                return True
+            else:
+                return False
+
+        @property
         def name(self):
             return self.__name__
 
