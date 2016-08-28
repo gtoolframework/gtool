@@ -1077,3 +1077,47 @@ def test29d():
     """
 
     print('--- test 29d ends ---')
+
+def test30():
+    outputscheme = '1'
+    print('test 30 checks simple output to csv')
+    print('---- testing 30 begins ----')
+
+    sf = projectloader('test\\test30', dbg=False, outputscheme=outputscheme)
+
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['CSV']()
+
+    _ret = o.output(sf, output='..\\test30.csv')
+
+    print(_ret)
+    # correct output
+    """
+    True
+    """
+
+    print('--- test 30a ends ---')
+
+def test31():
+    outputscheme = '1'
+    print('test 31 checks split output to csv')
+    print('---- testing 31 begins ----')
+
+    sf = projectloader('test\\test31', dbg=False, outputscheme=outputscheme)
+
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['CSV']()
+
+    _ret = o.output(sf, output='..\\test31.csv')
+
+    print(_ret)
+    # correct output
+    """
+    True
+    """
+
+    print('--- test 31 ends ---')
