@@ -62,6 +62,21 @@ def readClass(configString):
         metaList = metaIndicator + metaName + metaSeparator + metavalue
         return metaList
 
+    def funcParser():
+        # --- func attribute parser ---
+        funcIndicator = p.LineStart() + p.Suppress(p.Literal('!'))
+        funcName = p.Word(p.alphanums)
+        funcSeparator = p.Suppress(p.Literal('='))
+
+        # TODO force case insensitivity in attributeMode keyword match
+        # TODO add debug names
+        # TODO add a conditional debug flag
+
+        funcvalue = p.Combine(p.restOfLine() + p.Suppress(p.LineEnd()))
+
+        funcList = funcIndicator + funcName + funcSeparator + funcvalue
+        return funcList
+
     def attributeParser():
         # --- attribute parser ---
         attributeIndicator = p.LineStart() + p.Suppress(p.Literal('@'))
@@ -241,9 +256,18 @@ def readClass(configString):
                 _attribparseresultslist.append(x[0])
             _parsedconfig['attributes'] = _generateAttributes(_attribparseresultslist)
 
-            _parsedconfig['methods'] = None  # not being used yet
-            _parsedconfig['processors'] = None,  # not being used yet
-            _parsedconfig['renderengines'] = None  # not being used yet
+            #TODO add parser for methods (should inject a property into attrs or list_slots?
+
+            #print('--- methods ---')
+            _methodsdict = {}
+            for x in funcParser().scanString(block):
+                #print(x[0])
+                _methodsdict[x[0][0]] = x[0][1]
+
+            _parsedconfig['methods'] = _methodsdict  # not being used yet
+
+            #_parsedconfig['processors'] = None,  # not being used yet
+            #_parsedconfig['renderengines'] = None  # not being used yet
 
             parsedconfigs[_classname] =_parsedconfig
 
@@ -251,17 +275,14 @@ def readClass(configString):
         #print('--- parseConfig --\n\n')
         return parsedconfigs
 
-    # --- methods parser ---
-    # TODO implement parser for methods
-    # TODO implement parser for plugins
-
     # --- full parser ---
 
     #parseconfig(configString)
 
     classStructure = p.Group(classParser() +
                              p.ZeroOrMore(metaParser()).setResultsName('metas') +
-                             p.OneOrMore(attributeParser()).setResultsName('attributes'))
+                             p.OneOrMore(attributeParser()).setResultsName('attributes') +
+                             p.ZeroOrMore(funcParser().setResultsName('methods')))
 
     parser = p.Dict(p.OneOrMore(classStructure))
 

@@ -1121,3 +1121,15 @@ def test31():
     """
 
     print('--- test 31 ends ---')
+
+def test32():
+    outputscheme = '1'
+    print('test 32 checks method injection')
+    print('---- testing 32 begins ----')
+
+    sf = projectloader('test\\test32', dbg=False, outputscheme=outputscheme)
+
+
+    print('--- explore results ---')
+
+    print('--- test 31 ends ---')
