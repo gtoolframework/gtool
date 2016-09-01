@@ -144,6 +144,9 @@ class attribute(object):
     def __iter__(self):
         return iter(self.__storage__)
 
+    def __getitem__(self, item):
+        return self.__storage__[item]
+
     def __len__(self):
         return len(self.__storage__)
 

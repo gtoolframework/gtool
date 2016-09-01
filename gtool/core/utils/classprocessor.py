@@ -62,20 +62,57 @@ def readClass(configString):
         metaList = metaIndicator + metaName + metaSeparator + metavalue
         return metaList
 
-    def funcParser():
+    def _funcParser():
         # --- func attribute parser ---
+        """
         funcIndicator = p.LineStart() + p.Suppress(p.Literal('!'))
         funcName = p.Word(p.alphanums)
-        funcSeparator = p.Suppress(p.Literal('='))
+        funcSeparator = p.Suppress(p.Literal('::'))
+        """
 
         # TODO force case insensitivity in attributeMode keyword match
         # TODO add debug names
         # TODO add a conditional debug flag
+        """
+        #funcvalue = p.Combine(p.restOfLine() + p.Suppress(p.LineEnd()))
+        funcvalue = p.Word(p.printables)
 
-        funcvalue = p.Combine(p.restOfLine() + p.Suppress(p.LineEnd()))
+        funcConfig = (
+            p.Literal("(").suppress() +
+            p.ZeroOrMore(p.Word(p.printables)) +
+            p.Literal("')").suppress() +
+            p.Suppress(p.LineEnd())
+        ).setResultsName('funcconfig')
 
-        funcList = funcIndicator + funcName + funcSeparator + funcvalue
-        return funcList
+        funcList = funcIndicator + funcName + funcSeparator + funcvalue + funcConfig
+        """
+
+        import pyparsing as p
+
+        funcIndicator = p.Literal('!')
+        funcIndicator.setName('indicator')
+
+        funcName = p.Word(p.alphanums)
+        funcName.setName('name')
+        funcSeparator = p.Suppress(p.Literal('::'))
+        funcSeparator.setName('separator')
+
+        funcModule = p.Word(p.printables, excludeChars='(')
+        funcModule.setName('module')
+        funcDemarcStart = p.Literal("(")
+        funcDemarcStart.setName('demarcstart')
+
+        funcDemarcEnd = p.Literal(")")
+        funcDemarcEnd.setName('demarcend')
+
+        funcMiddle = p.sglQuotedString()
+        funcMiddle.setName('middle')
+
+        funcPattern = p.LineStart() + p.Suppress(funcIndicator) + funcName + p.Suppress(funcSeparator) + \
+                      funcModule + p.Suppress(funcDemarcStart) + funcMiddle + p.Suppress(funcDemarcEnd) + \
+                      p.Suppress(p.Optional(p.LineEnd()))
+
+        return funcPattern
 
     def attributeParser():
         # --- attribute parser ---
@@ -137,6 +174,7 @@ def readClass(configString):
         attributeIndicator = p.LineStart() + p.Suppress(p.Literal('@'))
         attributeName = p.Word(p.alphanums).setResultsName('attributename')
         attributeSeparator = p.Suppress(p.Literal('::'))
+
 
         # TODO force case insensitivity in attributeMode keyword match
         # TODO add debug names
@@ -260,9 +298,11 @@ def readClass(configString):
 
             #print('--- methods ---')
             _methodsdict = {}
-            for x in funcParser().scanString(block):
+            for x in _funcParser().scanString(block):
                 #print(x[0])
-                _methodsdict[x[0][0]] = x[0][1]
+                _methodsdict[x[0][0]] = {'module': x[0][1], 'config': x[0][2][1:-1]}
+
+            print(_methodsdict)
 
             _parsedconfig['methods'] = _methodsdict  # not being used yet
 
@@ -279,12 +319,14 @@ def readClass(configString):
 
     #parseconfig(configString)
 
+    """
     classStructure = p.Group(classParser() +
                              p.ZeroOrMore(metaParser()).setResultsName('metas') +
                              p.OneOrMore(attributeParser()).setResultsName('attributes') +
                              p.ZeroOrMore(funcParser().setResultsName('methods')))
 
     parser = p.Dict(p.OneOrMore(classStructure))
+    """
 
     #return parser.parseString(configString)
     return parseconfig(configString)
@@ -308,6 +350,8 @@ def debugClass(config):
                     print(attribute.posargs)
                 if 'kwargs' in attribute:
                     print(attribute.kwargs)
+        if 'methods' in classDef:
+            print('methods:', classDef['methods'])
     return None
 
 
@@ -318,6 +362,12 @@ def processClass(config):
         if 'metas' in element:
             _metaDict = {k[0]: k[1] for k in element.metas}
         return _metaDict
+
+    def generateMethods(element):
+        _methodDict = {}
+        if 'methods' in element:
+            _methodDict = element.methods
+        return _methodDict
 
     def generateAttributes(attributes):
 
@@ -352,7 +402,7 @@ def processClass(config):
         classDict[element.classname] = {
             'metas': generateMetas(element),
             'attributes': generateAttributes(element.attributes),
-            'methods': None, # not being used yet
+            'methods': generateMethods(element),
             'processors': None, # not being used yet
             'renderengines': None # not being used yet
         }

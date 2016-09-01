@@ -1129,7 +1129,10 @@ def test32():
 
     sf = projectloader('test\\test32', dbg=False, outputscheme=outputscheme)
 
+    x = sf.dataasobject
 
     print('--- explore results ---')
 
-    print('--- test 31 ends ---')
+    print(x)
+
+    print('--- test 32 ends ---')

@@ -43,25 +43,26 @@ class factory(object):
 
     # --- static methods use by class factory to generate new classes
     @staticmethod
-    def methodbinder():
-        methodsDict = {}
-        # TODO remove methodbinder, it may not be needed anymore
-        """
-        methodsDict['__createattrs__'] = createattrs
-        methodsDict['__init__'] = init
-        # magic methods override = http://www.rafekettler.com/magicmethods.html
-        methodsDict['__getattr__'] = getattr
-        methodsDict['__setattr__'] = setattr
-        methodsDict['dynamicproperties'] = dynamicproperties
-        methodsDict['mandatoryproperties'] = mandatoryproperties
-        methodsDict['missingproperties'] = missingproperties
-        methodsDict['missingoptionalproperties'] = missingoptionalproperties
-        methodsDict['loads'] = loads
-        methodsDict['load'] = load
-        methodsDict['__repr__'] = repr
-        methodsDict['__str__'] = str
-        """
-        return methodsDict
+    def methodbinder(className, classDict):
+
+        _retdict = {}
+        _retdict['__methods__'] = {}
+
+        if 'methods' not in classDict:
+            return _retdict
+
+        basemethods = DynamicType.__dict__.keys()
+        attribnames = classDict['attributes'].keys()
+
+        for methodname, config in classDict['methods'].items():
+            if methodname in basemethods:
+                raise AttributeError('The dynamic class %s cannot have a method called %s' % (className, methodname))
+            if methodname in attribnames:
+                raise AttributeError('The dynamic class %s cannot have a method and an attributes called %s' % (className, methodname))
+
+            _retdict['__methods__'][methodname] = config
+
+        return _retdict
 
     @staticmethod
     def attributes(className, classDict):
@@ -127,7 +128,7 @@ class factory(object):
         # TODO kwargs is never used... do we need it?
 
         return factory.merge_dicts(factory.attributes(className, classDict),
-                                   factory.methodbinder(),
+                                   factory.methodbinder(className, classDict),
                                    factory.metasmaker(classDict)
                                    )
 

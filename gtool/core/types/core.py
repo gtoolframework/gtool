@@ -4,6 +4,7 @@ from gtool.core.utils.misc import striptoclassname
 from collections import defaultdict
 from copy import deepcopy
 import pyparsing as p
+from gtool.core.plugin import pluginnamespace
 
 
 class CoreType(object):
@@ -70,6 +71,7 @@ class DynamicType(object):
 
         self.__missing_mandatory_properties__ = []
         self.__missing_optional_properties__ = []
+        self.__method_results__ = {}
 
     # --- class methods that will be bound by factory ---
     # must be outside of class factory or they get factory's context and not the manufactured objects
@@ -116,7 +118,8 @@ class DynamicType(object):
 
     # TODO return some info about attribs
     def __repr__(self):
-        _dict = {prop: getattr(self, prop) for prop in self.dynamicproperties}
+        #_dict = {prop: getattr(self, prop) for prop in self.dynamicproperties}
+        _dict = {k:v for k, v in self}
         return '%s: %s' % (self.__class__, _dict)
 
     # TODO return some info about attribs
@@ -136,6 +139,8 @@ class DynamicType(object):
         """
         if attr in self.__list_slots__:
             return self.__list_slots__[attr]
+        elif attr in self.__method_results__:
+            return self.__method_results__[attr]
         elif attr in self.__dict__:
             return self.__dict__[attr]
         else:
@@ -155,6 +160,8 @@ class DynamicType(object):
         # TODO this code is partially shared with __createattrs__ code for doing the same thing
         if attr in self.__list_slots__.keys():
             self.__list_slots__[attr].__set__(item)
+        elif attr in self.__method_results__:
+            raise AttributeError('%s is the output from a method plugin and cannot be set' % attr)
         else:
             # setting a method using dot notation (self.attr) will trigger recursion unless we have this
             # else handler
@@ -245,6 +252,11 @@ class DynamicType(object):
                 except Exception as err:
                     raise TypeError('got an error when trying to load data for %s: %s' % (self.__class__, err))
 
+        for k, v in self.__methods__.items():
+            modulename = v['module']
+            _result = pluginnamespace()[modulename.upper()](self, expr=v['config'])
+            self.__method_results__[k] = _result.result
+
         return True if len(ret) > 0 else False
 
     def load(self, loadfile, softload=False):
@@ -310,9 +322,12 @@ class DynamicType(object):
         return _retdict
 
     def __iter__(self):
-        for item in self.__list_slots__.keys():
+        for item in self.__list_slots__.keys(): #TODO switch to .items
             _value = self.__list_slots__[item]
             yield (item, _value) # self.__list_slots__[item])
+
+        for k, v in self.__method_results__.items():
+            yield (k, v)
 
 
 class FunctionType(object):
