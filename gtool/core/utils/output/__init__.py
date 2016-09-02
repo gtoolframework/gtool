@@ -230,7 +230,7 @@ def matrixflatten(matrix, sep=', '):
 
 
 def parseformat(classname=None, formatstring=None):
-    attribmarker = p.Literal('@').suppress()
+    attribmarker = (p.Literal('@')|p.Literal('!')).suppress()
     cellseparator = '||'
     concatmarker = p.Optional(p.Literal('+'))
 
@@ -264,17 +264,6 @@ def parseformat(classname=None, formatstring=None):
 
     return cells
 
-"""
-def descend(rootclass=None, recursionlist=[], recursionmembers=[], recusionlimit=0):
-    if rootclass is None:
-        raise ValueError('rootclass argument required but not provided')
-    #detect recursion
-    if rootclass in recursionlist and rootclass not in recursionmembers:
-        raise RecursionError('The format string has caused a recursion. To allow limited recursion specify elements that can re')
-    recursionlist.append(rootclass)
-
-    return
-"""
 # --- static ---
 
 def formatters():

@@ -9,11 +9,6 @@ class Filler(object):
     def __str__(self):
         return '%s' % self.__fillertext__
 
-    """
-    def process(self):
-        return str(self)
-    """
-
     def __repr__(self):
         return '<%s>:%s' % (self.__class__, self.__fillertext__)
 
@@ -27,49 +22,9 @@ class AttributeMatch(object):
     def __isdynamic__(self, obj):
         return getattr(obj, self.__attrname__).isdynamic
 
-    def __descent__(self, classname=None, attrname=None):
-        #recurse
-        pass
-
     @property
     def isconcatter(self):
         return self.__concatmode__
-
-    """
-    def process(self, obj=None, sep=" ", outputscheme=None, flat=False):
-        if obj is None:
-            raise TypeError('Expected an object in obj kwarg')
-        # TODO type check object
-        if not hasattr(obj, self.__attrname__):
-            raise AttributeError('%s does not have a %s attribute as specified in the output format scheme:' % (
-                obj.__class__, self.__attrname__))
-
-        if not getattr(obj, self.__attrname__).isdynamic:
-            return sep.join(['%s' % f for f in getattr(obj, self.__attrname__)])
-        #elif flat:
-        #    return sep.join([f.output(outputscheme=outputscheme) for f in getattr(obj, self.__attrname__)])
-        else:
-            #raise NotImplementedError('still working on Attributematch.process')
-            return 'monkey'
-
-
-            # return sep.join(['%s' % f if not self.__isdynamic__(f) else f.output(outputscheme=outputscheme) for f in getattr(obj, self.__attrname__)])
-            # return sep.join(['%s' % f for f in getattr(obj, self.__attrname__)])
-    """
-
-    """
-    def process_to_list(self, obj=None, sep=" ", outputscheme=None):
-        if hasattr(obj, self.__attrname__):
-            for g in getattr(obj, self.__attrname__):
-                if isinstance(g,DynamicType):
-                    print(type(g))
-
-            # return sep.join(['%s' % f if not isinstance(f,DynamicType) else f.outputaslist(outputscheme=outputscheme) for f in getattr(obj, self.__attrname__)])
-            return [f for f in getattr(obj, self.__attrname__)]
-        else:
-            raise AttributeError('%s does not have a %s attribute as specified in the output format scheme:' % (
-                obj.__class__, self.__attrname__))
-    """
 
     def __repr__(self):
         return '<%s>:%s' % (self.__class__, self.__attrname__)

@@ -1,6 +1,6 @@
 CLASSONE::
 *file = tf
-*output = @num || @test
+*output = @num1 || @num2
 @num1:: single: Number (required = False)
 @num2:: single: Number (required = False)
 !test1:: Math('@num1 + @num2')

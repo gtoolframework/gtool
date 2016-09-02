@@ -30,7 +30,7 @@ class Math(FunctionType):
                                 'values but got a %s with a value of %s in %s' % (type(num), num, name))
 
             return num
-        
+
         self.targetobject = obj
         self.expression = config
         self.computable = False

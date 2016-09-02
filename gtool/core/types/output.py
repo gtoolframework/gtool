@@ -101,19 +101,6 @@ class GridOutput(Output):
         _grid.trim()
         return _grid
 
-    """
-    @classmethod
-    def formatter(cls):
-        _classname = '{}'.format(cls)[6:-2].split('.')[
-            -1]  # TODO this is hacky - removes '<class and >' - use striptoclassname
-        # print('formatter: dynamic props', cls.__dynamic_properties__)
-        # print('formatter: list slots:', cls.__list_slots__)
-        # for k, v in cls.__list_slots__.items():
-        #    print(k, ':', v.isdynamic) # isinstance(v.__lazyloadclass__()(), DynamicType))
-
-        return formatternamespace()[_classname]
-    """
-
     class Separator(object):
 
         def __repr__(self):
