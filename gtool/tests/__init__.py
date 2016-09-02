@@ -1136,3 +1136,23 @@ def test32():
     print(x)
 
     print('--- test 32 ends ---')
+
+def test33():
+    outputscheme = '1'
+    print('test 33 checks method inclusion in output using a format string')
+    print('---- testing 33 begins ----')
+
+    sf = projectloader('test\\test33', dbg=False, outputscheme=outputscheme)
+
+    x = sf.dataasobject
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['GRID']()
+
+    _ret = o.output(sf)
+
+    for row in _ret:
+        print(row)
+
+    print('--- test 33 ends ---')

@@ -7,6 +7,7 @@ from gtool.core.utils.runtime import runtimenamespace
 from gtool.core.utils.config import namespace as confignamespace
 from gtool.core.types.outputmanagers import Filler, AttributeMatch
 from gtool.core.types.matrix import Matrix
+from gtool.core.filewalker import striptoclassname
 
 class Output(ABC):
 
@@ -122,7 +123,6 @@ class GridOutput(Output):
                     if not element.isconcatter and getattr(getattr(obj, element.__attrname__, None), 'isdynamic', False):
                         attr = getattr(obj, element.__attrname__, None)
                         _attrtype = attr.attrtype()
-                        #_formatlist = _attrtype.__classoutputscheme__()
                         _retlist.extend(self.__getheaders__(_attrtype))
                     else:
                         _retlist.append(element.__attrname__)
@@ -134,7 +134,7 @@ class GridOutput(Output):
     def fillerprocess(self, fillerobj):
         return '%s' % fillerobj.__fillertext__
 
-    def attribprocess(self, attribobj, obj=None, sep=" "): #, outputscheme=None, flat=False):
+    def attribprocess(self, attribobj, obj=None, sep=" "):
         if obj is None:
             raise TypeError('Expected an object in obj kwarg')
         # TODO type check object
@@ -142,13 +142,16 @@ class GridOutput(Output):
             raise AttributeError('%s does not have a %s attribute as specified in the output format scheme:' % (
                 obj.__class__, attribobj.__attrname__))
 
-        if not getattr(obj, attribobj.__attrname__).isdynamic:
-            _ret = sep.join(['%s' % f for f in getattr(obj, attribobj.__attrname__)])
-
-            return _ret
+        #if not getattr(obj, attribobj.__attrname__).isdynamic:
+        _attrib = getattr(obj, attribobj.__attrname__)
+        if  striptoclassname(type(_attrib)) == 'attribute':
+            _ret = sep.join(['%s' % f for f in _attrib])
         else:
-            # TODO make this raise assert
-            raise AttributeError('attribprocess should not process dynamic properties')
+            _ret = '%s' % _attrib
+        return _ret
+        #else:
+        #    # TODO make this raise assert
+        #    raise AttributeError('attribprocess should not process dynamic properties')
 
     def dynattribprocess(self, obj, element):
         """
@@ -212,7 +215,14 @@ class GridOutput(Output):
                 if isinstance(element, Filler):
                     _x = self.fillerprocess(element)
                 elif isinstance(element, AttributeMatch):
-                    if getattr(obj, element.__attrname__).isdynamic:
+                    _attrib = getattr(obj, element.__attrname__)
+                    attribIsDynamic = False
+
+                    try:
+                        attribIsDynamic = _attrib.isdynamic
+                    except:
+                        pass
+                    if attribIsDynamic: #getattr(obj, element.__attrname__).isdynamic:
                         _x = self.dynattribprocess(obj, element)
                         q.extend(_x) #TODO this should be consistent with the appends below
                     else:

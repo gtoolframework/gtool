@@ -1,0 +1,7 @@
+CLASSONE::
+*file = tf
+*output = @num1 || @num2 || !test1 || !test2
+@num1:: single: Number (required = False)
+@num2:: single: Number (required = False)
+!test1:: Math('@num1 + @num2')
+!test2:: Math('@num1 - @num2')
