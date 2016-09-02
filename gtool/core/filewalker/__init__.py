@@ -192,7 +192,8 @@ class StructureFactory(object):
         def dataasobject(self):
             _retclass = self.__objectmatch__()
             _retobject = _retclass()
-            if _retobject.loads(self.__data__): # True if loadstring works
+            context = {'file': self.path} #also set in core.DynamicObject.load
+            if _retobject.loads(self.__data__, context=context): # True if loadstring works
                 return _retobject
             else:
                 raise TypeError('Could not parse the data from %s into a %s class' % (self.path, type(_retobject)))

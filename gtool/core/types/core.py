@@ -163,10 +163,9 @@ class DynamicType(object):
         :return:
         """
 
-        # TODO flatten/simplify nested logic
-        # TODO this code is partially shared with __createattrs__ code for doing the same thing
         if attr in self.__list_slots__.keys():
             self.__list_slots__[attr].__set__(item)
+        # TODO find a way to throw an error if caller attempts to override method attrib
         #elif attr in self.__method_results__:
         #    raise AttributeError('%s is the output from a method plugin and cannot be set' % attr)
         else:
@@ -191,7 +190,7 @@ class DynamicType(object):
     def missingoptionalproperties(self):
         return self.__missing_optional_properties__
 
-    def loads(self, loadstring, softload=False):
+    def loads(self, loadstring, softload=False, context=None):
         """
         Method to read in a correctly structured string and load it into the object attributes
         :param loadstring:
@@ -262,13 +261,15 @@ class DynamicType(object):
 
         for k, v in self.__methods__.items():
             modulename = v['module']
-            _result = pluginnamespace()[modulename.upper()](self, expr=v['config'])
+            _result = pluginnamespace()[modulename.upper()](self, config=v['config'], context=context)
             self.__method_results__[k] = _result.result
 
         return True if len(ret) > 0 else False
 
     def load(self, loadfile, softload=False):
         _ret = False
+
+        context = {'file': loadfile} #also set in dataobject
 
         # TODO make sure we can read file (in case it's large)
         try:
@@ -281,7 +282,7 @@ class DynamicType(object):
             raise Exception('attempted to to read %s and got an exception' % loadfile)
         else:
             try:
-                _ret = self.loads(f.read(), softload=softload)
+                _ret = self.loads(f.read(), softload=softload, context=context)
             except AttributeError as err:
                 raise Exception('Reading %s: %s' % (loadfile, err))
             f.close()

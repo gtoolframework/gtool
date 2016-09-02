@@ -6,7 +6,7 @@ import math as m
 
 class Math(FunctionType):
 
-    def __init__(self, obj, expr=str()):
+    def __init__(self, obj, config=str(), context=None):
 
         def getname(obj, name):
 
@@ -30,14 +30,14 @@ class Math(FunctionType):
                                 'values but got a %s with a value of %s in %s' % (type(num), num, name))
 
             return num
-
+        
         self.targetobject = obj
-        self.expression = expr
+        self.expression = config
         self.computable = False
         self.__result__ = None
         self.names = {}
 
-        if expr is None or len(self.expression) < 1 or not isinstance(self.expression, str):
+        if self.expression is None or len(self.expression) < 1 or not isinstance(self.expression, str):
             raise ValueError('Math plugin function requires an expression string')
 
         attrmatch = p.Literal('@').suppress() + p.Word(p.alphanums)
