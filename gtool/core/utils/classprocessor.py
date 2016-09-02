@@ -302,7 +302,7 @@ def readClass(configString):
                 #print(x[0])
                 _methodsdict[x[0][0]] = {'module': x[0][1], 'config': x[0][2][1:-1]}
 
-            print(_methodsdict)
+            #print(_methodsdict)
 
             _parsedconfig['methods'] = _methodsdict  # not being used yet
 

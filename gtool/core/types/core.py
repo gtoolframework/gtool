@@ -5,7 +5,7 @@ from collections import defaultdict
 from copy import deepcopy
 import pyparsing as p
 from gtool.core.plugin import pluginnamespace
-
+from abc import abstractmethod
 
 class CoreType(object):
     """
@@ -129,22 +129,29 @@ class DynamicType(object):
         _dict = {prop: getattr(self, prop) for prop in self.dynamicproperties}
         return '%s: %s' % (strclass, _dict)
 
-    def __getattr__(self, attr):
+    def __getattribute__(self, name):
         """
         an "anonymous" function that will be included into the dynamically generated class to made dynamically
         generated properties exist.
         :param self: object instance
-        :param attr: name of object attribute after the dot notation
+        :param name: name of object attribute after the dot notation
         :return: list
         """
-        if attr in self.__list_slots__:
-            return self.__list_slots__[attr]
-        elif attr in self.__method_results__:
-            return self.__method_results__[attr]
-        elif attr in self.__dict__:
-            return self.__dict__[attr]
-        else:
-            raise AttributeError('%s does not exist' % attr)
+        try:
+            listslots = object.__getattribute__(self, '__list_slots__')
+            return listslots[name]
+        except Exception:
+            pass
+
+        try:
+            #self.__method_results__[name]
+            methodresults = object.__getattribute__(self, '__method_results__')
+            return methodresults[name]
+        except Exception:
+            return super(DynamicType, self).__getattribute__(name)
+
+        #return object.__getattribute__(self, name)
+
 
     def __setattr__(self, attr, item):
         """
@@ -160,12 +167,13 @@ class DynamicType(object):
         # TODO this code is partially shared with __createattrs__ code for doing the same thing
         if attr in self.__list_slots__.keys():
             self.__list_slots__[attr].__set__(item)
-        elif attr in self.__method_results__:
-            raise AttributeError('%s is the output from a method plugin and cannot be set' % attr)
+        #elif attr in self.__method_results__:
+        #    raise AttributeError('%s is the output from a method plugin and cannot be set' % attr)
         else:
             # setting a method using dot notation (self.attr) will trigger recursion unless we have this
             # else handler
-            self.__dict__[attr] = item
+            #self.__dict__[attr] = item
+            super(DynamicType, self).__setattr__(attr, item)
 
     @property
     def dynamicproperties(self):
@@ -331,4 +339,5 @@ class DynamicType(object):
 
 
 class FunctionType(object):
+
     pass
