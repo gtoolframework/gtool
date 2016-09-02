@@ -269,7 +269,7 @@ class DynamicType(object):
     def load(self, loadfile, softload=False):
         _ret = False
 
-        context = {'file': loadfile} #also set in dataobject
+        context = {'file': loadfile, 'parent': None, 'class': type(self)} #also set in dataasobject
 
         # TODO make sure we can read file (in case it's large)
         try:

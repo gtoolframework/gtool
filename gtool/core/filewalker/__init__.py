@@ -161,6 +161,10 @@ class StructureFactory(object):
         def name(self):
             return self.__name__
 
+        @property
+        def parent(self):
+            return self.__parent__
+
         def __str__(self):
             # TODO return number of children and type (file or dir)
             return self.__name__
@@ -192,7 +196,9 @@ class StructureFactory(object):
         def dataasobject(self):
             _retclass = self.__objectmatch__()
             _retobject = _retclass()
-            context = {'file': self.path} #also set in core.DynamicObject.load
+            context = {'file': self.path,
+                       'parent': self.parent,
+                       'class': self.name} #also set in core.DynamicObject.load and CNode below
             if _retobject.loads(self.__data__, context=context): # True if loadstring works
                 return _retobject
             else:
@@ -311,7 +317,10 @@ class StructureFactory(object):
             _retobject = _retclass()
             _softload = True
             # --- object initialization ---
-            if not _retobject.loads(self.__data__, softload=_softload):  # True if loadstring works
+            context = {'file': self.path,
+                       'parent': self.__parent__,
+                       'class': self.name}  # also set in core.DynamicObject.load and Node aboce
+            if not _retobject.loads(self.__data__, softload=_softload, context=context):  # True if loadstring works
                 raise TypeError('Could not parse the data from %s into a %s class' % (self.path, type(_retobject)))
             if len(_retobject.missingproperties) == 0 and len(_retobject.missingoptionalproperties) == 0:
                 return _retobject
