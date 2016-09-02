@@ -134,7 +134,7 @@ class GridOutput(Output):
     def fillerprocess(self, fillerobj):
         return '%s' % fillerobj.__fillertext__
 
-    def attribprocess(self, attribobj, obj=None, sep=" ", outputscheme=None, flat=False):
+    def attribprocess(self, attribobj, obj=None, sep=" "): #, outputscheme=None, flat=False):
         if obj is None:
             raise TypeError('Expected an object in obj kwarg')
         # TODO type check object
