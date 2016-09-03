@@ -1,9 +1,10 @@
 CLASSONE::
 *file = tf
-*output = @num1 || @num2 || !test1 || !test2 || !test3 || !test4
+*output = @num1 || @num2 || !test1 || !test2 || !test3 || !test4 || !test5
 @num1:: single: Number (required = False)
 @num2:: single: Number (required = False)
 !test1:: Math('@num1 + @num2')
 !test2:: Math('@num1 - @num2')
 !test3:: Filename()
 !test4:: Path()
+!test5:: Fullpath()
