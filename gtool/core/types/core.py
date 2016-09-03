@@ -361,6 +361,8 @@ class FunctionType(object):
     @abstractmethod
     def compute(self):
         if self.computable:
+            #do something
+            raise NotImplemented('compute must be overridden')
             return self.__result__
 
     @property

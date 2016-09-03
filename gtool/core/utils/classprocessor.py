@@ -109,7 +109,7 @@ def readClass(configString):
         funcMiddle.setName('middle')
 
         funcPattern = p.LineStart() + p.Suppress(funcIndicator) + funcName + p.Suppress(funcSeparator) + \
-                      funcModule + p.Suppress(funcDemarcStart) + funcMiddle + p.Suppress(funcDemarcEnd) + \
+                      funcModule + p.Suppress(funcDemarcStart) + p.Optional(funcMiddle) + p.Suppress(funcDemarcEnd) + \
                       p.Suppress(p.Optional(p.LineEnd()))
 
         return funcPattern
@@ -300,7 +300,16 @@ def readClass(configString):
             _methodsdict = {}
             for x in _funcParser().scanString(block):
                 #print(x[0])
-                _methodsdict[x[0][0]] = {'module': x[0][1], 'config': x[0][2][1:-1]}
+
+                #check if method contains a config string
+                if len(x[0]) > 2:
+                    _config = x[0][2][1:-1]
+                else:
+                    _config = None
+
+                _methodsdict[x[0][0]] = {'module': x[0][1],
+                                         'config': _config
+                                         }
 
             #print(_methodsdict)
 
