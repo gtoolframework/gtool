@@ -6,7 +6,7 @@ import math as m
 
 class Math(FunctionType):
 
-    def __init__(self, obj, config=str(), context=None):
+    def __init__(self, obj, config=str()):
 
         def getname(obj, name):
 
@@ -32,6 +32,7 @@ class Math(FunctionType):
             return num
 
         self.targetobject = obj
+        self.__context__ = obj.__context__
         self.expression = config
         self.computable = False
         self.__result__ = None
