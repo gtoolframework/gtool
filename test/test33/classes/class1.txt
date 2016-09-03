@@ -11,3 +11,4 @@ CLASSONE::
 !test6:: Parent()
 !test7:: Combine('@num1 % @num2')
 !test8:: Static('THIS IS STATICA!!')
+!test9:: Enum(attribs, mapping, math, resultmapping)

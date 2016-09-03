@@ -15,6 +15,18 @@ class Combine(FunctionType):
     """
 
     def __init__(self, obj, config=str()):
+        
+        self.__attribs__ = {}
+        super(Combine, self).__init__(obj, config=config)
+
+        if self.config is None or len(self.config) < 1 or not isinstance(self.config, str):
+            raise ValueError('Combine plugin function requires an formatting string')
+
+    def substitute(self, s, l, t):
+        if t[0] in self.__attribs__.keys():
+            return self.__attribs__[t[0]]
+
+    def compute(self):
 
         def getname(obj, name):
 
@@ -38,12 +50,6 @@ class Combine(FunctionType):
                 _ret = ', '.join(['%s' % v.raw() for v in _val])
 
             return _ret
-        
-        self.__attribs__ = {}
-        super(Combine, self).__init__(obj, config=config)
-
-        if self.config is None or len(self.config) < 1 or not isinstance(self.config, str):
-            raise ValueError('Combine plugin function requires an formatting string')
 
         attrmatch = p.Literal('@').suppress() + p.Word(p.alphanums)
 
@@ -54,15 +60,10 @@ class Combine(FunctionType):
         if all(v is not None for v in self.__attribs__.values()):
             self.computable = True
 
-    def substiture(self, s, l, t):
-        if t[0] in self.__attribs__.keys():
-            return self.__attribs__[t[0]]
-
-    def compute(self):
         if self.computable:
 
             attrmatch = p.Literal('@').suppress() + p.Word(p.alphanums)
-            attrmatch.setParseAction(self.substiture)
+            attrmatch.setParseAction(self.substitute)
             attrlist = p.ZeroOrMore(p.Optional(p.White()) + attrmatch + p.Optional(p.White()))
 
             self.__result__ = attrlist.transformString(self.config)

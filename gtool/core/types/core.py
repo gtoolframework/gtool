@@ -360,10 +360,23 @@ class FunctionType(object):
 
     @abstractmethod
     def compute(self):
+        """
+        processes any instructions in config, determine if required input exists.
+        If required input exists, sets self.computable to true, computes and stores result
+        :return:  None
+        """
+        # process config or do something
+
+        if True: #determine if result can be computed
+            self.computable = True
+
         if self.computable:
-            #do something
+            self.__result__ = 'some result' #set result
             raise NotImplemented('compute must be overridden')
-            return self.__result__
+        else:
+            pass
+            # if not computable don't set result
+
 
     @property
     def context(self):

@@ -12,6 +12,14 @@ class Math(FunctionType):
     """
 
     def __init__(self, obj, config=str()):
+        
+        self.names = {}
+        super(Math, self).__init__(obj, config=config)
+
+        if self.config is None or len(self.config) < 1 or not isinstance(self.config, str):
+            raise ValueError('Math plugin function requires an expression string')
+
+    def compute(self):
 
         def getname(obj, name):
 
@@ -35,12 +43,6 @@ class Math(FunctionType):
                                 'values but got a %s with a value of %s in %s' % (type(num), num, name))
 
             return num
-        
-        self.names = {}
-        super(Math, self).__init__(obj, config=config)
-
-        if self.config is None or len(self.config) < 1 or not isinstance(self.config, str):
-            raise ValueError('Math plugin function requires an expression string')
 
         attrmatch = p.Literal('@').suppress() + p.Word(p.alphanums)
 
@@ -51,7 +53,7 @@ class Math(FunctionType):
         if all(v is not None for v in self.names.values()):
             self.computable = True
 
-    def compute(self):
+
         if self.computable:
             _expr = self.config.replace('@', '')
             self.__result__ = s.simple_eval(_expr, names=self.names)
