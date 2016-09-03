@@ -1,7 +1,5 @@
 from gtool.core.types.core import FunctionType
-import simpleeval as s
 import pyparsing as p
-import math as m
 
 
 class Combine(FunctionType):

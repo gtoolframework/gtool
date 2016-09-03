@@ -1,6 +1,6 @@
 CLASSONE::
 *file = tf
-*output = @num1 || @num2 || !test1 || !test2 || !test3 || !test4 || !test5 || !test6 || !test7
+*output = @num1 || @num2 || !test1 || !test2 || !test3 || !test4 || !test5 || !test6 || !test7 || !test8
 @num1:: single: Number (required = False)
 @num2:: single: Number (required = False)
 !test1:: Math('@num1 + @num2')
@@ -10,3 +10,4 @@ CLASSONE::
 !test5:: Fullpath()
 !test6:: Parent()
 !test7:: Combine('@num1 % @num2')
+!test8:: Static('THIS IS STATICA!!')
