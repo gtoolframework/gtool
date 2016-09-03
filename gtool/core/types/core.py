@@ -376,6 +376,7 @@ class FunctionType(object):
         else:
             pass
             # if not computable don't set result
+        #TODO look at returning True or False is compute completes
 
 
     @property
@@ -384,12 +385,12 @@ class FunctionType(object):
 
     @property
     def result(self):
-        self.compute()
+        self.compute() #TODO look at making this an if statement
         return self.__result__
 
     def __repr__(self):
         return self.config
 
     def __str__(self):
-        self.compute()
+        self.compute() #TODO look at making this an if statement
         return self.__result__

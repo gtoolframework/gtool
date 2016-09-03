@@ -7,8 +7,8 @@ import math as m
 class Math(FunctionType):
     """
     Performs math on numeric attributes of the object as specified in the config string.
-    Can only work attributes that are singleton ints. Will return None if any of the attributes
-    in the config string are missing.
+    Can only work attributes that are singleton numbers or method attributes that return numbers.
+    Will return None if any of the attributes in the config string are missing.
     """
 
     def __init__(self, obj, config=str()):
@@ -28,7 +28,7 @@ class Math(FunctionType):
             if hasattr(obj, name):
                 _val = getattr(obj, name, None)
 
-            if _val is None:
+            if isinstance(_val, int) or isinstance(_val, float): #if we get an a numeric value - the attrib is actual a method plugin output
                 return _val
 
             try:
@@ -44,7 +44,8 @@ class Math(FunctionType):
 
             return num
 
-        attrmatch = p.Literal('@').suppress() + p.Word(p.alphanums)
+        attrmarker = (p.Literal('@') | p.Literal('!'))
+        attrmatch = attrmarker.suppress() + p.Word(p.alphanums)
 
         for i in attrmatch.scanString(self.config):
             x = i[0][0]
@@ -55,7 +56,11 @@ class Math(FunctionType):
 
 
         if self.computable:
-            _expr = self.config.replace('@', '')
+            _expr = self.config
+            if '@' in _expr:
+                _expr = _expr.replace('@', '')
+            if '!' in _expr:
+                _expr = _expr.replace('!', '')
             self.__result__ = s.simple_eval(_expr, names=self.names)
 
 

@@ -4,7 +4,7 @@ CLASSONE::
 @num1:: single: Number (required = False)
 @num2:: single: Number (required = False)
 !test1:: Math('@num1 + @num2')
-!test2:: Math('@num1 - @num2')
+!test2:: Math('!test1 * 2')
 !test3:: Filename()
 !test4:: Path()
 !test5:: Fullpath()
