@@ -1,21 +1,22 @@
 import pyparsing as p
 
-s = '@num1 || @num2'
+testexpr = p.nestedExpr()
 
-d = {
-    'num1': 'boulder iron',
-    'num2': 'feather'
-}
+s="""!test2:: Math('1 * 2')"""
 
-def substituteMacro(s,l,t):
-    if t[0] in d:
-        print(s)
-        print(l)
-        print(t)
-        return d[t[0]]
+_match=[]
 
-attrmatch = p.Literal('@').suppress() + p.Word(p.alphanums)
-attrmatch.setParseAction( substituteMacro )
-attrlist = p.ZeroOrMore(p.Optional(p.White()) + attrmatch + p.Optional(p.White()))
+for x in testexpr.scanString(s):
+    _start = x[1] + 1
+    _end = x[2] - 1
+    _match.append(s[_start:_end])
 
-print(attrlist.transformString(s))
+print(_match[0])
+
+if _match[0].startswith("'"):
+    _match[0] = _match[0][1:]
+
+if _match[0].endswith("'"):
+    _match[0] = _match[0][:-1]
+
+print(_match[0])

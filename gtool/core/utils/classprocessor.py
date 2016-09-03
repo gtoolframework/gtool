@@ -64,30 +64,12 @@ def readClass(configString):
 
     def _funcParser():
         # --- func attribute parser ---
-        """
-        funcIndicator = p.LineStart() + p.Suppress(p.Literal('!'))
-        funcName = p.Word(p.alphanums)
-        funcSeparator = p.Suppress(p.Literal('::'))
-        """
 
-        # TODO force case insensitivity in attributeMode keyword match
         # TODO add debug names
         # TODO add a conditional debug flag
-        """
-        #funcvalue = p.Combine(p.restOfLine() + p.Suppress(p.LineEnd()))
-        funcvalue = p.Word(p.printables)
 
-        funcConfig = (
-            p.Literal("(").suppress() +
-            p.ZeroOrMore(p.Word(p.printables)) +
-            p.Literal("')").suppress() +
-            p.Suppress(p.LineEnd())
-        ).setResultsName('funcconfig')
-
-        funcList = funcIndicator + funcName + funcSeparator + funcvalue + funcConfig
-        """
-
-        import pyparsing as p
+        bracedString = p.Combine(p.Regex(r"{(?:[^{\n\r\\]|(?:{})|(?:\\(?:[^x]|x[0-9a-fA-F]+)))*") + "}").setName(
+            "string enclosed in braces")
 
         funcIndicator = p.Literal('!')
         funcIndicator.setName('indicator')
@@ -105,12 +87,12 @@ def readClass(configString):
         funcDemarcEnd = p.Literal(")")
         funcDemarcEnd.setName('demarcend')
 
-        funcMiddle = p.sglQuotedString()
+        funcMiddle = p.nestedExpr() #(p.sglQuotedString() | bracedString()) # | p.dblQuotedString())
         funcMiddle.setName('middle')
 
         funcPattern = p.LineStart() + p.Suppress(funcIndicator) + funcName + p.Suppress(funcSeparator) + \
-                      funcModule + p.Suppress(funcDemarcStart) + p.Optional(funcMiddle) + p.Suppress(funcDemarcEnd) + \
-                      p.Suppress(p.Optional(p.LineEnd()))
+                      funcModule + funcMiddle + \
+                      p.Suppress(p.Optional(p.LineEnd())) #funcModule + p.Suppress(funcDemarcStart) + p.Optional(funcMiddle) + p.Suppress(funcDemarcEnd) + \
 
         return funcPattern
 
@@ -302,10 +284,25 @@ def readClass(configString):
                 #print(x[0])
 
                 #check if method contains a config string
-                if len(x[0]) > 2:
-                    _config = x[0][2][1:-1]
+                if len(x[0]) < 2:
+                    _config = None
+                elif len(x[0][2]) > 0:
+
+                    if len(x[0][2]) == 1:
+                        _match = x[0][2][0][1:-1]
+                    else:
+                        _match = ' '.join(x[0][2])
+
+                    if _match.startswith("'"):
+                        _match = _match[1:]
+                    if _match.endswith("'"):
+                        _match = _match[:-1]
+
+                    _config = _match
                 else:
                     _config = None
+
+                print(_config)
 
                 _methodsdict[x[0][0]] = {'module': x[0][1],
                                          'config': _config
