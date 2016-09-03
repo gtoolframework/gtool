@@ -62,6 +62,7 @@ class DynamicType(object):
         # Deepcopy required otherwise list gets shared across instances of generated objects
         self.__list_slots__ = deepcopy(self.__list_slots__)
         self.kwargs = kwargs
+        self.__context__ = None
         self.__createattrs__(self.kwargs)
         if not (isinstance(self, DynamicType)):
             # all dynamic classes must inherit from gtool's Dynamic type found in gtool.core.types.core
@@ -190,7 +191,7 @@ class DynamicType(object):
     def missingoptionalproperties(self):
         return self.__missing_optional_properties__
 
-    def loads(self, loadstring, softload=False, context=None):
+    def loads(self, loadstring, softload=False, context=None): # TODO make use of context in error reporting
         """
         Method to read in a correctly structured string and load it into the object attributes
         :param loadstring:
@@ -233,6 +234,7 @@ class DynamicType(object):
 
             return [attrfunc(cfunc(s.strip())) for s in attrval]
 
+        self.__context__ = context
         ret = parseLoadstring(loadstring)
         attriblist = [k for k in ret.keys()]
         # check if all attribs required by class definition are in the data file
@@ -341,4 +343,38 @@ class DynamicType(object):
 
 class FunctionType(object):
 
-    pass
+    @abstractmethod
+    def __init__(self, obj, config=str()):
+        """
+        Based class for method plugins
+
+        :param obj: the DynamicType Object that the function will operate one
+        :param config: instructions on how the plugin should work. May be a list, dict or string
+        """
+
+        self.targetobject = obj
+        self.config = config
+        self.computable = False
+        self.__result__ = None
+
+    @abstractmethod
+    def compute(self):
+        if self.computable:
+            return self.__result__
+
+    @property
+    def context(self):
+        return self.__context__
+
+    @property
+    def result(self):
+        self.compute()
+        return self.__result__
+
+    @abstractmethod
+    def __repr__(self):
+        return self.config
+
+    def __str__(self):
+        self.compute()
+        return self.__result__
