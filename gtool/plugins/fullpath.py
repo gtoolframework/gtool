@@ -3,9 +3,9 @@ import codecs
 import os.path as path
 
 
-class Path(FunctionType):
+class Fullpath(FunctionType):
     """
-    Will return the path, without filename, of the object the attribute is a part of
+    Will return the path, with filename, of the object the method is a part of
     """
 
     def __init__(self, obj, config=None):
@@ -13,14 +13,14 @@ class Path(FunctionType):
         if config is not None:
             raise ValueError('Path method plugin does not accept a configuration')
 
-        super(Path, self).__init__(obj, config=None)
+        super(Fullpath, self).__init__(obj, config=None)
 
         self.computable = True
 
     def compute(self):
         if self.computable:
-            _result = codecs.decode(path.split(self.context['file'])[0], 'unicode_escape')
+            _result = codecs.decode(self.context['file'], 'unicode_escape')
             self.__result__ = _result
 
 def load():
-    return Path
+    return Fullpath

@@ -5,6 +5,11 @@ import math as m
 
 
 class Math(FunctionType):
+    """
+    Performs math on numeric attributes of the object as specified in the config string.
+    Can only work attributes that are singleton ints. Will return None if any of the attributes
+    in the config string
+    """
 
     def __init__(self, obj, config=str()):
 

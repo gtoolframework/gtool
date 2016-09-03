@@ -2,7 +2,11 @@ from gtool.core.types.core import FunctionType
 import codecs
 import os.path as path
 
+
 class Path(FunctionType):
+    """
+    Will return the path, without filename, of the object the method is a part of
+    """
 
     def __init__(self, obj, config=None):
 
