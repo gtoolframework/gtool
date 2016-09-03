@@ -263,7 +263,7 @@ class DynamicType(object):
 
         for k, v in self.__methods__.items():
             modulename = v['module']
-            _result = pluginnamespace()[modulename.upper()](self, config=v['config'], context=context)
+            _result = pluginnamespace()[modulename.upper()](self, config=v['config'])
             self.__method_results__[k] = _result.result
 
         return True if len(ret) > 0 else False
@@ -356,6 +356,7 @@ class FunctionType(object):
         self.config = config
         self.computable = False
         self.__result__ = None
+        self.__context__ = obj.__context__
 
     @abstractmethod
     def compute(self):
@@ -371,7 +372,6 @@ class FunctionType(object):
         self.compute()
         return self.__result__
 
-    @abstractmethod
     def __repr__(self):
         return self.config
 

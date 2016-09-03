@@ -30,20 +30,16 @@ class Math(FunctionType):
                                 'values but got a %s with a value of %s in %s' % (type(num), num, name))
 
             return num
-
-        self.targetobject = obj
-        self.__context__ = obj.__context__
-        self.expression = config
-        self.computable = False
-        self.__result__ = None
+        
         self.names = {}
+        super(Math, self).__init__(obj, config=config)
 
-        if self.expression is None or len(self.expression) < 1 or not isinstance(self.expression, str):
+        if self.config is None or len(self.config) < 1 or not isinstance(self.config, str):
             raise ValueError('Math plugin function requires an expression string')
 
         attrmatch = p.Literal('@').suppress() + p.Word(p.alphanums)
 
-        for i in attrmatch.scanString(self.expression):
+        for i in attrmatch.scanString(self.config):
             x = i[0][0]
             self.names[x] = getname(self.targetobject, x)
 
@@ -52,20 +48,8 @@ class Math(FunctionType):
 
     def compute(self):
         if self.computable:
-            _expr = self.expression.replace('@', '')
+            _expr = self.config.replace('@', '')
             self.__result__ = s.simple_eval(_expr, names=self.names)
-
-    @property
-    def result(self):
-        self.compute()
-        return self.__result__
-
-    def __repr__(self):
-        return self.expression
-
-    def __str__(self):
-        self.compute()
-        return self.__result__
 
 
 def load():
