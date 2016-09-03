@@ -11,7 +11,7 @@ class Fullpath(FunctionType):
     def __init__(self, obj, config=None):
 
         if config is not None:
-            raise ValueError('Path method plugin does not accept a configuration')
+            raise ValueError('Fullpath method plugin does not accept a configuration')
 
         super(Fullpath, self).__init__(obj, config=None)
 
