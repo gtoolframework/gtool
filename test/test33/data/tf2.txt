@@ -1,2 +1,3 @@
 @num1: 15
 @num2: 25
+@text1: High

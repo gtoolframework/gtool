@@ -293,16 +293,16 @@ def readClass(configString):
                     else:
                         _match = ' '.join(x[0][2])
 
-                    if _match.startswith("'"):
-                        _match = _match[1:]
-                    if _match.endswith("'"):
-                        _match = _match[:-1]
+                    if _match.startswith("'") and _match.endswith("'"):
+                        _match = _match[1:-1]
+                    #if _match.endswith("'"):
+                    #    _match = _match[:-1]
 
                     _config = _match
                 else:
                     _config = None
 
-                print(_config)
+                #print(_config)
 
                 _methodsdict[x[0][0]] = {'module': x[0][1],
                                          'config': _config

@@ -1,22 +1,27 @@
 import pyparsing as p
 
-testexpr = p.nestedExpr()
+inputkeyword = 'input'
 
-s="""!test2:: Math('1 * 2')"""
+mappingkeyword = 'mapping'
 
-_match=[]
+attrexpr = p.Combine(p.Literal("'").suppress() + (p.Literal('@') | p.Literal('!')).suppress() + p.Word(p.alphanums) + p.Literal("'").suppress())
 
-for x in testexpr.scanString(s):
-    _start = x[1] + 1
-    _end = x[2] - 1
-    _match.append(s[_start:_end])
+inputexpr = p.CaselessKeyword(inputkeyword).suppress() + p.Literal('=').suppress() + attrexpr
 
-print(_match[0])
 
-if _match[0].startswith("'"):
-    _match[0] = _match[0][1:]
+mappingexpr = p.CaselessKeyword(mappingkeyword).suppress() + p.Literal('=').suppress() + p.sglQuotedString()
 
-if _match[0].endswith("'"):
-    _match[0] = _match[0][:-1]
+expr = inputexpr + p.Literal(',').suppress() + mappingexpr
 
-print(_match[0])
+
+s="""input = '@text1', mapping = 'low = 1, medium = 2, high = 3'"""
+
+for x in expr.scanString(s):
+
+    mappingdict = {}
+
+    for mapitem in x[0][1][1:-1].split(','):
+        k, v = mapitem.split('=')
+        mappingdict[k.strip()] = v.strip()
+
+    print((x[0][0], mappingdict))

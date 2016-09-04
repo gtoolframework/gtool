@@ -264,7 +264,7 @@ class DynamicType(object):
         for k, v in self.__methods__.items():
             modulename = v['module']
             _result = pluginnamespace()[modulename.upper()](self, config=v['config'])
-            self.__method_results__[k] = _result.result
+            self.__method_results__[k] = _result.result()
 
         return True if len(ret) > 0 else False
 
@@ -383,7 +383,6 @@ class FunctionType(object):
     def context(self):
         return self.__context__
 
-    @property
     def result(self):
         self.compute() #TODO look at making this an if statement
         return self.__result__
