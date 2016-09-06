@@ -4,6 +4,7 @@ from gtool.core.namespace import registerClass
 from gtool.core.types.attributes import attribute
 #from .methods import * # TODO already moved methods into DynamicType
 from gtool.core.types.core import DynamicType
+from collections import OrderedDict
 
 class factory(object):
     """
@@ -46,7 +47,7 @@ class factory(object):
     def methodbinder(className, classDict):
 
         _retdict = {}
-        _retdict['__methods__'] = {}
+        _retdict['__methods__'] = OrderedDict() #{}
 
         if 'methods' not in classDict:
             return _retdict
@@ -118,7 +119,7 @@ class factory(object):
 
     @staticmethod
     def metasmaker(classDict):
-        _retDict = {}
+        _retDict = OrderedDict()
         if 'metas' in classDict:
             _retDict['__metas__'] = classDict['metas']
         return _retDict

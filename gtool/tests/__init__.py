@@ -1139,7 +1139,7 @@ def test32():
 
 def test33():
     outputscheme = '1'
-    print('test 33 checks method inclusion in output using a format string')
+    print('test 33 checks if all methods work')
     print('---- testing 33 begins ----')
 
     sf = projectloader('test\\test33', dbg=False, outputscheme=outputscheme)
@@ -1156,3 +1156,88 @@ def test33():
         print(row)
 
     print('--- test 33 ends ---')
+
+
+    #expected output
+    """
+    test 33 checks method inclusion in output using a format string
+    ---- testing 33 begins ----
+    loading plug-in: choice
+    loading plug-in: combine
+    loading plug-in: csv
+    loading plug-in: dummy
+    loading plug-in: enum
+    loading plug-in: excel
+    loading plug-in: filename
+    loading plug-in: fullpath
+    loading plug-in: grid
+    loading plug-in: json
+    loading plug-in: math
+    loading plug-in: number
+    loading plug-in: parent
+    loading plug-in: path
+    loading plug-in: real
+    loading plug-in: ref
+    loading plug-in: static
+    loading plug-in: string
+    loading plug-in: url
+    loading plug-in: yaml
+    Registering Dynamic Class: CLASSONE
+    --- explore results ---
+    ['num1', 'num2', 'text1', 'test1', 'test2', 'test3', 'test4', 'test5', 'test6', 'test7', 'test8', 'test9', 'test10', 'test11']
+    ['10', '20', 'High', '30', '60', 'tf1.txt', 'test\test33\\data', 'test\test33\\data\tf1.txt', '*', '10 % 20', 'THIS IS STATICA!!', '3', 'High', '3']
+    ['15', '25', 'High', '40', '80', 'tf2.txt', 'test\test33\\data', 'test\test33\\data\tf2.txt', '*', '15 % 25', 'THIS IS STATICA!!', '3', 'High', '3']
+    --- test 33 ends ---
+
+
+    """
+
+def test34():
+    outputscheme = '1'
+    print('test 34 checks if method "use before declaration" works')
+    print('---- testing 34 begins ----')
+
+    sf = projectloader('test\\test34', dbg=False, outputscheme=outputscheme)
+
+    x = sf.dataasobject
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['GRID']()
+
+    _ret = o.output(sf)
+
+    for row in _ret:
+        print(row)
+
+    print('--- test 34 ends ---')
+
+    # expected output
+    """
+    test 34 checks if method "use before declaration" works
+    ---- testing 34 begins ----
+    loading plug-in: choice
+    loading plug-in: combine
+    loading plug-in: csv
+    loading plug-in: dummy
+    loading plug-in: enum
+    loading plug-in: excel
+    loading plug-in: filename
+    loading plug-in: fullpath
+    loading plug-in: grid
+    loading plug-in: json
+    loading plug-in: math
+    loading plug-in: number
+    loading plug-in: parent
+    loading plug-in: path
+    loading plug-in: real
+    loading plug-in: ref
+    loading plug-in: static
+    loading plug-in: string
+    loading plug-in: url
+    loading plug-in: yaml
+    Registering Dynamic Class: CLASSONE
+    Error in Math Plugin config: In CLASSONE a method called test1 is being consumed before it is initialized. Make sure you declare your methods in order.
+
+    Process finished with exit code 1
+    """

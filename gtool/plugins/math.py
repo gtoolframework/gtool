@@ -2,7 +2,8 @@ from gtool.core.types.core import FunctionType
 import simpleeval as s
 import pyparsing as p
 import math as m
-
+#from gtool.core.filewalker import striptoclassname
+import sys
 
 class Math(FunctionType):
     """
@@ -25,10 +26,25 @@ class Math(FunctionType):
 
             _val = None
 
-            if hasattr(obj, name):
-                _val = getattr(obj, name, None)
+            #TODO move this method's error checking into base class (add a more for attribute only vs method and attribute)
+            #TODO need more context to say which method has an invalid input config
+            try:
+                _val = getattr(obj, name)
+            except AttributeError as a_err:
+                raise AttributeError(a_err)
+            except SyntaxError as s_err:
+                print("Error in Math Plugin config:", SyntaxError(s_err))
+                sys.exit(1)
+
+            """
+                if name in obj.__methods__.keys() and name not in obj.__method_results__.keys():
+                    raise AttributeError('%s method in %s dynamic object has not initialized yet' % (name, striptoclassname(type(obj))))
+                else:
+                    raise AttributeError(err)
+            """
 
             if isinstance(_val, int) or isinstance(_val, float): #if we get an a numeric value - the attrib is actual a method plugin output
+                #print('got a number')
                 return _val
 
             try:
@@ -38,9 +54,11 @@ class Math(FunctionType):
                 raise TypeError('Expected an attribute but got a %s' % type(_val))
 
             num = _val[0].raw()
+            """
             if m.isnan(num):
                 raise TypeError('Math plugin can only perform path on numeric '
                                 'values but got a %s with a value of %s in %s' % (type(num), num, name))
+            """
 
             return num
 
@@ -50,6 +68,10 @@ class Math(FunctionType):
         for i in attrmatch.scanString(self.config):
             x = i[0][0]
             self.names[x] = getname(self.targetobject, x)
+            if m.isnan(self.names[x]):
+                raise TypeError('Math plugin can only perform path on numeric '
+                                'values but got a %s with a value of %s in %s'
+                                % (type(self.names[x]), self.names[x], x))
 
         if all(v is not None for v in self.names.values()):
             self.computable = True

@@ -1,4 +1,5 @@
 import pyparsing as p
+import collections
 
 # Statics
 # TODO make this proper object or wrap inside a module
@@ -279,7 +280,11 @@ def readClass(configString):
             #TODO add parser for methods (should inject a property into attrs or list_slots?
 
             #print('--- methods ---')
-            _methodsdict = {}
+            """
+            We use an orderedDict to ensure that dependencies in methods that take other methods as input aren't broken.
+            A normal dict get's read randomly and will result in attribute errors when you call
+            """
+            _methodsdict = collections.OrderedDict()
             for x in _funcParser().scanString(block):
                 #print(x[0])
 
@@ -370,7 +375,11 @@ def processClass(config):
         return _metaDict
 
     def generateMethods(element):
-        _methodDict = {}
+        """
+        We use an orderedDict to ensure that dependencies in methods that take other methods as input aren't broken.
+        A normal dict get's read randomly and will result in attribute errors when you call
+        """
+        _methodDict = collections.OrderedDict()
         if 'methods' in element:
             _methodDict = element.methods
         return _methodDict

@@ -6,6 +6,7 @@ from copy import deepcopy
 import pyparsing as p
 from gtool.core.plugin import pluginnamespace
 from abc import abstractmethod
+import asyncio
 
 class CoreType(object):
     """
@@ -149,7 +150,18 @@ class DynamicType(object):
             methodresults = object.__getattribute__(self, '__method_results__')
             return methodresults[name]
         except Exception:
-            return super(DynamicType, self).__getattribute__(name)
+            pass
+
+        try:
+            methodlist = object.__getattribute__(self, '__methods__')
+            if name in methodlist: #assume it's not in method_results because that would have returned
+                raise SyntaxError('In %s a method called %s is being consumed before it is initialized. '
+                                  'Make sure you declare your methods in order.' % (striptoclassname(type(self)), name))
+
+        except AttributeError:
+            pass
+
+        return super(DynamicType, self).__getattribute__(name)
 
         #return object.__getattribute__(self, name)
 
@@ -190,6 +202,23 @@ class DynamicType(object):
     @property
     def missingoptionalproperties(self):
         return self.__missing_optional_properties__
+
+
+    def loadmethod(self, key, val):
+        #print('initializing method: %s' % key)
+        modulename = val['module']
+        _result = pluginnamespace()[modulename.upper()](self, config=val['config'])
+
+        """
+        We use an orderedDict to ensure that dependencies in methods that take other methods as input aren't broken.
+        A normal dict get's read randomly and will result in attribute errors when you call.
+        If the user declared an input on a method that had not been processed yet, an AttributeError would be thrown.
+
+        see classprocessor.parseconfig and processClass.generateMethods
+        also see classgen.factory.methodbinder
+        """
+
+        self.__method_results__[key] = _result.result()
 
     def loads(self, loadstring, softload=False, context=None): # TODO make use of context in error reporting
         """
@@ -262,9 +291,13 @@ class DynamicType(object):
                     raise TypeError('got an error when trying to load data for %s: %s' % (self.__class__, err))
 
         for k, v in self.__methods__.items():
+            self.loadmethod(k,v)
+            """
+            print('initializing method: %s' % k)
             modulename = v['module']
             _result = pluginnamespace()[modulename.upper()](self, config=v['config'])
             self.__method_results__[k] = _result.result()
+            """
 
         return True if len(ret) > 0 else False
 
@@ -357,6 +390,10 @@ class FunctionType(object):
         self.computable = False
         self.__result__ = None
         self.__context__ = obj.__context__
+        #self.__hasdependency__ = False
+
+    def __getname__(self, attrname, nativetypes = [], singletononly=False):
+        pass
 
     @abstractmethod
     def compute(self):
@@ -378,6 +415,24 @@ class FunctionType(object):
             # if not computable don't set result
         #TODO look at returning True or False is compute completes
 
+    """
+    @abstractmethod
+    def __dependencyresolved__(self, ):
+        pass
+
+    @abstractmethod
+    def checkdependency(self):
+        dependencylist = []
+        if self.__hasdependency__:
+            pass
+            # define a check for dependency
+            # append to dependency list
+        return dependencylist
+
+    def hasdependency(self):
+        return self.__hasdependency__
+
+    """
 
     @property
     def context(self):

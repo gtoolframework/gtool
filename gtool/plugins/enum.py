@@ -7,6 +7,7 @@ class Enum(FunctionType):
     """
     returns a numeric value for a specific string value.
     Best to use with a choice type but works with string type attributes too.
+    Can also consume method outputs as long as they are string values.
 
     EXAMPLE Config string: input = '@text1', mapping = 'low = 1, medium = 2, high = 3'
 
@@ -90,24 +91,38 @@ class Enum(FunctionType):
             except ValueError:
                 return float(s)
 
-        _inputval = getattr(self.targetobject, self.input, None)
+        def getname(obj, name):
 
-        try:
-            if not _inputval.issingleton():
-                raise ValueError('Enum plugin cannot process multi value attributes in %s' % self.input)
-        except AttributeError:
-            raise TypeError('Expected an attribute but got a %s' % type(_inputval))
+            _inputval = getattr(obj, name, None)
+
+            if _inputval is None:
+                return None
+
+            if isinstance(_inputval, str):  # if we get a string - the attrib is actually a method plugin output
+                #print('got a string')
+                return _inputval
+
+            try:
+                if not _inputval.issingleton():
+                    raise ValueError('Enum plugin cannot process multi value attributes in %s' % name)
+            except AttributeError:
+                raise TypeError('Expected an attribute but got a %s' % type(_inputval))
+
+            return '%s' % _inputval[0]
+
+        _inputval = getname(self.targetobject, self.input)
 
         if _inputval is not None:
             self.computable = True
 
         if not self.computable:
-            return None
-
+            return False
+        """
         if striptoclassname(type(_inputval)) == 'attribute':
             _inputval = '%s' % _inputval[0]
         else:
             _inputval = '%s' % _inputval
+        """
 
         try:
             self.__result__ = num(self.mapping[self.mapping.key(_inputval.lower())])
