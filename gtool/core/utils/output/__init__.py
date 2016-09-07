@@ -275,6 +275,9 @@ def formatters():
 
 def registerFormatter(formatterName, formatter):
     #print(globals())
+    if not isinstance(formatter, dict):
+        raise TypeError('Expected a dictionary for formatter arg but got a %s' % type(formatter))
+
     if formatterName in globals()[formatters()]:
         # this error will occur for a misconfig or a security event
         raise KeyError('One formatter tried to overwrite an existing one. Formatter name: %s' % formatterName)

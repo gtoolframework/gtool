@@ -2,6 +2,7 @@ from gtool.core.types.output import TreeOutput
 from gtool.core.filewalker import StructureFactory
 import json
 
+
 class Json(TreeOutput):
 
     def __output__(self, projectstructure, output=None):
@@ -11,10 +12,10 @@ class Json(TreeOutput):
         if output is None:
             return _jsonoutput
         else:
-            with open(output,mode='w') as f:
+            with open(output, mode='w') as f:
                 f.write(_jsonoutput)
                 f.close()
-            return True #TODO inconsistent return json object vs true
+            return True  # TODO inconsistent return json object vs true
 
     def __jsonoutput__(self, projectstructure):
 

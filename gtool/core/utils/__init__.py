@@ -49,13 +49,30 @@ def __outputparser(globalnamespace, outputscheme=None):
     for k, v in globalnamespace.items():
         #print(k, ':', v.metas()[outputscheme])
 
+        _formatterdict = {}
+
         outputbasename = 'output'
         outputschemeseparator = '.'
         # use the specified outscheme but if not available use the default
         _outputscheme = outputbasename + outputschemeseparator + outputscheme
         formatstring = v.metas()[_outputscheme] if _outputscheme in v.metas() else v.metas()[outputbasename]
         _formatter = parseformat(formatstring=formatstring) #, classname=k)
-        registerFormatter(k, _formatter)
+        _formatterdict['format'] = _formatter
+
+        headeroutputbasename = outputbasename + outputschemeseparator + 'headers'
+        _headeroutputscheme = headeroutputbasename + outputschemeseparator + outputscheme
+
+        _headers = None
+
+        if _headeroutputscheme in v.metas():
+            _headers = v.metas()[_headeroutputscheme]
+        elif headeroutputbasename in v.metas():
+            _headers = v.metas()[headeroutputbasename]
+
+        if _headers is not None:
+            _formatterdict['headers'] = _headers
+
+        registerFormatter(k, _formatterdict)
 
         #print(k, ':', _formatter)
 

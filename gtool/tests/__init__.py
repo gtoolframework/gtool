@@ -1241,3 +1241,79 @@ def test34():
 
     Process finished with exit code 1
     """
+
+def test35():
+    outputscheme = '1'
+    print('test 35 validates new header system works')
+    print('---- testing 35 begins ----')
+
+    sf = projectloader('test\\test35', dbg=False, outputscheme=outputscheme)
+
+    """
+    try:
+        checkalignment(sf)
+    except ValueError as err:
+        print(err)
+        sys.exit(1)
+    """
+    print('--- explore results ---')
+
+    o = pluginnamespace()['GRID']()
+
+    _ret = o.output(sf)
+
+    _ret.trim()
+
+    for row in _ret:
+        print(row)
+
+    # correct output
+    """
+    --- explore results ---
+    ['A_p1', 'A_p2', 'B_p1', 'B_p2', 'B_p3', 'C_p1', 'C_p2', 'C_p3']
+    ['d1 ipsum lorum horus', 'hello world', 'subc1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0', 'subb1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    ['d1 ipsum lorum horus', 'hello world', 'subc1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0', 'subb1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    --- test 35 ends ---
+    """
+
+    print('--- test 35 ends ---')
+
+def test36():
+    outputscheme = '1'
+    print('test 36 validates new header system works')
+    print('---- testing 36 begins ----')
+
+    sf = projectloader('test\\test36', dbg=False, outputscheme=outputscheme)
+
+    """
+    try:
+        checkalignment(sf)
+    except ValueError as err:
+        print(err)
+        sys.exit(1)
+    """
+    print('--- explore results ---')
+
+    o = pluginnamespace()['GRID']()
+
+    _ret = o.output(sf)
+
+    _ret.trim()
+
+    for row in _ret:
+        print(row)
+
+    # correct output
+    """
+    ['testpropd1', 'testpropd2', 'testprop1', 'testprop2', 'testprop3']
+    ['d1 ipsum lorum horus', 'dk1 test 123\nhello world', 'tdk1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    ['d2 ipsum lorum horus', 'test 123', '', '', '']
+    ['d3 ipsum lorum horus', 'test 123\nhello world', 'tdk3-1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    ['d4 ipsum lorum horus', 'test 123\nhello world', 'tdk4-1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    [None, None, 'tdk4-2 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    ['d5 ipsum lorum horus', 'test 123\nhello world', 'tdk5-1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    [None, None, 'tdk5-2 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    ['d6 ipsum lorum horus', 'test 123\nhello world', 'tdk6 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    """
+
+    print('--- test 36 ends ---')

@@ -8,6 +8,7 @@ from gtool.core.utils.config import namespace as confignamespace
 from gtool.core.types.outputmanagers import Filler, AttributeMatch
 from gtool.core.types.matrix import Matrix
 from gtool.core.filewalker import striptoclassname
+from collections import OrderedDict
 
 class Output(ABC):
 
@@ -73,6 +74,12 @@ class Output(ABC):
         # TODO call formatter, integrater and __output__ from DynamicType (moving it over first)
         pass
 
+    def __outputconfig__(self):
+        outputscheme_id = runtimenamespace()['outputscheme']
+        outputconfig = confignamespace()[outputconfigname(outputscheme_id)]
+
+        return outputconfig
+
 class GridOutput(Output):
     """
     Output subclass for output that has aligned columns. Must override self.__output__
@@ -114,22 +121,57 @@ class GridOutput(Output):
         :return: list of header strings
         """
 
-        formatlist = obj.__classoutputscheme__()
+        _formatdict = obj.__classoutputscheme__() #TODO if headers exists then use that instead
 
-        _retlist = []
-        for cell in formatlist:
-            for element in cell:
-                if isinstance(element, AttributeMatch):
-                    if not element.isconcatter and getattr(getattr(obj, element.__attrname__, None), 'isdynamic', False):
-                        attr = getattr(obj, element.__attrname__, None)
-                        _attrtype = attr.attrtype()
-                        _retlist.extend(self.__getheaders__(_attrtype))
-                    else:
-                        _retlist.append(element.__attrname__)
-                elif isinstance(element, Filler) and len(cell) == 1:
-                    # handle formatting cells that only contain static Filler text
-                    _retlist.append('')
-        return _retlist
+        formatlist = _formatdict['format']
+
+        formatheaders = None
+
+        if 'headers' in _formatdict:
+            formatheaders = _formatdict['headers']
+
+        # use the headers provided by the user
+        if formatheaders is not None:
+            _headers = [header.strip() for header in formatheaders.split('||')]
+            _retlist = []
+
+            if len(_headers) != len(formatlist):
+                raise ValueError('Class %s has an output.header definition that '
+                                 'is not the same number of cells as the '
+                                 'output format string' % striptoclassname(type(obj)))
+
+            for i, cell in enumerate(formatlist):
+                for element in cell:
+                    if isinstance(element, AttributeMatch):
+                        if not element.isconcatter and getattr(getattr(obj, element.__attrname__, None), 'isdynamic',
+                                                               False):
+                            attr = getattr(obj, element.__attrname__, None)
+                            _attrtype = attr.attrtype()
+                            _retlist.extend(self.__getheaders__(_attrtype))
+                        else:
+                            _retlist.append(_headers[i])
+                    elif isinstance(element, Filler) and len(cell) == 1:
+                        _retlist.append(_headers[i])
+            return _retlist
+
+
+        # generate headers if the user didn't provide headers
+        if formatheaders is None:
+            _retlist = []
+
+            for cell in formatlist:
+                for element in cell:
+                    if isinstance(element, AttributeMatch):
+                        if not element.isconcatter and getattr(getattr(obj, element.__attrname__, None), 'isdynamic', False):
+                            attr = getattr(obj, element.__attrname__, None)
+                            _attrtype = attr.attrtype()
+                            _retlist.extend(self.__getheaders__(_attrtype))
+                        else:
+                            _retlist.append(element.__attrname__)
+                    elif isinstance(element, Filler) and len(cell) == 1:
+                        # handle formatting cells that only contain static Filler text
+                        _retlist.append('')
+            return _retlist
 
     def fillerprocess(self, fillerobj):
         return '%s' % fillerobj.__fillertext__
@@ -303,12 +345,6 @@ class GridOutput(Output):
         grid.carriagereturn(_depth)
         return True
 
-    def __outputconfig__(self):
-        outputscheme_id = runtimenamespace()['outputscheme']
-        outputconfig = confignamespace()[outputconfigname(outputscheme_id)]
-
-        return outputconfig
-
     def __separatorstrip__(self, separator):
         if (separator.startswith('"') and separator.endswith('"')) or (separator.startswith("'") and separator.endswith("'")):
             _separator = bytes('%s' % separator[1:-1], "utf-8").decode("unicode_escape")  # prevent escaping
@@ -337,7 +373,7 @@ class GridOutput(Output):
             else:
                 separator = separatoroverride
 
-            _formatlist = obj.__classoutputscheme__()
+            _formatlist = obj.__classoutputscheme__()['format']
             # TODO add a len() method to dynamic class type to help with matrix width sizing
             self.integrate(obj, formatlist=_formatlist, separator=separator, grid=grid)
 
@@ -380,3 +416,42 @@ class TreeOutput(Output):
 
     def __init__(self):
         super(TreeOutput, self).__init__(aligned=False)
+
+    def integrate(self, obj, tree=None, formatlist=None, separator=" "):
+
+        _retdict = OrderedDict()
+
+        for cell in formatlist:
+            # if dynamic attribute is by itself (and is not zero length) then we stack otherwise we merge
+            for element in cell:
+                if isinstance(element, Filler):
+                    pass
+                elif isinstance(element, AttributeMatch):
+                    pass
+        return True
+
+    def __treeoutput__(self, obj, tree=None):
+
+        """
+        Processes data into a tree in accordance with outputscheme.
+
+        :param obj: a DynamicType object that will be processed for output
+        :return:
+        """
+        def sub(self, obj, tree=None):
+            outputconfig = self.__outputconfig__()
+
+            separatorname = 'separator'
+            separator = self.__separatorstrip__(outputconfig[separatorname])
+
+            _formatlist = obj.__classoutputscheme__()
+
+            self.integrate(obj, formatlist=_formatlist, separator=separator, tree=tree)
+
+        if isinstance(obj, list):
+            for _obj in obj:
+                sub(self, _obj, tree=tree)
+        else:
+            sub(self, obj, tree=tree)
+
+        return tree

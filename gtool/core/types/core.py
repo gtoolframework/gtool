@@ -390,10 +390,10 @@ class FunctionType(object):
         self.computable = False
         self.__result__ = None
         self.__context__ = obj.__context__
-        #self.__hasdependency__ = False
 
+    # TODO implement an  attribute getter for method plugins
     def __getname__(self, attrname, nativetypes = [], singletononly=False):
-        pass
+        raise NotImplemented
 
     @abstractmethod
     def compute(self):
@@ -414,25 +414,6 @@ class FunctionType(object):
             pass
             # if not computable don't set result
         #TODO look at returning True or False is compute completes
-
-    """
-    @abstractmethod
-    def __dependencyresolved__(self, ):
-        pass
-
-    @abstractmethod
-    def checkdependency(self):
-        dependencylist = []
-        if self.__hasdependency__:
-            pass
-            # define a check for dependency
-            # append to dependency list
-        return dependencylist
-
-    def hasdependency(self):
-        return self.__hasdependency__
-
-    """
 
     @property
     def context(self):

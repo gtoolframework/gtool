@@ -51,7 +51,7 @@ def readClass(configString):
     def _metaParser():
         # --- meta parser ---
         metaIndicator = p.LineStart() + p.Suppress(p.Literal('*'))
-        metaName = p.Word(p.alphanums)
+        metaName = p.Word(p.printables)
         metaSeparator = p.Suppress(p.Literal('='))
 
         # TODO force case insensitivity in attributeMode keyword match
