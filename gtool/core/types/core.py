@@ -355,13 +355,19 @@ class DynamicType(object):
     def __classoutputscheme__(self):
         return formatternamespace()[striptoclassname(self.__class__)]
 
+    # TODO move into TreeOutput
     def asdict(self):
         _retdict = {}
         for k, v in self:
-            if not v.isdynamic:
-                _v = [i.raw() for i in v]
+            if striptoclassname(type(v)) == 'attribute':
+                if not v.isdynamic:
+                    _v = [i.raw() for i in v]
+                    _v = _v[0] if len(_v) == 1 else _v
+                else:
+                    _v = [i.asdict() for i in v]
+                    _v = _v[0] if len(_v) == 1 else _v
             else:
-                _v = [i.asdict() for i in v]
+                _v = v
             _retdict[k] = _v
         return _retdict
 

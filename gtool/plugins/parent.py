@@ -17,7 +17,7 @@ class Parent(FunctionType):
 
     def compute(self):
         if self.computable:
-            _result = self.context['parent']
+            _result = '%s' % self.context['parent']
             self.__result__ = _result
 
 def load():

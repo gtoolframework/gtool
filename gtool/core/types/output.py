@@ -417,18 +417,31 @@ class TreeOutput(Output):
     def __init__(self):
         super(TreeOutput, self).__init__(aligned=False)
 
-    def integrate(self, obj, tree=None, formatlist=None, separator=" "):
+    def integrate(self, obj, formatlist=None, separator=" "):
 
-        _retdict = OrderedDict()
+        _tree = {}
 
         for cell in formatlist:
             # if dynamic attribute is by itself (and is not zero length) then we stack otherwise we merge
+            _value = ''
+            _key = ''
             for element in cell:
                 if isinstance(element, Filler):
-                    pass
+                    _value += '%s' % element
                 elif isinstance(element, AttributeMatch):
-                    pass
-        return True
+                    if element.__isdynamic__(obj):
+                        pass
+                    else:
+                        pass
+                    _key += element.__attrname__
+
+            if len(_key) == 0:
+                raise ValueError('A format string in class %s has a '
+                                 'cell in a format string that does '
+                                 'not include an attribute or method' % (striptoclassname(type(obj))))
+            _tree[_key] = _value
+
+        return _tree
 
     def __treeoutput__(self, obj, tree=None):
 

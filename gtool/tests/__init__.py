@@ -1244,7 +1244,7 @@ def test34():
 
 def test35():
     outputscheme = '1'
-    print('test 35 validates new header system works')
+    print('test 35 validates new header system works for grid output')
     print('---- testing 35 begins ----')
 
     sf = projectloader('test\\test35', dbg=False, outputscheme=outputscheme)
@@ -1280,7 +1280,7 @@ def test35():
 
 def test36():
     outputscheme = '1'
-    print('test 36 validates new header system works')
+    print('test 36 validates header system works json output')
     print('---- testing 36 begins ----')
 
     sf = projectloader('test\\test36', dbg=False, outputscheme=outputscheme)
@@ -1294,7 +1294,7 @@ def test36():
     """
     print('--- explore results ---')
 
-    o = pluginnamespace()['GRID']()
+    o = pluginnamespace()['JSON']()
 
     _ret = o.output(sf)
 
@@ -1317,3 +1317,90 @@ def test36():
     """
 
     print('--- test 36 ends ---')
+
+def test37():
+    outputscheme = '1'
+    print('test 37 checks if all methods work for tree output')
+    print('---- testing 37 begins ----')
+
+    sf = projectloader('test\\test37', dbg=False, outputscheme=outputscheme)
+
+    x = sf.dataasobject
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['JSON']()
+
+    _ret = o.output(sf)
+
+    print(_ret)
+
+    print('--- test 37 ends ---')
+
+
+    #expected output
+    """
+    test 37 checks if all methods work for tree output
+    ---- testing 37 begins ----
+    loading plug-in: choice
+    loading plug-in: combine
+    loading plug-in: csv
+    loading plug-in: dummy
+    loading plug-in: enum
+    loading plug-in: excel
+    loading plug-in: filename
+    loading plug-in: fullpath
+    loading plug-in: grid
+    loading plug-in: json
+    loading plug-in: math
+    loading plug-in: number
+    loading plug-in: parent
+    loading plug-in: path
+    loading plug-in: real
+    loading plug-in: ref
+    loading plug-in: static
+    loading plug-in: string
+    loading plug-in: url
+    loading plug-in: yaml
+    Registering Dynamic Class: CLASSONE
+    --- explore results ---
+    [
+        {
+            "tf1": {
+                "num1": 10,
+                "num2": 20,
+                "test1": 30,
+                "test10": "High",
+                "test11": 3,
+                "test2": 60,
+                "test3": "tf1.txt",
+                "test4": "test\test37\\data",
+                "test5": "test\test37\\data\tf1.txt",
+                "test6": "*",
+                "test7": "10 % 20",
+                "test8": "THIS IS STATICA!!",
+                "test9": 3,
+                "text1": "High"
+            }
+        },
+        {
+            "tf2": {
+                "num1": 15,
+                "num2": 25,
+                "test1": 40,
+                "test10": "High",
+                "test11": 3,
+                "test2": 80,
+                "test3": "tf2.txt",
+                "test4": "test\test37\\data",
+                "test5": "test\test37\\data\tf2.txt",
+                "test6": "*",
+                "test7": "15 % 25",
+                "test8": "THIS IS STATICA!!",
+                "test9": 3,
+                "text1": "High"
+            }
+        }
+    ]
+    --- test 37 ends ---
+    """

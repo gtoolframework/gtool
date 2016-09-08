@@ -1,0 +1,18 @@
+CLASSONE::
+*file = tf
+*output.1 = @num1 || @num2 || @text1 || !test1 || !test2 || !test3 || !test4 || !test5 || !test6 || !test7 || !test8 || !test9 || !test10 || !test11
+*output.headers.1 = n_one || n_two || t_one || t_two || t_three || t_four || t_five || t_six || t_seven || t_eight || t_nine || t_ten || t_ten || t_eleven
+@num1:: single: Number (required = False)
+@num2:: single: Number (required = False)
+@text1:: single: String (required = False)
+!test1:: Math('@num1 + @num2')
+!test2:: Math('!test1 * 2')
+!test3:: Filename()
+!test4:: Path()
+!test5:: Fullpath()
+!test6:: Parent()
+!test7:: Combine('@num1 % @num2')
+!test8:: Static('THIS IS STATICA!!')
+!test9:: Enum(input = '@text1', mapping = 'l = 1, m = 2, h = 3')
+!test10:: Combine('@text1')
+!test11:: Enum(input = '@test10', mapping = 'l = 1, m = 2, h = 3')
