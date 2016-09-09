@@ -1142,7 +1142,7 @@ def test33():
     print('test 33 checks if all methods work')
     print('---- testing 33 begins ----')
 
-    sf = projectloader('test\\test33', dbg=False, outputscheme=outputscheme)
+    sf = projectloader('test\\test33\\', dbg=False, outputscheme=outputscheme)
 
     x = sf.dataasobject
 
@@ -1280,10 +1280,10 @@ def test35():
 
 def test36():
     outputscheme = '1'
-    print('test 36 validates header system works json output')
+    print('test 36 validates format string system works tree output')
     print('---- testing 36 begins ----')
 
-    sf = projectloader('test\\test36', dbg=False, outputscheme=outputscheme)
+    sf = projectloader('test\\test36\\', dbg=False, outputscheme=outputscheme)
 
     """
     try:
@@ -1298,10 +1298,7 @@ def test36():
 
     _ret = o.output(sf)
 
-    _ret.trim()
-
-    for row in _ret:
-        print(row)
+    print(_ret)
 
     # correct output
     """

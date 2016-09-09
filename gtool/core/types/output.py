@@ -443,7 +443,7 @@ class TreeOutput(Output):
 
         return _tree
 
-    def __treeoutput__(self, obj, tree=None):
+    def __treeoutput__(self, tree=StructureFactory.Container()):
 
         """
         Processes data into a tree in accordance with outputscheme.
@@ -451,7 +451,9 @@ class TreeOutput(Output):
         :param obj: a DynamicType object that will be processed for output
         :return:
         """
-        def sub(self, obj, tree=None):
+
+        """
+        def sub(self, tree=None):
             outputconfig = self.__outputconfig__()
 
             separatorname = 'separator'
@@ -461,10 +463,18 @@ class TreeOutput(Output):
 
             self.integrate(obj, formatlist=_formatlist, separator=separator, tree=tree)
 
-        if isinstance(obj, list):
-            for _obj in obj:
-                sub(self, _obj, tree=tree)
+        if isinstance(tree, list):
+            for _obj in tree:
+                sub(tree=tree)
         else:
-            sub(self, obj, tree=tree)
+            sub(tree=tree)
 
-        return tree
+        """
+
+        def _sub(tree):
+            if tree.haschildren:
+                return [_sub(child) for child in tree.children]
+            else:
+                return {tree.name: tree.dataasobject}
+
+        return _sub(tree)

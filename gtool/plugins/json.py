@@ -19,14 +19,29 @@ class Json(TreeOutput):
 
     def __jsonoutput__(self, projectstructure):
 
+        """
         def sub(tree=StructureFactory.Container()):
             if tree.haschildren:
                 return [sub(child) for child in tree.children]
             else:
                 return {tree.name: tree.dataasobject.asdict()}
+        """
 
-        _ret = sub(projectstructure)
-        return json.dumps(_ret, sort_keys=True, indent=4)
+        def _sub(tree):
+            if isinstance(tree, list):
+                return [_sub(item) for item in tree]
+            elif isinstance(tree, dict):
+                return {k: _sub(v) for k, v in tree.items()}
+            else:
+                return tree.asdict()
+
+        pass
+        _output = self.__treeoutput__(projectstructure)
+        _tree = _sub(_output)
+        #_ret = sub(projectstructure)
+        #if y == _ret:
+        #    print('match!')
+        return json.dumps(_tree, sort_keys=True, indent=4)
 
 
 def load():
