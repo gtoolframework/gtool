@@ -7,7 +7,9 @@ class Json(TreeOutput):
 
     def __output__(self, projectstructure, output=None):
 
-        _jsonoutput = self.__jsonoutput__(projectstructure)
+        _output = super(Json, self).__output__(projectstructure)
+
+        _jsonoutput = self.__jsonoutput__(_output)
 
         if output is None:
             return _jsonoutput
@@ -19,14 +21,6 @@ class Json(TreeOutput):
 
     def __jsonoutput__(self, projectstructure):
 
-        """
-        def sub(tree=StructureFactory.Container()):
-            if tree.haschildren:
-                return [sub(child) for child in tree.children]
-            else:
-                return {tree.name: tree.dataasobject.asdict()}
-        """
-
         def _sub(tree):
             if isinstance(tree, list):
                 return [_sub(item) for item in tree]
@@ -35,12 +29,7 @@ class Json(TreeOutput):
             else:
                 return tree.asdict()
 
-        pass
-        _output = self.__treeoutput__(projectstructure)
-        _tree = _sub(_output)
-        #_ret = sub(projectstructure)
-        #if y == _ret:
-        #    print('match!')
+        _tree = _sub(projectstructure)
         return json.dumps(_tree, sort_keys=True, indent=4)
 
 

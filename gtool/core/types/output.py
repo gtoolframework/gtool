@@ -443,7 +443,7 @@ class TreeOutput(Output):
 
         return _tree
 
-    def __treeoutput__(self, tree=StructureFactory.Container()):
+    def __output__(self, projectstructure, output=None):
 
         """
         Processes data into a tree in accordance with outputscheme.
@@ -477,4 +477,4 @@ class TreeOutput(Output):
             else:
                 return {tree.name: tree.dataasobject}
 
-        return _sub(tree)
+        return _sub(projectstructure)
