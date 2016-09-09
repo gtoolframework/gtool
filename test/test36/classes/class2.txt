@@ -1,7 +1,7 @@
 SUBA::
 *file = suba
 *displayname = test1
-*output = suba (@testpropa1) dn|| @testpropa2 @testpropa3 || @testpropa4
+*output = @testpropa1 || @testpropa2 @testpropa3 || @testpropa4
 *output.headers.1 = A_p1 || A_p2_and_p3 || A_p3
 @testpropa1:: single: String (required = True)
 @testpropa2:: multiple: String (required = True)

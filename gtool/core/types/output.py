@@ -272,7 +272,7 @@ class GridOutput(Output):
                         q.append(_x)
                 else:
                     raise TypeError('element in formatting cell is neither a Filler or an Attribute')
-                    q.append(_x)
+                    #q.append(_x)
             return q
 
         def __integratesingle__(element, obj, grid):
@@ -417,31 +417,72 @@ class TreeOutput(Output):
     def __init__(self):
         super(TreeOutput, self).__init__(aligned=False)
 
-    def integrate(self, obj, formatlist=None, separator=" "):
+    def integrate(self, obj):
 
-        _tree = {}
+        def sub(obj, attrname):
+            _attrib = getattr(obj, attrname)
+
+            attribIsDynamic = False
+
+            try:
+                attribIsDynamic = _attrib.isdynamic
+            except:
+                pass
+
+            if attribIsDynamic:
+                pass
+                return attrname
+                #return self.integrate(_attrib.attrtype())
+            else:
+                return attrname
+
+        formatlist = obj.__classoutputscheme__()['format']
+
+        _outputdict = OrderedDict()
+        _outputlist = []
 
         for cell in formatlist:
             # if dynamic attribute is by itself (and is not zero length) then we stack otherwise we merge
-            _value = ''
-            _key = ''
+
+            _keylist = []
+            _templist = []
+
             for element in cell:
                 if isinstance(element, Filler):
-                    _value += '%s' % element
+                    _filler = '%s' % element
+                    if not _filler.isspace():
+                        raise ValueError('Tree based output plugins do not '
+                                         'support non-attribute values, such '
+                                         'as %s in %s, in the format string' % (element, striptoclassname(type(obj))))
                 elif isinstance(element, AttributeMatch):
-                    if element.__isdynamic__(obj):
-                        pass
+                    _keylist.append(element.__attrname__)
+                    _x = sub(obj, element.__attrname__)
+                    if isinstance(_x, list):
+                        _templist.append({element.__attrname__: _x})
                     else:
-                        pass
-                    _key += element.__attrname__
+                        _templist.append(_x)
 
-            if len(_key) == 0:
+                else:
+                    raise TypeError('Received an unexpected value of '
+                                    'type %s in class %s\'s format '
+                                    'string' % (type(element), striptoclassname(type(obj))))
+
+            """
+            if len(_keylist) == 0:
                 raise ValueError('A format string in class %s has a '
                                  'cell in a format string that does '
                                  'not include an attribute or method' % (striptoclassname(type(obj))))
-            _tree[_key] = _value
+            """
+            if len(_keylist) > 1:
+                _key = '_'.join(_keylist)
+                _outputlist.append({_key: _templist})
+                _outputdict[_key] = _templist
+            else:
+                _outputlist.extend(_templist)
+                _outputdict[_keylist[0]] = None
 
-        return _tree
+        #print(_outputdict)
+        return _outputdict #_outputlist
 
     def __output__(self, projectstructure, output=None):
 
@@ -449,32 +490,31 @@ class TreeOutput(Output):
         Processes data into a tree in accordance with outputscheme.
 
         :param obj: a DynamicType object that will be processed for output
-        :return:
+        :param output: Output target location (not used by base class, should be used by inheriting class)
+        :return: list or dict
         """
 
-        """
-        def sub(self, tree=None):
-            outputconfig = self.__outputconfig__()
-
-            separatorname = 'separator'
-            separator = self.__separatorstrip__(outputconfig[separatorname])
-
-            _formatlist = obj.__classoutputscheme__()
-
-            self.integrate(obj, formatlist=_formatlist, separator=separator, tree=tree)
-
-        if isinstance(tree, list):
-            for _obj in tree:
-                sub(tree=tree)
-        else:
-            sub(tree=tree)
-
-        """
+        def attrselector(idict):
+            for k,v in idict.items():
+                if isinstance(v, list):
+                    for i in v:
+                        print('retrieving:', i)
+                else:
+                    print('retrieving:', k)
 
         def _sub(tree):
             if tree.haschildren:
                 return [_sub(child) for child in tree.children]
             else:
-                return {tree.name: tree.dataasobject}
+                _obj = tree.dataasobject
+                t = self.integrate(_obj)
+                attrselector(t)
+
+                import json
+                j = json.dumps(t, indent=4, sort_keys=True)
+                print('-'*20)
+                print(j)
+                print('-' * 20)
+                return {tree.name: _obj}
 
         return _sub(projectstructure)
