@@ -2,13 +2,12 @@ from abc import ABC, abstractmethod
 from gtool.core.utils.output import checkalignment, recursioncheck
 import sys
 from gtool.core.filewalker import StructureFactory
-from gtool.core.utils.output import outputconfigname #, formatternamespace
+from gtool.core.utils.output import outputconfigname
 from gtool.core.utils.runtime import runtimenamespace
 from gtool.core.utils.config import namespace as confignamespace
 from gtool.core.types.outputmanagers import Filler, AttributeMatch
 from gtool.core.types.matrix import Matrix
 from gtool.core.filewalker import striptoclassname
-from collections import OrderedDict
 
 class Output(ABC):
 
@@ -418,43 +417,21 @@ class TreeOutput(Output):
         super(TreeOutput, self).__init__(aligned=False)
 
     def integrate(self, obj):
+        """
+        Read the format string in the class and output a list of attributes
 
-        def sub(obj, attrname):
-            _attrib = getattr(obj, attrname)
-
-            attribIsDynamic = False
-
-            try:
-                attribIsDynamic = _attrib.isdynamic
-            except:
-                pass
-
-            if attribIsDynamic:
-                pass
-                #return attrname
-                #return self.integrate(_attrib.attrtype())
-                return {attrname: self.integrate(_attrib.attrtype())}
-
-
-            else:
-                return attrname
+        :param obj: DynamicType
+        :return: list of attributes
+        """
 
         formatlist = obj.__classoutputscheme__()['format']
-
-        _outputdict = OrderedDict()
-        _outputlist = []
         _keylist = []
 
         for cell in formatlist:
-            # if dynamic attribute is by itself (and is not zero length) then we stack otherwise we merge
-
-
-            _templist = []
-
             if len(cell) > 1:
-                raise ValueError('Tree based outputs do not support '
-                                 'multiple attributes in a single '
-                                 'cell found in %s' % striptoclassname(type(obj)))
+                raise ValueError('Tree based output plugins do not '
+                                 'support multiple attributes in a single '
+                                 'cell; found in %s' % striptoclassname(type(obj)))
 
             for element in cell:
                 if isinstance(element, Filler):
@@ -465,61 +442,69 @@ class TreeOutput(Output):
                                          'as %s in %s, in the format string' % (element, striptoclassname(type(obj))))
                 elif isinstance(element, AttributeMatch):
                     _keylist.append(element.__attrname__)
-                    #_keylist.append(sub(obj, element.__attrname__))
-                    """
-                    _x = sub(obj, element.__attrname__)
-                    if isinstance(_x, list):
-                        _templist.append({element.__attrname__: _x})
-                    else:
-                        _templist.append(_x)
-                    """
-
                 else:
                     raise TypeError('Received an unexpected value of '
                                     'type %s in class %s\'s format '
                                     'string' % (type(element), striptoclassname(type(obj))))
 
-            """
-            if len(_keylist) == 0:
-                raise ValueError('A format string in class %s has a '
-                                 'cell in a format string that does '
-                                 'not include an attribute or method' % (striptoclassname(type(obj))))
-            """
-            """
-            if len(_keylist) > 1:
-                _key = '_'.join(_keylist)
-                _outputlist.append({_key: _templist})
-                _outputdict[_key] = _templist
-            else:
-                _outputlist.extend(_templist)
-                _outputdict[_keylist[0]] = None
-            """
-
-        #print(_outputdict)
-        """
-        import json
-        j = json.dumps(_keylist, indent=4, sort_keys=True)
-        print('-' * 20)
-        print(j)
-        print('-' * 20)
-        """
-
-        return _keylist #_outputdict #_outputlist
+        return _keylist
 
     @abstractmethod
     def filter(self, obj):
+        """
+        Override this method in your output plugin to change how format string is handled
 
-        _x = self.integrate(obj)
-        print(_x)
-        _retlist =  _x #[k for k,v in obj]
+        :param obj: a DynamicType
+        :return: a list of attributes, read from the class formatter, to render in outputprocessor
+        """
+
+        _filteredattribs = self.integrate(obj)
+        _retlist = _filteredattribs
 
         return _retlist
 
     @abstractmethod
     def outputprocessor(self, projectstructure):
-        pass
 
-    def __output__(self, projectstructure):
+        """
+        Takes the tree structure read by __output__ and converts into a final form.
+        self.filter should be called from here if the class format string is used.
+        :param projectstructure: must be a list or a dict containing DynamicType objects
+        :return:
+        """
+        # TODO implement a type validator
+        raise NotImplemented('output processor must be implemented ')
+
+    def convert(self, obj, filterfunction=None):
+
+        filterlist = [k for k, v in obj]
+
+        if filterfunction is not None:
+            if not callable(filterfunction):
+                raise TypeError('filterfunction "%s" must be callable' % (filterfunction))
+            filterlist = filterfunction(obj)
+            #print(filterlist)
+            if not isinstance(filterlist, list):
+                raise TypeError('filterfunction "%s" did not return a list, it return a %s' % (filterfunction, type(filterlist)))
+
+        #print(filterlist)
+
+        _retdict = {}
+        for k, v in obj:
+            if k in filterlist:
+                if striptoclassname(type(v)) == 'attribute':
+                    if not v.isdynamic:
+                        _v = [i.raw() for i in v]
+                        _v = _v[0] if len(_v) == 1 else _v
+                    else:
+                        _v = [self.convert(i, filterfunction=filterfunction) for i in v]
+                        _v = _v[0] if len(_v) == 1 else _v
+                else:
+                    _v = v
+                _retdict[k] = _v
+        return _retdict
+
+    def __output__(self, projectstructure, output=None): # TODO use output
 
         """
         Processes data into a tree in accordance with outputscheme.
@@ -529,33 +514,14 @@ class TreeOutput(Output):
         :return: list or dict
         """
 
-        def attrselector(idict):
-            for k,v in idict.items():
-                if isinstance(v, list):
-                    for i in v:
-                        print('retrieving:', i)
-                else:
-                    print('retrieving:', k)
-
         def _sub(tree):
             if tree.haschildren:
                 return [_sub(child) for child in tree.children]
             else:
                 _obj = tree.dataasobject
-                """
-                t = self.integrate(_obj)
-                #attrselector(t)
-
-
-                import json
-                j = json.dumps(t, indent=4, sort_keys=True)
-                print('-'*20)
-                print(j)
-                print('-' * 20)
-                """
                 return {tree.name: _obj}
 
 
         _output = _sub(projectstructure)
 
-        return  self.outputprocessor(_output) #_sub(projectstructure)
+        return  self.outputprocessor(_output)

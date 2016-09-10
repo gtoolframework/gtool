@@ -354,6 +354,7 @@ class DynamicType(object):
     def __classoutputscheme__(self):
         return formatternamespace()[striptoclassname(self.__class__)]
 
+    """
     # TODO move into TreeOutput (or make core class behave more like a dict)
     def asdict(self, filterfunction=None):
 
@@ -383,6 +384,7 @@ class DynamicType(object):
                     _v = v
                 _retdict[k] = _v
         return _retdict
+        """
 
     def __iter__(self):
         for item in self.__list_slots__.keys(): #TODO switch to .items
