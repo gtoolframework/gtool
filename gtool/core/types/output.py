@@ -431,8 +431,11 @@ class TreeOutput(Output):
 
             if attribIsDynamic:
                 pass
-                return attrname
+                #return attrname
                 #return self.integrate(_attrib.attrtype())
+                return {attrname: self.integrate(_attrib.attrtype())}
+
+
             else:
                 return attrname
 
@@ -440,12 +443,18 @@ class TreeOutput(Output):
 
         _outputdict = OrderedDict()
         _outputlist = []
+        _keylist = []
 
         for cell in formatlist:
             # if dynamic attribute is by itself (and is not zero length) then we stack otherwise we merge
 
-            _keylist = []
+
             _templist = []
+
+            if len(cell) > 1:
+                raise ValueError('Tree based outputs do not support '
+                                 'multiple attributes in a single '
+                                 'cell found in %s' % striptoclassname(type(obj)))
 
             for element in cell:
                 if isinstance(element, Filler):
@@ -456,11 +465,14 @@ class TreeOutput(Output):
                                          'as %s in %s, in the format string' % (element, striptoclassname(type(obj))))
                 elif isinstance(element, AttributeMatch):
                     _keylist.append(element.__attrname__)
+                    #_keylist.append(sub(obj, element.__attrname__))
+                    """
                     _x = sub(obj, element.__attrname__)
                     if isinstance(_x, list):
                         _templist.append({element.__attrname__: _x})
                     else:
                         _templist.append(_x)
+                    """
 
                 else:
                     raise TypeError('Received an unexpected value of '
@@ -473,6 +485,7 @@ class TreeOutput(Output):
                                  'cell in a format string that does '
                                  'not include an attribute or method' % (striptoclassname(type(obj))))
             """
+            """
             if len(_keylist) > 1:
                 _key = '_'.join(_keylist)
                 _outputlist.append({_key: _templist})
@@ -480,11 +493,33 @@ class TreeOutput(Output):
             else:
                 _outputlist.extend(_templist)
                 _outputdict[_keylist[0]] = None
+            """
 
         #print(_outputdict)
-        return _outputdict #_outputlist
+        """
+        import json
+        j = json.dumps(_keylist, indent=4, sort_keys=True)
+        print('-' * 20)
+        print(j)
+        print('-' * 20)
+        """
 
-    def __output__(self, projectstructure, output=None):
+        return _keylist #_outputdict #_outputlist
+
+    @abstractmethod
+    def filter(self, obj):
+
+        _x = self.integrate(obj)
+        print(_x)
+        _retlist =  _x #[k for k,v in obj]
+
+        return _retlist
+
+    @abstractmethod
+    def outputprocessor(self, projectstructure):
+        pass
+
+    def __output__(self, projectstructure):
 
         """
         Processes data into a tree in accordance with outputscheme.
@@ -507,14 +542,20 @@ class TreeOutput(Output):
                 return [_sub(child) for child in tree.children]
             else:
                 _obj = tree.dataasobject
+                """
                 t = self.integrate(_obj)
-                attrselector(t)
+                #attrselector(t)
+
 
                 import json
                 j = json.dumps(t, indent=4, sort_keys=True)
                 print('-'*20)
                 print(j)
                 print('-' * 20)
+                """
                 return {tree.name: _obj}
 
-        return _sub(projectstructure)
+
+        _output = _sub(projectstructure)
+
+        return  self.outputprocessor(_output) #_sub(projectstructure)

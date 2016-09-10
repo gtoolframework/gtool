@@ -7,9 +7,9 @@ class Json(TreeOutput):
 
     def __output__(self, projectstructure, output=None):
 
-        _output = super(Json, self).__output__(projectstructure)
+        _jsonoutput = super(Json, self).__output__(projectstructure)
 
-        _jsonoutput = self.__jsonoutput__(_output)
+        #_jsonoutput = self.outputprocessor(_output)
 
         if output is None:
             return _jsonoutput
@@ -19,7 +19,10 @@ class Json(TreeOutput):
                 f.close()
             return True  # TODO inconsistent return json object vs true
 
-    def __jsonoutput__(self, projectstructure):
+    def filter(self, obj):
+        return super(Json, self).filter(obj)
+
+    def outputprocessor(self, projectstructure):
 
         def _sub(tree):
             if isinstance(tree, list):
@@ -27,7 +30,7 @@ class Json(TreeOutput):
             elif isinstance(tree, dict):
                 return {k: _sub(v) for k, v in tree.items()}
             else:
-                return tree.asdict()
+                return tree.asdict(filterfunction=self.filter)
 
         _tree = _sub(projectstructure)
         return json.dumps(_tree, sort_keys=True, indent=4)

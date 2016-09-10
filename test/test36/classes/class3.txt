@@ -2,7 +2,7 @@ SUBC::
 *file = subc
 *moo = 1
 *displayname = Blah
-*output.1 = @testpropc1 || @testpropc2 || @testpropc3
+*output.1 = @testpropc1 || @testpropc3
 *output.headers.1 = C_p1 || C_p2 || C_p3
 @testpropc1:: single: String (required = False)
 @testpropc2:: multiple: String (required = True)

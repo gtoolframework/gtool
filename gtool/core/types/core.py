@@ -6,7 +6,6 @@ from copy import deepcopy
 import pyparsing as p
 from gtool.core.plugin import pluginnamespace
 from abc import abstractmethod
-import asyncio
 
 class CoreType(object):
     """
@@ -53,7 +52,7 @@ class CoreType(object):
         except ValueError:
             raise ValueError('cannot convert %s to type %s' %(item, cls.__converter__()))
 
-
+# TODO look at deriving this class from the ABC.mutablecollections
 class DynamicType(object):
     """
     base object for dynamically generated classes
@@ -355,20 +354,34 @@ class DynamicType(object):
     def __classoutputscheme__(self):
         return formatternamespace()[striptoclassname(self.__class__)]
 
-    # TODO move into TreeOutput
-    def asdict(self):
+    # TODO move into TreeOutput (or make core class behave more like a dict)
+    def asdict(self, filterfunction=None):
+
+        filterlist = [k for k, v in self]
+
+        if filterfunction is not None:
+            if not callable(filterfunction):
+                raise TypeError('filterfunction "%s" must be callable' % (filterfunction))
+            filterlist = filterfunction(self)
+            #print(filterlist)
+            if not isinstance(filterlist, list):
+                raise TypeError('filterfunction "%s" did not return a list, it return a %s' % (filterfunction, type(filterlist)))
+
+        #print(filterlist)
+
         _retdict = {}
         for k, v in self:
-            if striptoclassname(type(v)) == 'attribute':
-                if not v.isdynamic:
-                    _v = [i.raw() for i in v]
-                    _v = _v[0] if len(_v) == 1 else _v
+            if k in filterlist:
+                if striptoclassname(type(v)) == 'attribute':
+                    if not v.isdynamic:
+                        _v = [i.raw() for i in v]
+                        _v = _v[0] if len(_v) == 1 else _v
+                    else:
+                        _v = [i.asdict(filterfunction=filterfunction) for i in v]
+                        _v = _v[0] if len(_v) == 1 else _v
                 else:
-                    _v = [i.asdict() for i in v]
-                    _v = _v[0] if len(_v) == 1 else _v
-            else:
-                _v = v
-            _retdict[k] = _v
+                    _v = v
+                _retdict[k] = _v
         return _retdict
 
     def __iter__(self):
