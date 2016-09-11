@@ -1300,17 +1300,63 @@ def test36():
 
     print(_ret)
 
+    # output should not include attributes ending in "2"
     # correct output
     """
-    ['testpropd1', 'testpropd2', 'testprop1', 'testprop2', 'testprop3']
-    ['d1 ipsum lorum horus', 'dk1 test 123\nhello world', 'tdk1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
-    ['d2 ipsum lorum horus', 'test 123', '', '', '']
-    ['d3 ipsum lorum horus', 'test 123\nhello world', 'tdk3-1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
-    ['d4 ipsum lorum horus', 'test 123\nhello world', 'tdk4-1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
-    [None, None, 'tdk4-2 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
-    ['d5 ipsum lorum horus', 'test 123\nhello world', 'tdk5-1 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
-    [None, None, 'tdk5-2 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
-    ['d6 ipsum lorum horus', 'test 123\nhello world', 'tdk6 ipsum lorum horus', 'alpha beta\nipsum lorum horus rictum', '4.0']
+    ---- testing 36 begins ----
+    loading plug-in: choice
+    loading plug-in: combine
+    loading plug-in: csv
+    loading plug-in: dummy
+    loading plug-in: enum
+    loading plug-in: excel
+    loading plug-in: filename
+    loading plug-in: fullpath
+    loading plug-in: grid
+    loading plug-in: json
+    loading plug-in: math
+    loading plug-in: number
+    loading plug-in: parent
+    loading plug-in: path
+    loading plug-in: real
+    loading plug-in: ref
+    loading plug-in: static
+    loading plug-in: string
+    loading plug-in: url
+    loading plug-in: yaml
+    Registering Dynamic Class: SUBB
+    Registering Dynamic Class: SUBA
+    Registering Dynamic Class: SUBC
+    --- explore results ---
+    [
+        {
+            "suba1": {
+                "testpropa1": "d1 ipsum lorum horus",
+                "testpropa3": {
+                    "testpropb1": "subc1 ipsum lorum horus",
+                    "testpropb3": 4.0
+                },
+                "testpropa4": {
+                    "testpropc1": "subb1 ipsum lorum horus",
+                    "testpropc3": 4.0
+                }
+            }
+        },
+        {
+            "suba2": {
+                "testpropa1": "d1 ipsum lorum horus",
+                "testpropa3": {
+                    "testpropb1": "subc1 ipsum lorum horus",
+                    "testpropb3": 4.0
+                },
+                "testpropa4": {
+                    "testpropc1": "subb1 ipsum lorum horus",
+                    "testpropc3": 4.0
+                }
+            }
+        }
+    ]
+    --- test 36 ends ---
     """
 
     print('--- test 36 ends ---')

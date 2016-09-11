@@ -47,16 +47,14 @@ def __outputparser(globalnamespace, outputscheme=None):
         raise ValueError('An outputscheme was not provided, cannot build output format tree')
     #print('Namespace:...')
     for k, v in globalnamespace.items():
-        #print(k, ':', v.metas()[outputscheme])
-
         _formatterdict = {}
-
         outputbasename = 'output'
         outputschemeseparator = '.'
+
         # use the specified outscheme but if not available use the default
         _outputscheme = outputbasename + outputschemeseparator + outputscheme
-        formatstring = v.metas()[_outputscheme] if _outputscheme in v.metas() else v.metas()[outputbasename]
-        _formatter = parseformat(formatstring=formatstring) #, classname=k)
+        formatstring = v.metas()[_outputscheme] if _outputscheme in v.metas() else v.metas().get(outputbasename, None)
+        _formatter = parseformat(formatstring=formatstring) if formatstring is not None else None
         _formatterdict['format'] = _formatter
 
         headeroutputbasename = outputbasename + outputschemeseparator + 'headers'
@@ -73,10 +71,6 @@ def __outputparser(globalnamespace, outputscheme=None):
             _formatterdict['headers'] = _headers
 
         registerFormatter(k, _formatterdict)
-
-        #print(k, ':', _formatter)
-
-        #print(parseformat(v.metas()[outputscheme]))
 
 def __loadclass(classpath, dbg=False):
     """

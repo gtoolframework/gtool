@@ -19,6 +19,9 @@ class Json(TreeOutput):
     def filter(self, obj):
         return super(Json, self).filter(obj)
 
+    def convert(self, obj):
+        return super(Json, self).convert(obj)
+
     def outputprocessor(self, projectstructure):
 
         def _sub(tree):
@@ -27,7 +30,7 @@ class Json(TreeOutput):
             elif isinstance(tree, dict):
                 return {k: _sub(v) for k, v in tree.items()}
             else:
-                return self.convert(tree, filterfunction=self.filter)  #tree.asdict(filterfunction=self.filter)
+                return self.convert(tree) #, filterfunction=self.filter)  #tree.asdict(filterfunction=self.filter)
 
         _tree = _sub(projectstructure)
         return json.dumps(_tree, sort_keys=True, indent=4)

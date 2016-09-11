@@ -263,7 +263,7 @@ class GridOutput(Output):
                         attribIsDynamic = _attrib.isdynamic
                     except:
                         pass
-                    if attribIsDynamic: #getattr(obj, element.__attrname__).isdynamic:
+                    if attribIsDynamic:
                         _x = self.dynattribprocess(obj, element)
                         q.extend(_x) #TODO this should be consistent with the appends below
                     else:
@@ -271,7 +271,6 @@ class GridOutput(Output):
                         q.append(_x)
                 else:
                     raise TypeError('element in formatting cell is neither a Filler or an Attribute')
-                    #q.append(_x)
             return q
 
         def __integratesingle__(element, obj, grid):
@@ -287,13 +286,12 @@ class GridOutput(Output):
                 if _grid.height > 1:
                     # TODO make this an assert
                     raise ValueError('dynamic object should only return a matrix with a height of 1')
-                #_x = '\n'.join(_grid.row(0))
                 if element.isconcatter:
                     _x = ['\n'.join(_grid.row(0))]
                 else:
                     _x = _grid.row(0)
-                grid.insert(datalist=_x, cursor=c) #[_x]
-                if (i+1) < len(_obj): # and len(_obj) > 1
+                grid.insert(datalist=_x, cursor=c)
+                if (i+1) < len(_obj):
                     grid.nextrow()
                     grid.x -= len(_x)
                 c = grid.cursor
@@ -425,6 +423,9 @@ class TreeOutput(Output):
         """
 
         formatlist = obj.__classoutputscheme__()['format']
+        if formatlist is None:
+            return None
+
         _keylist = []
 
         for cell in formatlist:
@@ -468,26 +469,32 @@ class TreeOutput(Output):
 
         """
         Takes the tree structure read by __output__ and converts into a final form.
-        self.filter should be called from here if the class format string is used.
         :param projectstructure: must be a list or a dict containing DynamicType objects
         :return:
         """
         # TODO implement a type validator
         raise NotImplemented('output processor must be implemented ')
 
-    def convert(self, obj, filterfunction=None):
+    @abstractmethod
+    def convert(self, obj): #, filterfunction=None):
+        """
+        Converts dynamictype object into dict.
+        self.filter is called from within if the class format string is used.
+        Override if different behaviour required.
+        :param obj: dynamictype object
+        :return: nested dict of values
+        """
 
         filterlist = [k for k, v in obj]
 
-        if filterfunction is not None:
-            if not callable(filterfunction):
-                raise TypeError('filterfunction "%s" must be callable' % (filterfunction))
-            filterlist = filterfunction(obj)
-            #print(filterlist)
-            if not isinstance(filterlist, list):
-                raise TypeError('filterfunction "%s" did not return a list, it return a %s' % (filterfunction, type(filterlist)))
+        if hasattr(self, 'filter'):
+            _filterlist = self.filter(obj)
+            if not isinstance(_filterlist, list) and _filterlist is not None:
+                raise TypeError(
+                    'filter method in "%s" did not return a list, it return a %s' % (striptoclassname(type(self)), type(filterlist)))
 
-        #print(filterlist)
+        if _filterlist is not None:
+            filterlist = _filterlist
 
         _retdict = {}
         for k, v in obj:
@@ -497,7 +504,7 @@ class TreeOutput(Output):
                         _v = [i.raw() for i in v]
                         _v = _v[0] if len(_v) == 1 else _v
                     else:
-                        _v = [self.convert(i, filterfunction=filterfunction) for i in v]
+                        _v = [self.convert(_obj) for _obj in v]
                         _v = _v[0] if len(_v) == 1 else _v
                 else:
                     _v = v
@@ -520,7 +527,6 @@ class TreeOutput(Output):
             else:
                 _obj = tree.dataasobject
                 return {tree.name: _obj}
-
 
         _output = _sub(projectstructure)
 
