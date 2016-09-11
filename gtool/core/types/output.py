@@ -508,6 +508,11 @@ class TreeOutput(Output):
             attrlist = _filterlist
             headers = self.headers(obj)
 
+        if headers is not None:
+            if len(attrlist) != len(headers):
+                raise ValueError('headers and output format in class %s '
+                                 'are not the same length' % striptoclassname(type(obj)))
+
         _retdict = {}
         for i, k in enumerate(attrlist): #, v in obj:
             v = getattr(obj, k)
