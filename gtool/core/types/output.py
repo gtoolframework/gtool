@@ -467,7 +467,6 @@ class TreeOutput(Output):
     def headers(self, obj):
         _retlist = None
         _ret = obj.__classoutputscheme__().get('headers', None)
-        print(_ret)
         if _ret is not None:
             _retlist = [i.strip() for i in _ret.split('||')]
             pass

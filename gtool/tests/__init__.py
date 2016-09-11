@@ -1280,18 +1280,11 @@ def test35():
 
 def test36():
     outputscheme = '1'
-    print('test 36 validates format string system works tree output')
+    print('test 36 validates format string system, including headers, works for tree output')
     print('---- testing 36 begins ----')
 
     sf = projectloader('test\\test36\\', dbg=False, outputscheme=outputscheme)
 
-    """
-    try:
-        checkalignment(sf)
-    except ValueError as err:
-        print(err)
-        sys.exit(1)
-    """
     print('--- explore results ---')
 
     o = pluginnamespace()['JSON']()
