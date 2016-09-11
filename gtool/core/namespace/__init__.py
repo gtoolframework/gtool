@@ -17,12 +17,6 @@ def registerClass(className, classObj):
     else:
         globals()[dynamicclass()][className] = classObj
 
-        #print(dir(globals()[dynamicclass()][className]))
-        """
-        # TODO move .register out of the class and rather just have the class return objects/data for a registration function
-        globals()[dynamicclass()][className].register(className)
-
-        """
         gtool.core.filewalker.registerFileMatcher(
             '%s' % classObj.classfile(),
             className

@@ -6,6 +6,7 @@ from copy import deepcopy
 import pyparsing as p
 from gtool.core.plugin import pluginnamespace
 from abc import abstractmethod
+from gtool.core.noderegistry import registerObject
 
 class CoreType(object):
     """
@@ -291,12 +292,8 @@ class DynamicType(object):
 
         for k, v in self.__methods__.items():
             self.loadmethod(k,v)
-            """
-            print('initializing method: %s' % k)
-            modulename = v['module']
-            _result = pluginnamespace()[modulename.upper()](self, config=v['config'])
-            self.__method_results__[k] = _result.result()
-            """
+
+        registerObject(self.__context__['file'], self)
 
         return True if len(ret) > 0 else False
 
