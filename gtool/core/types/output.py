@@ -464,6 +464,15 @@ class TreeOutput(Output):
 
         return _retlist
 
+    def headers(self, obj):
+        _retlist = None
+        _ret = obj.__classoutputscheme__().get('headers', None)
+        print(_ret)
+        if _ret is not None:
+            _retlist = [i.strip() for i in _ret.split('||')]
+            pass
+        return _retlist
+
     @abstractmethod
     def outputprocessor(self, projectstructure):
 
@@ -485,30 +494,35 @@ class TreeOutput(Output):
         :return: nested dict of values
         """
 
-        filterlist = [k for k, v in obj]
+        attrlist = [k for k, v in obj]
 
         if hasattr(self, 'filter'):
             _filterlist = self.filter(obj)
             if not isinstance(_filterlist, list) and _filterlist is not None:
                 raise TypeError(
-                    'filter method in "%s" did not return a list, it return a %s' % (striptoclassname(type(self)), type(filterlist)))
+                    'filter method in "%s" did not return a list, '
+                    'it returned a %s' % (striptoclassname(type(self)), type(_filterlist)))
 
+        headers = None
         if _filterlist is not None:
-            filterlist = _filterlist
+            attrlist = _filterlist
+            headers = self.headers(obj)
 
         _retdict = {}
-        for k, v in obj:
-            if k in filterlist:
-                if striptoclassname(type(v)) == 'attribute':
-                    if not v.isdynamic:
-                        _v = [i.raw() for i in v]
-                        _v = _v[0] if len(_v) == 1 else _v
-                    else:
-                        _v = [self.convert(_obj) for _obj in v]
-                        _v = _v[0] if len(_v) == 1 else _v
+        for i, k in enumerate(attrlist): #, v in obj:
+            v = getattr(obj, k)
+            if striptoclassname(type(v)) == 'attribute':
+                if not v.isdynamic:
+                    _v = [attr.raw() for attr in v]
+                    _v = _v[0] if len(_v) == 1 else _v
                 else:
-                    _v = v
-                _retdict[k] = _v
+                    _v = [self.convert(_obj) for _obj in v]
+                    _v = _v[0] if len(_v) == 1 else _v
+            else:
+                _v = v
+
+            key = k if headers is None else headers[i]
+            _retdict[key] = _v
         return _retdict
 
     def __output__(self, projectstructure, output=None): # TODO use output
