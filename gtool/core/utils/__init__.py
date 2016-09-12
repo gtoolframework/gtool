@@ -4,7 +4,7 @@ from gtool.core.filewalker import StructureFactory
 from gtool.core.plugin import loadplugins
 from .classgen import generateClass
 from .classprocessor import readClass, processClass, debugClass
-from .config import configloader
+from .config import configloader, register
 from gtool.core.namespace import namespace
 from gtool.core.utils.output import parseformat, registerFormatter
 from gtool.core.utils.runtime import registerruntimeoption
@@ -21,6 +21,7 @@ def projectloader(projectroot, dbg=False, outputscheme=None):
     projectconfigpath = os.path.join(projectroot, PROJECTCONFIG)
     projectpluginroot = os.path.join(projectroot, PROJECTPLUGINS)
 
+    register('config', {'root': projectroot, 'classes': projectclassroot, 'dataroot': projectdataroot, 'configpath': projectconfigpath, 'plugin': projectpluginroot})
     loadplugins(projectpluginroot)
     configloader(projectconfigpath)
 
