@@ -19,6 +19,14 @@ def attribindex():
 # a shared globals ala...
 # http://stackoverflow.com/questions/15959534/python-visibility-of-global-variables-in-imported-modules
 
+def convert(path):
+    if '\\' in path:
+        path = path.replace('\\', '/')
+    if '//' in path:
+        path = path.replace('//', '/')
+
+    return path
+
 def registerObject(objectPath, obj):
     if objectPath.endswith('.txt'):
         objectPath = objectPath[:-4]
@@ -32,14 +40,22 @@ def registerObject(objectPath, obj):
         raise KeyError('One node tried to overwrite an existing one. node name: %s' % objectPath)
     else:
         # store an object by URI
-        nodenamespace()[objectPath] = obj
+        nodenamespace()[convert(objectPath)] = obj
         # store all URI's by object
         _key = striptoclassname(type(obj))
-        nodenamespacereverse()[_key].append(objectPath)
+        nodenamespacereverse()[_key].append(convert(objectPath))
         # store objects by attribute name
         for k, v in obj:
             attribnamespace()[k].append(obj)
         return True
+
+def searchnode(searchkey, exact=True):
+    pass
+
+def searchattrib(searchkey, exact=True):
+    pass
+
+
 
 def nodenamespace():
     # store an object by URI

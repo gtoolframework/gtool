@@ -1351,7 +1351,6 @@ def test36():
     ]
     --- test 36 ends ---
     """
-
     print('--- test 36 ends ---')
 
 def test37():
