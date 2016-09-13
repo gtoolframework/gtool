@@ -25,7 +25,7 @@ def convert(path):
     if '//' in path:
         path = path.replace('//', '/')
 
-    return path
+    return path.lower()
 
 def registerObject(objectPath, obj):
     if objectPath.endswith('.txt'):
@@ -42,20 +42,36 @@ def registerObject(objectPath, obj):
         # store an object by URI
         nodenamespace()[convert(objectPath)] = obj
         # store all URI's by object
-        _key = striptoclassname(type(obj))
+        _key = striptoclassname(type(obj)).lower()
         nodenamespacereverse()[_key].append(convert(objectPath))
         # store objects by attribute name
         for k, v in obj:
-            attribnamespace()[k].append(obj)
+            attribnamespace()[k.lower()].append(obj)
         return True
 
-def searchnode(searchkey, exact=True):
-    pass
+# I want all the objects with a certain attribute
+def searchByAttrib(attribname):
+    return attribnamespace()[attribname.lower()]
 
-def searchattrib(searchkey, exact=True):
-    pass
+# I want all the objects with a certain attribute but only of a certain type
+def searchByAttribAndObjectType(attribname, objecttype):
+    return [obj for obj in searchByAttrib(attribname) if striptoclassname(type(obj)).lower() == objecttype.lower()]
 
+# return object at specific URI
+def getObjectByUri(uri):
+    return nodenamespace()[convert(uri)]
 
+# return objects that match the URI fragment
+def getObjectByUriElement(urielement):
+    return [obj for path, obj in nodenamespace() if convert(urielement) in path]
+
+# return objects that match the URI fragment only if they are of a specific type
+def getObjectByUriElementAndType(urielement, objectype):
+    return [obj for path, obj in nodenamespace() if convert(urielement) in path and striptoclassname(type(obj)).lower() == objectype.lower()]
+
+# return Uris for a specific type
+def getUrisByNodeType(nodetype):
+    return nodenamespacereverse()[nodetype.lower()]
 
 def nodenamespace():
     # store an object by URI
