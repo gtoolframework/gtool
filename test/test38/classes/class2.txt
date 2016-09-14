@@ -1,7 +1,7 @@
 SUBA::
 *file = suba
 *displayname = test1
-*output = suba (@testpropa1) dn|| @testpropa2 || @testpropa3 || @testpropa4
+*output = @testpropa1 || @testpropa2 || @testpropa3 || @testpropa4
 @testpropa1:: single: String (required = True)
 @testpropa2:: multiple: String (required = True)
 @testpropa3:: multiple: SUBB (required = False)

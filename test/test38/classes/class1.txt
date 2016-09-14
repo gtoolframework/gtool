@@ -2,8 +2,7 @@ SUBB::
 *file = subb
 *moo = 1
 *displayname = Blah
-*output = default subb@testpropb1 || @testpropb2 || @testpropb3
-*output.1 = schemeone subb @testpropb1 || @testpropb2 || @testpropb3
+*output = @testpropb1 || @testpropb2 || @testpropb3
 @testpropb1:: single: String (required = False)
 @testpropb2:: multiple: String (required = True)
 @testpropb3:: single: Real (required = False, max = 6)

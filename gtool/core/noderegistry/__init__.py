@@ -27,13 +27,27 @@ def convert(path):
 
     return path.lower()
 
-def registerObject(objectPath, obj):
+def stripToUri(objectPath):
     if objectPath.endswith('.txt'):
         objectPath = objectPath[:-4]
 
     _dataroot = namespace().get('config', None).get('dataroot', '')
     if objectPath.startswith(_dataroot):
         objectPath = objectPath[len(_dataroot):]
+
+    return objectPath
+
+def registerObject(objectPath, obj):
+    """
+    if objectPath.endswith('.txt'):
+        objectPath = objectPath[:-4]
+
+    _dataroot = namespace().get('config', None).get('dataroot', '')
+    if objectPath.startswith(_dataroot):
+        objectPath = objectPath[len(_dataroot):]
+    """
+
+    objectPath = stripToUri(objectPath)
 
     if objectPath in nodenamespace(): # globals()[objectindex()]:
         # this error will occur for a misconfig or a security event
@@ -63,15 +77,21 @@ def getObjectByUri(uri):
 
 # return objects that match the URI fragment
 def getObjectByUriElement(urielement):
-    return [obj for path, obj in nodenamespace() if convert(urielement) in path]
+    return [v for k, v in nodenamespace().items() if convert(urielement) in k]
 
 # return objects that match the URI fragment only if they are of a specific type
 def getObjectByUriElementAndType(urielement, objectype):
-    return [obj for path, obj in nodenamespace() if convert(urielement) in path and striptoclassname(type(obj)).lower() == objectype.lower()]
+    return [obj for path, obj in nodenamespace().items() if convert(urielement) in path and striptoclassname(type(obj)).lower() == objectype.lower()]
+
+def objectUri(obj):
+    return convert(stripToUri(obj.__context__['file']))
 
 # return Uris for a specific type
 def getUrisByNodeType(nodetype):
     return nodenamespacereverse()[nodetype.lower()]
+
+# TODO implement object by parent
+# TODO implement object by attribute value
 
 def nodenamespace():
     # store an object by URI

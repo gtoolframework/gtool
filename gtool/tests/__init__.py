@@ -1441,7 +1441,7 @@ def test37():
     """
 
 def test38():
-    outputscheme = 'json'
+    outputscheme = 'json' #not actually used
     print('test 38 tests node registry search')
     print('---- testing 38 begins ----')
 
@@ -1450,91 +1450,104 @@ def test38():
 
     print('--- explore results ---')
 
-    o = pluginnamespace()['JSON']() #TODO read engine from config
+    from gtool.core.noderegistry import getObjectByUri, \
+        getObjectByUriElement, \
+        getObjectByUriElementAndType, \
+        getUrisByNodeType, \
+        nodenamespace, \
+        objectUri
 
-    _ret = o.output(sf)
+    _x = sf.dataasobject
 
-    print(_ret)
+    nspace = nodenamespace().keys()
+
+    print('--- registered objects by uri ---')
+
+    for node in nspace:
+        print(node)
+
+    print('\n--- object by uri ---')
+
+    print(getObjectByUri('/suba1/testpropa4'))
+
+    print('\n--- object by node type ---')
+    for uri in getUrisByNodeType('SUBB'):
+        print(uri)
+
+    print('\n--- object by uri element ---')
+
+    objbyuri = getObjectByUriElement('test')
+    for obj in objbyuri:
+        print(objectUri(obj))
+
+    print('\n--- object by uri and type ---')
+
+    objbyuriandtype = getObjectByUriElementAndType('test', 'SUBC')
+    for obj in objbyuriandtype:
+        print(obj)
+
+    print('\n--- object uri ---')
+
+    for obj in objbyuriandtype:
+        print(objectUri(obj))
+
     # correct output
     """
-    [
-        {
-            "suba1": {
-                "testpropa1": [
-                    "d1 ipsum lorum horus"
-                ],
-                "testpropa2": [
-                    "hello world"
-                ],
-                "testpropa3": [
-                    {
-                        "testpropb1": [
-                            "subc1 ipsum lorum horus"
-                        ],
-                        "testpropb2": [
-                            "alpha beta",
-                            "ipsum lorum horus rictum"
-                        ],
-                        "testpropb3": [
-                            4.0
-                        ]
-                    }
-                ],
-                "testpropa4": [
-                    {
-                        "testpropc1": [
-                            "subb1 ipsum lorum horus"
-                        ],
-                        "testpropc2": [
-                            "alpha beta",
-                            "ipsum lorum horus rictum"
-                        ],
-                        "testpropc3": [
-                            4.0
-                        ]
-                    }
-                ]
-            }
-        },
-        {
-            "suba2": {
-                "testpropa1": [
-                    "d1 ipsum lorum horus"
-                ],
-                "testpropa2": [
-                    "hello world"
-                ],
-                "testpropa3": [
-                    {
-                        "testpropb1": [
-                            "subc1 ipsum lorum horus"
-                        ],
-                        "testpropb2": [
-                            "alpha beta",
-                            "ipsum lorum horus rictum"
-                        ],
-                        "testpropb3": [
-                            4.0
-                        ]
-                    }
-                ],
-                "testpropa4": [
-                    {
-                        "testpropc1": [
-                            "subb1 ipsum lorum horus"
-                        ],
-                        "testpropc2": [
-                            "alpha beta",
-                            "ipsum lorum horus rictum"
-                        ],
-                        "testpropc3": [
-                            4.0
-                        ]
-                    }
-                ]
-            }
-        }
-    ]
-    """
+    test 38 tests node registry search
+    ---- testing 38 begins ----
+    loading plug-in: choice
+    loading plug-in: combine
+    loading plug-in: csv
+    loading plug-in: dummy
+    loading plug-in: enum
+    loading plug-in: excel
+    loading plug-in: filename
+    loading plug-in: fullpath
+    loading plug-in: grid
+    loading plug-in: json
+    loading plug-in: math
+    loading plug-in: nodename
+    loading plug-in: number
+    loading plug-in: parent
+    loading plug-in: path
+    loading plug-in: real
+    loading plug-in: ref
+    loading plug-in: static
+    loading plug-in: string
+    loading plug-in: url
+    loading plug-in: xattrib
+    loading plug-in: yaml
+    Registering Dynamic Class: SUBB
+    Registering Dynamic Class: SUBA
+    Registering Dynamic Class: SUBC
+    --- explore results ---
+    --- registered objects by uri ---
+    /suba2/testpropa4
+    /suba1/testpropa3
+    /suba1/testpropa4
+    /suba1
+    /suba2/testpropa3
+    /suba2
 
-    print('--- test 38 ends ---')
+    --- object by uri ---
+    SUBC: {'testpropc1': [subb1 ipsum lorum horus], 'testpropc3': [4.0], 'testpropc2': [alpha beta, ipsum lorum horus rictum]}
+
+    --- object by node type ---
+    /suba1/testpropa3
+    /suba2/testpropa3
+
+    --- object by uri element ---
+    /suba2/testpropa4
+    /suba1/testpropa3
+    /suba1/testpropa4
+    /suba2/testpropa3
+
+    --- object by uri and type ---
+    SUBC: {'testpropc1': [subb1 ipsum lorum horus], 'testpropc3': [4.0], 'testpropc2': [alpha beta, ipsum lorum horus rictum]}
+    SUBC: {'testpropc1': [subb1 ipsum lorum horus], 'testpropc3': [4.0], 'testpropc2': [alpha beta, ipsum lorum horus rictum]}
+
+    --- object uri ---
+    /suba2/testpropa4
+    /suba1/testpropa4
+    --- test 38 ends ---
+    """
