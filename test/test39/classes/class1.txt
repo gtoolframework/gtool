@@ -1,6 +1,6 @@
 CLASSONE::
 *file = tf
-*output.1 = @num1 || @num2 || @text1 || !test1 || !test2
+*output.1 = @num1 || @num2 || !test1 || !test2 || !test3
 @num1:: single: Number (required = False)
 @num2:: single: Number (required = False)
 @text1:: single: String (required = False)
