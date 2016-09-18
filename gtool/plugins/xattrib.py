@@ -20,11 +20,16 @@ class Xattrib(FunctionType):
     def __init__(self, obj, config=str()):
 
         def process(config):
-            pathexpr = p.Literal("'").suppress() + p.Optional(
-                p.Combine(p.Word(p.alphanums + '/')).setResultsName('path')) + \
+            pathexpr = p.Literal("'").suppress() + \
+                       p.Optional(
+                        p.Combine(
+                            p.OneOrMore(p.Literal("/") + p.Word(p.alphanums)) + p.Literal("/").suppress())
+                       ).setResultsName('path') + \
                        p.Combine(
-                           (p.Literal('@').suppress() | p.Literal('!').suppress()) + p.Word(p.alphanums) + p.Literal("'").suppress()).setResultsName(
-                           'attrib')
+                           (p.Literal('@').suppress() | p.Literal('!').suppress()) +
+                           p.Word(p.alphanums) +
+                           p.Literal("'").suppress()
+                       ).setResultsName('attrib')
 
             expr = p.Group(pathexpr).setResultsName('search')
 
@@ -34,7 +39,7 @@ class Xattrib(FunctionType):
 
             if 'search' in match2:
                 if 'path' in match2['search']:
-                    _ret.append(match2['search']['path'][:-1]) #drop the trailing slash
+                    _ret.append(match2['search']['path'])
                 if 'attrib' in match2['search']:
                    _ret.append(match2['search']['attrib'])
 
@@ -53,6 +58,7 @@ class Xattrib(FunctionType):
                 _config = getattr(obj, _result[0], None)
                 if _config is None:
                     raise ValueError('Xattrib plugin received an attribute name that does not exist')
+                # TODO len check only required for attributes, but not method plugins
                 if len(_config) > 1:
                     raise ValueError('Xattrib plugin received a attribute name that contains multiple values')
                 self.targetobject, self.targetattribute = process("'%s'" % _config[0])

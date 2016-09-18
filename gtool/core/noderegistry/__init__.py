@@ -20,6 +20,7 @@ def attribindex():
 # http://stackoverflow.com/questions/15959534/python-visibility-of-global-variables-in-imported-modules
 
 def convert(path):
+
     if '\\' in path:
         path = path.replace('\\', '/')
     if '//' in path:
