@@ -1551,3 +1551,29 @@ def test38():
     /suba1/testpropa4
     --- test 38 ends ---
     """
+
+
+def test39():
+    outputscheme = '1'
+    print('test 39 checks if all xattrib method plugin works')
+    print('---- testing 39 begins ----')
+
+    sf = projectloader('test\\test39\\', dbg=False, outputscheme=outputscheme)
+
+    x = sf.dataasobject
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['JSON']()
+
+    _ret = o.output(sf)
+
+    print(_ret)
+
+    print('--- test 39 ends ---')
+
+
+    #expected output
+    """
+
+    """

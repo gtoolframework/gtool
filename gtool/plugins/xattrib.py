@@ -1,71 +1,79 @@
 from gtool.core.types.core import FunctionType
 import pyparsing as p
+from gtool.core.noderegistry import getObjectByUri, nodenamespace
 
 
 class Xattrib(FunctionType):
     """
     Retrieves an attribute from the object as specified in the config string.
-    Will return None if any of the attributes in the config string are missing.
+    Will return None if the config string is missing or invalid.
 
     Example strings are:
     '/objectname@attrib1'
     '/container/objectname@attrib1'
 
+    You can also read in the string from another attribute, examples are:
+    '@attrib1'
+
     """
 
     def __init__(self, obj, config=str()):
-        
-        self.__attribs__ = {}
-        super(Xattrib, self).__init__(obj, config=config)
 
-        if self.config is None or len(self.config) < 1 or not isinstance(self.config, str):
-            raise ValueError('Xattrib plugin function requires a configuration string')
+        def process(config):
+            pathexpr = p.Literal("'").suppress() + p.Optional(
+                p.Combine(p.Word(p.alphanums + '/')).setResultsName('path')) + \
+                       p.Combine(
+                           p.Literal('@').suppress() + p.Word(p.alphanums) + p.Literal("'").suppress()).setResultsName(
+                           'attrib')
 
-    def substitute(self, s, l, t):
-        if t[0] in self.__attribs__.keys():
-            return self.__attribs__[t[0]]
+            expr = p.Group(pathexpr).setResultsName('search')
 
-    def compute(self):
+            match2 = expr.parseString(config)
 
-        def getname(obj, name):
+            _ret = []
 
-            _val = None
-
-            if hasattr(obj, name):
-                _val = getattr(obj, name, None)
-
-            if _val is None:
-                return _val
-
-            try:
-                if _val.isdynamic:
-                    raise ValueError('Xattrib plugin cannot process %s because it contains a dynamic class' % name)
-            except AttributeError:
-                raise TypeError('Expected an attribute but got a %s' % type(_val))
-
-            if _val.issingleton():
-                _ret = '%s' % _val[0].raw()
-            else:
-                _ret = ', '.join(['%s' % v.raw() for v in _val])
+            if 'search' in match2:
+                if 'path' in match2['search']:
+                    _ret.append(match2['search']['path'][:-1])
+                if 'attrib' in match2['search']:
+                   _ret.append(match2['search']['attrib'])
 
             return _ret
 
-        attrmatch = p.Literal('@').suppress() + p.Word(p.alphanums)
+        super(Xattrib, self).__init__(obj, config=config, defer=True)
 
-        for i in attrmatch.scanString(self.config):
-            x = i[0][0]
-            self.__attribs__[x] = getname(self.targetobject, x)
+        if self.config is None or len(self.config) < 1 or not isinstance(self.config, str):
+            raise ValueError('Xattrib plugin function requires a config string')
 
-        if all(v is not None for v in self.__attribs__.values()):
+        try:
+            _result = process("'%s'" % self.config)
+            if len(_result) == 2:
+                self.targetobject, self.targetattribute = _result
+            elif len(_result) == 1:
+                _config = getattr(self, _result[0], None)
+                if _config is None:
+                    raise ValueError('Xattrib plugin received an attribute name that does not exist')
+                _pathFromAttribute = '%s' % _config
+                self.targetobject, self.targetattribute = process(_pathFromAttribute)
+            else:
+                raise Exception()
+        except:
+            raise ValueError('An error occured when processing the search string for the Xattrib plugin function')
+
+    def compute(self):
+
+        _obj = getObjectByUri(self.targetobject)
+
+        if _obj is not None:
             self.computable = True
 
-        if self.computable:
+        if not self.computable:
+            return False
 
-            attrmatch = p.Literal('@').suppress() + p.Word(p.alphanums)
-            attrmatch.setParseAction(self.substitute)
-            attrlist = p.ZeroOrMore(p.Optional(p.White()) + attrmatch + p.Optional(p.White()))
-
-            self.__result__ = attrlist.transformString(self.config)
+        try:
+            self.__result__ = getattr(_obj, self.targetattribute)
+        except KeyError:
+            self.__result__ = None
 
 
 def load():

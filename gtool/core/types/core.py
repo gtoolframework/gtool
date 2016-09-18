@@ -8,6 +8,9 @@ from gtool.core.plugin import pluginnamespace
 from abc import abstractmethod
 from gtool.core.noderegistry import registerObject
 
+class NotComputed(Exception):
+    pass
+
 class CoreType(object):
     """
     CoreType is the base object for all attribute types (except user created classes)
@@ -74,6 +77,7 @@ class DynamicType(object):
         self.__missing_mandatory_properties__ = []
         self.__missing_optional_properties__ = []
         self.__method_results__ = {}
+        self.__method_deferred__ = []
 
     # --- class methods that will be bound by factory ---
     # must be outside of class factory or they get factory's context and not the manufactured objects
@@ -154,10 +158,21 @@ class DynamicType(object):
 
         try:
             methodlist = object.__getattribute__(self, '__methods__')
-            if name in methodlist: #assume it's not in method_results because that would have returned
-                raise SyntaxError('In %s a method called %s is being consumed before it is initialized. '
-                                  'Make sure you declare your methods in order.' % (striptoclassname(type(self)), name))
+            methodresults = object.__getattribute__(self, '__method_results__')
+            methoddeferred = object.__getattribute__(self, '__method_deferred__')
 
+            if name in methodlist and methoddeferred: #assume it's not in method_results because that would have returned
+                #attempt to compute because it was deferred before
+                self.loadmethod(name, methodlist[name], force=True)
+                if name in methodresults:
+                    return methodresults[name]
+                else:
+                    raise SyntaxError('In %s a method called %s is being consumed before it is initialized. '
+                                      'Make sure you declare your methods in order.' % (striptoclassname(type(self)), name))
+
+
+        except NotComputed:
+            print('could not compute')
         except AttributeError:
             pass
 
@@ -204,10 +219,10 @@ class DynamicType(object):
         return self.__missing_optional_properties__
 
 
-    def loadmethod(self, key, val):
+    def loadmethod(self, key, val, force=False):
         #print('initializing method: %s' % key)
         modulename = val['module']
-        _result = pluginnamespace()[modulename.upper()](self, config=val['config'])
+        _method = pluginnamespace()[modulename.upper()](self, config=val['config'])
 
         """
         We use an orderedDict to ensure that dependencies in methods that take other methods as input aren't broken.
@@ -218,7 +233,18 @@ class DynamicType(object):
         also see classgen.factory.methodbinder
         """
 
-        self.__method_results__[key] = _result.result()
+        _result = None
+        try:
+            _result = _method.result(force=force)
+            #self.__method_results__[key] = _result.result()
+        except NotComputed:
+            if force:
+                print('reraising not computed')
+                raise
+            else:
+                self.__method_deferred__.append(key)
+        else:
+            self.__method_results__[key] = _result
 
     def loads(self, loadstring, softload=False, context=None): # TODO make use of context in error reporting
         """
@@ -395,7 +421,7 @@ class DynamicType(object):
 class FunctionType(object):
 
     @abstractmethod
-    def __init__(self, obj, config=str()):
+    def __init__(self, obj, config=str(), defer=False):
         """
         Based class for method plugins
 
@@ -408,6 +434,7 @@ class FunctionType(object):
         self.computable = False
         self.__result__ = None
         self.__context__ = obj.__context__
+        self.__defer__ = defer
 
     # TODO implement an  attribute getter for method plugins
     def __getname__(self, attrname, nativetypes = [], singletononly=False):
@@ -437,9 +464,13 @@ class FunctionType(object):
     def context(self):
         return self.__context__
 
-    def result(self):
-        self.compute() #TODO look at making this an if statement
-        return self.__result__
+    def result(self, force=False):
+
+        if not self.__defer__ or force:
+            self.compute() #TODO look at making this an if statement
+            return self.__result__
+        else:
+            raise NotComputed('Computation deferred')
 
     def __repr__(self):
         return self.config

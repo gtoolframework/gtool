@@ -39,7 +39,7 @@ class Combine(FunctionType):
                 return _val
 
             try:
-                if _val.isdynamic:
+                if _val.isdynamic: #TODO make this work for non-attributes, non-dynamics (use .issingleton? - what about a concat mode?)
                     raise ValueError('Combine plugin cannot process %s because it contains a dynamic class' % name)
             except AttributeError:
                 raise TypeError('Expected an attribute but got a %s' % type(_val))
@@ -51,7 +51,8 @@ class Combine(FunctionType):
 
             return _ret
 
-        attrmatch = p.Literal('@').suppress() + p.Word(p.alphanums)
+        attrmarker = (p.Literal('@') | p.Literal('!'))
+        attrmatch = attrmarker.suppress() + p.Word(p.alphanums)
 
         for i in attrmatch.scanString(self.config):
             x = i[0][0]

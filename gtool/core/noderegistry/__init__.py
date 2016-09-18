@@ -73,7 +73,7 @@ def searchByAttribAndObjectType(attribname, objecttype):
 
 # return object at specific URI
 def getObjectByUri(uri):
-    return nodenamespace()[convert(uri)]
+    return nodenamespace().get(convert(uri), None)
 
 # return objects that match the URI fragment
 def getObjectByUriElement(urielement):
@@ -88,7 +88,7 @@ def objectUri(obj):
 
 # return Uris for a specific type
 def getUrisByNodeType(nodetype):
-    return nodenamespacereverse()[nodetype.lower()]
+    return nodenamespacereverse().get(nodetype.lower(), None)
 
 # TODO implement object by parent
 # TODO implement object by attribute value

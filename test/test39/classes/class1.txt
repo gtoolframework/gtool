@@ -1,0 +1,8 @@
+CLASSONE::
+*file = tf
+*output.1 = @num1 || @num2 || @text1 || !test1 || !test2
+@num1:: single: Number (required = False)
+@num2:: single: Number (required = False)
+@text1:: single: String (required = False)
+!test1:: Math('@num1 + @num2')
+!test2:: Xattrib('/tf2/@num1')
