@@ -34,7 +34,7 @@ class Xattrib(FunctionType):
 
             if 'search' in match2:
                 if 'path' in match2['search']:
-                    _ret.append(match2['search']['path'][:-1])
+                    _ret.append(match2['search']['path'][:-1]) #drop the trailing slash
                 if 'attrib' in match2['search']:
                    _ret.append(match2['search']['attrib'])
 
@@ -50,11 +50,12 @@ class Xattrib(FunctionType):
             if len(_result) == 2:
                 self.targetobject, self.targetattribute = _result
             elif len(_result) == 1:
-                _config = getattr(self, _result[0], None)
+                _config = getattr(obj, _result[0], None)
                 if _config is None:
                     raise ValueError('Xattrib plugin received an attribute name that does not exist')
-                _pathFromAttribute = '%s' % _config
-                self.targetobject, self.targetattribute = process(_pathFromAttribute)
+                if len(_config) > 1:
+                    raise ValueError('Xattrib plugin received a attribute name that contains multiple values')
+                self.targetobject, self.targetattribute = process("'%s'" % _config[0])
             else:
                 raise Exception()
         except:

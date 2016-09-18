@@ -6,3 +6,4 @@ CLASSONE::
 @text1:: single: String (required = False)
 !test1:: Math('@num1 + @num2')
 !test2:: Xattrib('/tf2/@num1')
+!test3:: Xattrib('@text1')
