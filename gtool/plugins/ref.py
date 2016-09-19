@@ -21,8 +21,8 @@ class Ref(CoreType):
         if _splitlist[0] != emptysplit:
             # ref must start with /
             return False
-        if _splitlist[-1:][0] == emptysplit:
-            # ref must node end with /
+        if ref.endswith(separator):
+            # ref must not end with /
             return False
 
         for node in _splitlist:

@@ -23,7 +23,8 @@ class Xattrib(FunctionType):
             pathexpr = p.Literal("'").suppress() + \
                        p.Optional(
                         p.Combine(
-                            p.OneOrMore(p.Literal("/") + p.Word(p.alphanums)) + p.Literal("/").suppress())
+                            p.OneOrMore(p.Literal("/") + p.Word(p.alphanums)) + p.Literal("/").suppress()
+                        )
                        ).setResultsName('path') + \
                        p.Combine(
                            (p.Literal('@').suppress() | p.Literal('!').suppress()) +
@@ -33,15 +34,15 @@ class Xattrib(FunctionType):
 
             expr = p.Group(pathexpr).setResultsName('search')
 
-            match2 = expr.parseString(config)
+            match = expr.parseString(config)
 
             _ret = []
 
-            if 'search' in match2:
-                if 'path' in match2['search']:
-                    _ret.append(match2['search']['path'])
-                if 'attrib' in match2['search']:
-                   _ret.append(match2['search']['attrib'])
+            if 'search' in match:
+                if 'path' in match['search']:
+                    _ret.append(match['search']['path'])
+                if 'attrib' in match['search']:
+                   _ret.append(match['search']['attrib'])
 
             return _ret
 
