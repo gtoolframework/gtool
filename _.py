@@ -8,9 +8,21 @@ x = """TOTAL::
 TOTALS::
 *name = Sum of Sam
 *function = sum
-*select = @attr1//objtype
+*select = @attr1
+
+TOTALZ::
+*name = Sum of Sam
+*function = sum
+*select = /obj/@attr1
 """
 
+def parseSelector(selectorstring):
+    #*select = @attr1 | /tf1/@attr | @attr1//objtype
+    attrmatch = p.Combine(p.Literal('@') + p.Word(p.alphanums))
+    fullpathmatch = p.Combine(p.OneOrMore(p.Literal('/') + p.Word(p.alphanums))) + p.Literal('/').suppress() + p.Combine(p.Literal('@').suppress() + p.Word(p.alphanums))
+    attrbyobjmatch = p.Combine(p.Literal('@') + p.Word(p.alphanums)) + p.Literal('//').suppress() + p.Word(p.alphanums)
+
+    return (fullpathmatch | attrbyobjmatch | attrmatch).parseString(selectorstring)
 
 def aggregatorIdParser():
     # --- class parser ---
@@ -47,3 +59,7 @@ for m in match:
     _retlist.append(_retdict)
 
 print(_retlist)
+
+for aggregatordict in _retlist:
+    print(parseSelector(aggregatordict.get('select')))
+

@@ -37,6 +37,10 @@ def process(configstring):
     return _retlist
 
 def parseSelector(selectorstring):
+    #*select = @attr1 | /tf1/@attr | @attr1//objtype
+    attrmatch = p.Combine(p.Literal('@') + p.Word(p.alphanums))
+    fullpathmatch = p.Combine(p.OneOrMore(p.Literal('/') + p.Word(p.alphanums)))
+    attrbyobjmatch = p.Combine(p.Literal('@') + p.Word(p.alphanums) + p.Literal('//') + p.Word(p.alphanums))
     pass
 
 def load(configstring):
