@@ -550,8 +550,5 @@ class TreeOutput(Output):
 
         return  self.outputprocessor(_output)
 
-class ProcessedOutput():
-    pass
-
-class TemplatedOutput():
+class TemplatedOutput(Output):
     pass

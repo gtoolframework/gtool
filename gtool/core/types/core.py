@@ -11,6 +11,9 @@ from gtool.core.noderegistry import registerObject
 class NotComputed(Exception):
     pass
 
+class HiddenObject(Exception):
+    pass
+
 class CoreType(object):
     """
     CoreType is the base object for all attribute types (except user created classes)
@@ -478,3 +481,7 @@ class FunctionType(object):
     def __str__(self):
         self.compute() #TODO look at making this an if statement
         return self.__result__
+
+
+class Aggregator(object):
+    pass

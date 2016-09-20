@@ -1,0 +1,4 @@
+TOTAL1::
+*name = Sum of Sam
+*function = sum
+*select = @attr1//objtype
