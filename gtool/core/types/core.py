@@ -484,4 +484,9 @@ class FunctionType(object):
 
 
 class Aggregator(object):
-    pass
+    
+    def __init__(self):
+        pass
+
+    def factory(self):
+        pass

@@ -1,43 +1,49 @@
+import pyparsing as p
 
-import asyncio
-import functools
+x = """TOTAL::
+*name = Sum of Sam
+*function = sum
+*select = @attr1//objtype
 
-
-def set_event(event):
-    print('setting event in callback')
-    event.set()
-
-
-async def coro1(event):
-    print('coro1 waiting for event')
-    await event.wait()
-    print('coro1 triggered')
+TOTALS::
+*name = Sum of Sam
+*function = sum
+*select = @attr1//objtype
+"""
 
 
-async def coro2(event):
-    print('coro2 waiting for event')
-    await event.wait()
-    print('coro2 triggered')
+def aggregatorIdParser():
+    # --- class parser ---
+    colon = p.Literal('::').suppress()
+    aggregatorName = p.Word(p.alphas.upper())
+    aggregatorDef = aggregatorName + colon + p.LineEnd().suppress()
+    return aggregatorDef
 
+aggregatorIdParser().setResultsName('id')
 
-event_loop = asyncio.get_event_loop()
-try:
-    # Create a shared event
-    event = asyncio.Event()
+def aggregatorMetas():
+    star = p.Literal('*').suppress()
+    metaName = p.Word(p.alphanums)
+    metaKeyword = p.Combine(star + metaName).setResultsName('key')
+    equals = p.Literal('=').suppress()
+    value = p.Word(p.printables + ' ')
+    metaValue = (equals + value).setResultsName('value')
+    metaDef = p.Dict(p.Group(metaKeyword + metaValue) + p.Optional(p.LineEnd().suppress()))
+    return metaDef
 
-    print('event state: {}'.format(event.is_set()))
+aggregatorMetas()
 
-    event_loop.call_later(
-        0.1, functools.partial(set_event, event)
-    )
+expr = p.OneOrMore(p.Group(aggregatorIdParser() + p.OneOrMore(aggregatorMetas())))
 
-    print('entering event loop')
-    result = event_loop.run_until_complete(
-        asyncio.wait([coro1(event),
-                      coro2(event)]),
-    )
-    print('exited event loop')
+match = expr.parseString(x)
 
-    print('event state: {}'.format(event.is_set()))
-finally:
-    event_loop.close()
+_retlist = []
+
+for m in match:
+    _retdict = {}
+    _retdict['id'] = m[0]
+    for k, v in m.items():
+        _retdict[k] = v
+    _retlist.append(_retdict)
+
+print(_retlist)
