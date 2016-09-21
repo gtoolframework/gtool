@@ -1,6 +1,10 @@
 import pyparsing as p
 from gtool.core.noderegistry import getObjectByUri, searchByAttribAndObjectType, searchByAttrib
 
+"""
+DESIGN NOTE: Aggregates are not data and therefore live outside the data structure
+"""
+
 def process(configstring):
 
     """

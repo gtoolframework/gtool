@@ -108,11 +108,12 @@ def __loadclass(classpath, dbg=False):
     f.close()
 
 def __loadaggregators(aggregatespath, dbg=False):
-    if os.path.isfile(aggregatespath):
-        __loadaggregator(aggregatespath, dbg=dbg)
-    elif os.path.isdir(aggregatespath):
-        for aggregatefile in [f for f in os.listdir(aggregatespath) if os.path.isfile(os.path.join(aggregatespath, f))]:
-            __loadaggregator(os.path.join(aggregatespath, aggregatefile), dbg=dbg)
+    if os.path.exists(aggregatespath):
+        if os.path.isfile(aggregatespath):
+            __loadaggregator(aggregatespath, dbg=dbg)
+        elif os.path.isdir(aggregatespath):
+            for aggregatefile in [f for f in os.listdir(aggregatespath) if os.path.isfile(os.path.join(aggregatespath, f))]:
+                __loadaggregator(os.path.join(aggregatespath, aggregatefile), dbg=dbg)
 
 def __loadaggregator(aggregatorpath, dbg=False):
     if os.path.exists(aggregatorpath):

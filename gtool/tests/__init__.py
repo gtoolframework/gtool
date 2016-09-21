@@ -1581,7 +1581,7 @@ def test39():
 def test40():
     outputscheme = '1'
     print('test 40 checks if aggregator loading works')
-    print('---- testing 39 begins ----')
+    print('---- testing 40 begins ----')
 
     sf = projectloader('test\\test40\\', dbg=False, outputscheme=outputscheme)
 
@@ -1600,6 +1600,82 @@ def test40():
     print(aggregatornamespace().keys())
 
     print('--- test 40 ends ---')
+
+
+    #expected output
+    """
+    test 40 checks if aggregator loading works
+    ---- testing 39 begins ----
+    loading plug-in: choice
+    loading plug-in: combine
+    loading plug-in: csv
+    loading plug-in: dummy
+    loading plug-in: enum
+    loading plug-in: excel
+    loading plug-in: filename
+    loading plug-in: fullpath
+    loading plug-in: grid
+    loading plug-in: json
+    loading plug-in: math
+    loading plug-in: nodename
+    loading plug-in: number
+    loading plug-in: parent
+    loading plug-in: path
+    loading plug-in: real
+    loading plug-in: ref
+    loading plug-in: static
+    loading plug-in: string
+    loading plug-in: url
+    loading plug-in: xattrib
+    loading plug-in: yaml
+    Registering Dynamic Class: CLASSONE
+    --- explore results ---
+    [
+        {
+            "tf1": {
+                "num1": 10,
+                "num2": 20,
+                "test1": 30,
+                "test2": 15,
+                "test3": 15
+            }
+        },
+        {
+            "tf2": {
+                "num1": 15,
+                "num2": 25,
+                "test1": 40,
+                "test2": 15,
+                "test3": 10
+            }
+        }
+    ]
+    dict_keys(['AVERAGE', 'LIST1', 'TOTAL23'])
+    --- test 40 ends ---
+    """
+
+def test41():
+    outputscheme = '1'
+    print('test 41 checks if aggregator logic works')
+    print('---- testing 41 begins ----')
+
+    sf = projectloader('test\\test40\\', dbg=False, outputscheme=outputscheme)
+
+    x = sf.dataasobject
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['JSON']()
+
+    _ret = o.output(sf)
+
+    print(_ret)
+
+    from gtool.core.aggregatorregistry import aggregatornamespace
+
+    print(aggregatornamespace().keys())
+
+    print('--- test 41 ends ---')
 
 
     #expected output
