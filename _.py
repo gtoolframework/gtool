@@ -1,4 +1,10 @@
 import pyparsing as p
+#from gtool.core.noderegistry import getObjectByUri, searchByAttribAndObjectType, searchByAttrib
+from abc import abstractmethod
+
+getObjectByUri = print
+searchByAttribAndObjectType = print
+searchByAttrib = print
 
 x = """TOTAL::
 *name = Sum of Sam
@@ -13,16 +19,76 @@ TOTALS::
 TOTALZ::
 *name = Sum of Sam
 *function = sum
-*select = /obj/@attr1
+*select = /obj/blah/@attr1
 """
 
-def parseSelector(selectorstring):
-    #*select = @attr1 | /tf1/@attr | @attr1//objtype
-    attrmatch = p.Combine(p.Literal('@') + p.Word(p.alphanums))
-    fullpathmatch = p.Combine(p.OneOrMore(p.Literal('/') + p.Word(p.alphanums))) + p.Literal('/').suppress() + p.Combine(p.Literal('@').suppress() + p.Word(p.alphanums))
-    attrbyobjmatch = p.Combine(p.Literal('@') + p.Word(p.alphanums)) + p.Literal('//').suppress() + p.Word(p.alphanums)
+class Selector():
 
-    return (fullpathmatch | attrbyobjmatch | attrmatch).parseString(selectorstring)
+    @property
+    def method(self):
+        _method = getattr(self, '__method__', None)
+        if _method is None:
+            raise NotImplemented('self.__method__ must be implemented by descendants of Selector class')
+        return _method
+
+class AttrSelector(Selector):
+
+    def __init__(self):
+        self.__method__ = searchByAttrib
+
+class AttrByObjectSelector():
+
+    def __init__(self):
+        self.__method__ = searchByAttribAndObjectType
+
+class FullPathSelector():
+
+    def __init__(self):
+        self.__method__ = getObjectByUri
+
+def parseSelector(selectorstring):
+    # *select = @attr1 | /tf1/@attr | @attr1//objtype
+
+    """
+    def enumtype(*args,**kwargs): #s, l, t, selectortype=None):
+        print(args)
+        selectortype = kwargs['selectortype']
+        if selectortype is None or not isinstance(selectortype, str):
+            raise ValueError('enumtype requires a selectortype string but got a', type(selectortype))
+        return selectortype
+    """
+
+    def attrtype():
+        return AttrSelector() # 'ATTRTYPE'
+
+    def fullpathtype():
+        return FullPathSelector() #'FULLPATH'
+
+    def attrbyobjtype():
+        return AttrByObjectSelector() #'ATTRBYOBJECT'
+
+    def expr(selectorstring=None, returntype=False):
+        attrmatch = p.Combine(p.Literal('@').suppress() + p.Word(p.alphanums))
+        fullpathmatch = p.Combine(p.OneOrMore(p.Literal('/') + p.Word(p.alphanums))) + p.Literal(
+            '/').suppress() + p.Combine(p.Literal('@').suppress() + p.Word(p.alphanums))
+        attrbyobjmatch = p.Combine(p.Literal('@').suppress() + p.Word(p.alphanums)) + p.Literal('//').suppress() + p.Word(p.alphanums)
+
+        matchgroup = (fullpathmatch | attrbyobjmatch | attrmatch)
+
+        if returntype:
+            attrmatch.setParseAction(attrtype)
+            fullpathmatch.setParseAction(fullpathtype)
+            attrbyobjmatch.setParseAction(attrbyobjtype)
+
+        return matchgroup.parseString(selectorstring)
+
+    _selectorconfig = expr(selectorstring=selectorstring)
+    _selectortype = expr(selectorstring=selectorstring, returntype=True)
+
+    return {
+            'type': _selectortype[0],
+            'config': _selectorconfig[:2] #TODO unclear why [0] returns only a subset of the matches
+    }
 
 def aggregatorIdParser():
     # --- class parser ---

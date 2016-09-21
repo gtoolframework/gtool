@@ -1,4 +1,4 @@
-TOTAL1::
+TOTAL23::
 *name = Sum of Sam
 *function = sum
 *select = @attr1//objtype

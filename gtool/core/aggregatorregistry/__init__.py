@@ -7,13 +7,13 @@ def aggregatorindex():
 # a shared globals ala...
 # http://stackoverflow.com/questions/15959534/python-visibility-of-global-variables-in-imported-modules
 
-def registerAggregator(aggregatorId, obj):
+def registerAggregator(aggregatorId, aggregatorobj):
 
     if aggregatorId in aggregatornamespace(): # globals()[objectindex()]:
         # this error will occur for a misconfig or a security event
         raise KeyError('One aggregator tried to overwrite an existing one. Aggregator name: %s' % aggregatorId)
     else:
-        aggregatornamespace()[aggregatorId] = obj
+        aggregatornamespace()[aggregatorId] = aggregatorobj
         return True
 
 def aggregatornamespace():

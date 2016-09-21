@@ -1,0 +1,5 @@
+AVERAGE::
+*name = Average Andy
+*function = average
+*select = @attr1//objtype
+

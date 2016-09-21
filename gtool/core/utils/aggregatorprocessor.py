@@ -1,11 +1,42 @@
 import pyparsing as p
+from gtool.core.noderegistry import getObjectByUri, searchByAttribAndObjectType, searchByAttrib
 
 def process(configstring):
+
+    """
+
+    :param configstring: string containing contents of aggregator config file
+    :return: config dict
+
+    AGGREGATORNAME::
+    *name = friendly name
+    *function = function that will be used
+    *select = @attr1 | /tf1/@attr | @attr1//objtype <-- selector
+
+    TOTAL1::
+    *name = Sum of Sam
+    *function = sum
+    *select = @attr1//objtype
+
+
+    AVERAGE1::
+    *name = Average Andy
+    *function = average
+    *select = @attr1//objtype
+
+    LIST1::
+    *name = Lenny List
+    *function = List
+    *select = /tf1/@attr
+
+    """
+
+
 
     def aggregatorIdParser():
         # --- class parser ---
         colon = p.Literal('::').suppress()
-        aggregatorName = p.Word(p.alphas.upper())
+        aggregatorName = p.Word(p.alphas.upper() + p.nums)
         aggregatorDef = aggregatorName + colon + p.LineEnd().suppress()
         return aggregatorDef
 
@@ -36,17 +67,79 @@ def process(configstring):
 
     return _retlist
 
-def parseSelector(selectorstring):
-    #*select = @attr1 | /tf1/@attr | @attr1//objtype
-    attrmatch = p.Combine(p.Literal('@') + p.Word(p.alphanums))
-    fullpathmatch = p.Combine(p.OneOrMore(p.Literal('/') + p.Word(p.alphanums)))
-    attrbyobjmatch = p.Combine(p.Literal('@') + p.Word(p.alphanums) + p.Literal('//') + p.Word(p.alphanums))
-    pass
+class Selector():
 
-def load(configstring):
+    @property
+    def method(self):
+        _method = getattr(self, '__method__', None)
+        if _method is None:
+            raise NotImplemented('self.__method__ must be implemented by descendants of Selector class')
+        return _method
+
+class AttrSelector(Selector):
+
+    def __init__(self):
+        self.__method__ = searchByAttrib
+
+class AttrByObjectSelector():
+
+    def __init__(self):
+        self.__method__ = searchByAttribAndObjectType
+
+class FullPathSelector():
+
+    def __init__(self):
+        self.__method__ = getObjectByUri
+
+def parseSelector(selectorstring):
+    # *select = @attr1 | /tf1/@attr | @attr1//objtype
+
+    """
+    def enumtype(*args,**kwargs): #s, l, t, selectortype=None):
+        print(args)
+        selectortype = kwargs['selectortype']
+        if selectortype is None or not isinstance(selectortype, str):
+            raise ValueError('enumtype requires a selectortype string but got a', type(selectortype))
+        return selectortype
+    """
+
+    def attrtype():
+        return AttrSelector() # 'ATTRTYPE'
+
+    def fullpathtype():
+        return FullPathSelector() #'FULLPATH'
+
+    def attrbyobjtype():
+        return AttrByObjectSelector() #'ATTRBYOBJECT'
+
+    def expr(selectorstring=None, returntype=False):
+        attrmatch = p.Combine(p.Literal('@').suppress() + p.Word(p.alphanums))
+        fullpathmatch = p.Combine(p.OneOrMore(p.Literal('/') + p.Word(p.alphanums))) + p.Literal(
+            '/').suppress() + p.Combine(p.Literal('@').suppress() + p.Word(p.alphanums))
+        attrbyobjmatch = p.Combine(p.Literal('@').suppress() + p.Word(p.alphanums)) + p.Literal('//').suppress() + p.Word(p.alphanums)
+
+        matchgroup = (fullpathmatch | attrbyobjmatch | attrmatch)
+
+        if returntype:
+            attrmatch.setParseAction(attrtype)
+            fullpathmatch.setParseAction(fullpathtype)
+            attrbyobjmatch.setParseAction(attrbyobjtype)
+
+        return matchgroup.parseString(selectorstring)
+
+    _selectorconfig = expr(selectorstring=selectorstring)
+    _selectortype = expr(selectorstring=selectorstring, returntype=True)
+
+    return {
+            'type': _selectortype[0],
+            'config': _selectorconfig[:2] #TODO unclear why [0] returns only a subset of the matches
+    }
+
+def loadaggregators(configstring):
+    SELECT = 'select'
     _retlist =process(configstring)
     for aggregatordict in _retlist:
-        if 'select' in aggregatordict:
-            selector = aggregatordict['select']
-            aggregatordict['select'] = parseSelector(selector)
+        if SELECT in aggregatordict:
+            selector = aggregatordict[SELECT]
+            aggregatordict[SELECT] = parseSelector(selector)
     return _retlist

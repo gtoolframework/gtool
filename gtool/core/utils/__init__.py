@@ -8,6 +8,8 @@ from .config import configloader, register
 from gtool.core.namespace import namespace
 from gtool.core.utils.output import parseformat, registerFormatter
 from gtool.core.utils.runtime import registerruntimeoption
+from gtool.core.utils.aggregatorprocessor import loadaggregators
+from gtool.core.aggregatorregistry import registerAggregator
 
 def projectloader(projectroot, dbg=False, outputscheme=None):
 
@@ -15,11 +17,13 @@ def projectloader(projectroot, dbg=False, outputscheme=None):
     PROJECTCLASS = "classes"
     PROJECTCONFIG = "gtool.cfg"
     PROJECTPLUGINS = "plugins"
+    PROJECTAGGREGATORS = "aggregates"
 
     projectclassroot = os.path.join(projectroot, PROJECTCLASS)
     projectdataroot = os.path.join(projectroot, PROJECTDATA)
     projectconfigpath = os.path.join(projectroot, PROJECTCONFIG)
     projectpluginroot = os.path.join(projectroot, PROJECTPLUGINS)
+    projectaggregatespath = os.path.join(projectroot, PROJECTAGGREGATORS)
 
     register('config', {'root': projectroot, 'classes': projectclassroot, 'dataroot': projectdataroot, 'configpath': projectconfigpath, 'plugin': projectpluginroot})
     loadplugins(projectpluginroot)
@@ -31,6 +35,9 @@ def projectloader(projectroot, dbg=False, outputscheme=None):
         registerruntimeoption('debug', dbg)
 
     __loadclasses(projectclassroot, dbg=dbg)
+
+    __loadaggregators(projectaggregatespath)
+
     # loading output parser can only occur after all classes are loaded
 
     __outputparser(namespace(), outputscheme=outputscheme) #TODO make this a functional style call <-- return namespace from __loadclasses
@@ -98,6 +105,40 @@ def __loadclass(classpath, dbg=False):
     for classname, classconfig in classDict.items():
         # TODO capture exceptions
         generateClass(classname, classconfig)
+    f.close()
+
+def __loadaggregators(aggregatespath, dbg=False):
+    if os.path.isfile(aggregatespath):
+        __loadaggregator(aggregatespath, dbg=dbg)
+    elif os.path.isdir(aggregatespath):
+        for aggregatefile in [f for f in os.listdir(aggregatespath) if os.path.isfile(os.path.join(aggregatespath, f))]:
+            __loadaggregator(os.path.join(aggregatespath, aggregatefile), dbg=dbg)
+
+def __loadaggregator(aggregatorpath, dbg=False):
+    if os.path.exists(aggregatorpath):
+        # TODO check if file is readable
+        f = open(aggregatorpath, 'r')
+        # TODO try except for file read errors
+        aggregatorString = f.read()
+    else:
+        raise FileNotFoundError('%s does not exist' % aggregatorpath)
+    # TODO capture exceptions
+    aggregatorDataList =  loadaggregators(aggregatorString) #TODO get rid of \n by fixing attribute parser
+
+    for aggregatorData in aggregatorDataList:
+        if dbg is True:
+            #debug(aggregatorData)
+            print('aggregator debug not implemented yet')
+        # TODO capture exceptions
+        """
+        for aggregatorname, aggregatorconfig in aggregatorData.items():
+            # TODO capture exceptions
+            print(aggregatorname,':', aggregatorconfig)
+        """
+        _id = aggregatorData['id']
+        del aggregatorData['id']
+        _config = aggregatorData
+        registerAggregator(_id, _config)
     f.close()
 
 

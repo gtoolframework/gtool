@@ -1,0 +1,4 @@
+LIST1::
+*name = Lenny List
+*function = List
+*select = /tf1/@attr
