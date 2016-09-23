@@ -61,7 +61,12 @@ def registerObject(objectPath, obj):
         nodenamespacereverse()[_key].append(convert(objectPath))
         # store objects by attribute name
         for k, v in obj:
-            attribnamespace()[k.lower()].append(obj)
+            if k.lower() not in attribnamespace():
+                attribnamespace()[k.lower()].append(obj)
+            else:
+                _objlist = attribnamespace()[k.lower()]
+                if obj not in _objlist:
+                    attribnamespace()[k.lower()].append(obj)
         return True
 
 # I want all the objects with a certain attribute

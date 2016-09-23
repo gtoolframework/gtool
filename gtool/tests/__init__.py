@@ -1656,10 +1656,11 @@ def test40():
 
 def test41():
     outputscheme = '1'
+    aggregators = ['AVERAGE']
     print('test 41 checks if aggregator logic works')
     print('---- testing 41 begins ----')
 
-    sf = projectloader('test\\test40\\', dbg=False, outputscheme=outputscheme)
+    sf = projectloader('test\\test41\\', dbg=False, outputscheme=outputscheme)
 
     x = sf.dataasobject
 
@@ -1673,7 +1674,18 @@ def test41():
 
     from gtool.core.aggregatorregistry import aggregatornamespace
 
-    print(aggregatornamespace().keys())
+    """
+    for k,v in aggregatornamespace().items():
+        print(k,':',v)
+    """
+
+    aggconfig = aggregatornamespace()
+
+    agg = pluginnamespace()['SUM']
+
+    _agg = agg(config=aggconfig)
+
+    print(_agg.compute())
 
     print('--- test 41 ends ---')
 

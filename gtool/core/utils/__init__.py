@@ -25,12 +25,22 @@ def projectloader(projectroot, dbg=False, outputscheme=None):
     projectpluginroot = os.path.join(projectroot, PROJECTPLUGINS)
     projectaggregatespath = os.path.join(projectroot, PROJECTAGGREGATORS)
 
-    register('config', {'root': projectroot, 'classes': projectclassroot, 'dataroot': projectdataroot, 'configpath': projectconfigpath, 'plugin': projectpluginroot})
+    register('config',
+             {
+            'root': projectroot,
+            'classes': projectclassroot,
+            'dataroot': projectdataroot,
+            'configpath': projectconfigpath,
+            'plugin': projectpluginroot,
+            'aggregators': projectaggregatespath
+             }
+            )
     loadplugins(projectpluginroot)
     configloader(projectconfigpath)
 
     if outputscheme is not None:
         registerruntimeoption('outputscheme', outputscheme) # TODO confirm outputscheme exists
+
     if dbg:
         registerruntimeoption('debug', dbg)
 

@@ -548,7 +548,7 @@ class TreeOutput(Output):
 
         _output = _sub(projectstructure)
 
-        return  self.outputprocessor(_output)
+        return self.outputprocessor(_output)
 
 class TemplatedOutput(Output):
     pass

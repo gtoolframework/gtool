@@ -7,6 +7,7 @@ import pyparsing as p
 from gtool.core.plugin import pluginnamespace
 from abc import abstractmethod
 from gtool.core.noderegistry import registerObject
+from gtool.core.noderegistry import getObjectByUri, searchByAttribAndObjectType, searchByAttrib
 
 class NotComputed(Exception):
     pass
@@ -204,6 +205,24 @@ class DynamicType(object):
             # else handler
             #self.__dict__[attr] = item
             super(DynamicType, self).__setattr__(attr, item)
+
+    def __eq__(self, other):
+        """
+        implements equality operator - assumes if two objects come from the same file
+        then they are equal.
+
+        :param other:
+        :return:
+        """
+        if type(self) != type(other):
+            return False
+
+        a = getattr(self, '__context__').get('file', None)
+        b = getattr(other, '__context__').get('file', None)
+        if a is not None and b is not None:
+            return a == b
+        else:
+            return False
 
     @property
     def dynamicproperties(self):
@@ -482,11 +501,73 @@ class FunctionType(object):
         self.compute() #TODO look at making this an if statement
         return self.__result__
 
+class Selector():
+
+    @property
+    def method(self):
+        _method = getattr(self, '__method__', None)
+        if _method is None:
+            raise NotImplemented('self.__method__ must be implemented by descendants of Selector class')
+        return _method
+
+class AttrSelector(Selector):
+
+    def __init__(self):
+        self.__method__ = searchByAttrib
+
+class AttrByObjectSelector(Selector):
+
+    def __init__(self):
+        self.__method__ = searchByAttribAndObjectType
+
+class FullPathSelector(Selector):
+
+    def __init__(self):
+        self.__method__ = getObjectByUri
 
 class Aggregator(object):
 
-    def __init__(self):
-        pass
+    def __init__(self, config=None):
 
-    def factory(self):
-        pass
+        if config is None or not isinstance(config,dict):
+            raise TypeError('config keyword arg should be a dict but got a', type(config))
+
+        self.id = None
+        _payload = None
+
+        try:
+            _keys = [k for k in config.keys()]
+            if len(_keys) != 1:
+                raise ValueError()
+            self.id = _keys[0]
+            _values = [v for v in config.values()]
+            if len(_values) != 1:
+                raise ValueError()
+            _payload = _values[0]
+            if not isinstance(_payload, dict):
+                raise ValueError()
+        except (KeyError, ValueError, IndexError):
+            raise ValueError('The dict passed via the config keyword arg is not correctly structured. '
+                             'It must contaim a dict with a single Key whose Value is a dict')
+
+        self.name = _payload.get('name', None) #optional
+        self.function = _payload.get('function', None)
+        self.selecttype = _payload.get('select', None).get('type', None)
+        self.selectors = _payload.get('select', None).get('config', None)
+        self.targetattribute = _payload.get('select', None).get('attribute', None)
+
+        if self.function is None or not isinstance(self.function, str):
+            raise TypeError('Aggregator function value, received via config dict, '
+                            'should be a string containing a function name but is', type(self.function))
+
+        if not isinstance(self.selecttype, Selector):
+            raise TypeError('select.type, received via config dict, should be derived '
+                            'from the Selector Class but is', type(self.selecttype))
+
+        if not isinstance(self.selectors, list):
+            raise TypeError('select.config, received via config dict, should be a '
+                            'list but is', type(self.selecttype))
+
+    @abstractmethod
+    def compute(self):
+        return self.selecttype.method(*self.selectors)

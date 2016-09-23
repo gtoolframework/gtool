@@ -46,6 +46,10 @@ class FullPathSelector():
     def __init__(self):
         self.__method__ = getObjectByUri
 
+
+def attrexpr():
+    return p.Combine(p.Literal('@').suppress() + p.Word(p.alphanums))
+
 def parseSelector(selectorstring):
     # *select = @attr1 | /tf1/@attr | @attr1//objtype
 
@@ -66,6 +70,8 @@ def parseSelector(selectorstring):
 
     def attrbyobjtype():
         return AttrByObjectSelector() #'ATTRBYOBJECT'
+
+
 
     def expr(selectorstring=None, returntype=False):
         attrmatch = p.Combine(p.Literal('@').suppress() + p.Word(p.alphanums))
@@ -112,6 +118,11 @@ def aggregatorMetas():
 aggregatorMetas()
 
 expr = p.OneOrMore(p.Group(aggregatorIdParser() + p.OneOrMore(aggregatorMetas())))
+
+a_expr = attrexpr()
+
+a_match = a_expr.searchString(x)
+print(a_match)
 
 match = expr.parseString(x)
 

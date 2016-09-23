@@ -1,5 +1,5 @@
 import pyparsing as p
-from gtool.core.noderegistry import getObjectByUri, searchByAttribAndObjectType, searchByAttrib
+from gtool.core.types.core import AttrSelector, FullPathSelector, AttrByObjectSelector
 
 """
 DESIGN NOTE: Aggregates are not data and therefore live outside the data structure
@@ -71,30 +71,6 @@ def process(configstring):
 
     return _retlist
 
-class Selector():
-
-    @property
-    def method(self):
-        _method = getattr(self, '__method__', None)
-        if _method is None:
-            raise NotImplemented('self.__method__ must be implemented by descendants of Selector class')
-        return _method
-
-class AttrSelector(Selector):
-
-    def __init__(self):
-        self.__method__ = searchByAttrib
-
-class AttrByObjectSelector():
-
-    def __init__(self):
-        self.__method__ = searchByAttribAndObjectType
-
-class FullPathSelector():
-
-    def __init__(self):
-        self.__method__ = getObjectByUri
-
 def parseSelector(selectorstring):
     # *select = @attr1 | /tf1/@attr | @attr1//objtype
 
@@ -116,6 +92,10 @@ def parseSelector(selectorstring):
     def attrbyobjtype():
         return AttrByObjectSelector() #'ATTRBYOBJECT'
 
+    def attrexpr(selectorstring=None):
+        attrmatch = p.Combine(p.Literal('@').suppress() + p.Word(p.alphanums))
+        return attrmatch.searchString(selectorstring)[0][0]
+
     def expr(selectorstring=None, returntype=False):
         attrmatch = p.Combine(p.Literal('@').suppress() + p.Word(p.alphanums))
         fullpathmatch = p.Combine(p.OneOrMore(p.Literal('/') + p.Word(p.alphanums))) + p.Literal(
@@ -133,10 +113,12 @@ def parseSelector(selectorstring):
 
     _selectorconfig = expr(selectorstring=selectorstring)
     _selectortype = expr(selectorstring=selectorstring, returntype=True)
+    _selectorattr = attrexpr(selectorstring=selectorstring)
 
     return {
             'type': _selectortype[0],
-            'config': _selectorconfig[:2] #TODO unclear why [0] returns only a subset of the matches
+            'config': _selectorconfig[:2], #TODO unclear why [0] returns only a subset of the matches
+            'attribute': _selectorattr
     }
 
 def loadaggregators(configstring):
