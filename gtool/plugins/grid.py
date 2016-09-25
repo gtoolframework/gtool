@@ -16,8 +16,7 @@ class Grid(GridOutput):
         """
         if output is not None:
             raise ValueError('Grid does not output a file to disk but an output location was provided.')
-        #structure = projectstructure.dataasobject
-        #return self.__gridoutput__(structure)
+
         return super(Grid, self).__output__(projectstructure)
 
 

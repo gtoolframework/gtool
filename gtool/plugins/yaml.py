@@ -1,12 +1,10 @@
 from gtool.core.types.output import TreeOutput
-from gtool.core.filewalker import StructureFactory
 import yaml
 
 class Yaml(TreeOutput):
 
     def __output__(self, projectstructure, output=None):
 
-        #_yamloutput = self.__yamloutput__(projectstructure)
         _yamloutput = super(Yaml, self).__output__(projectstructure)
 
         if output is None:
@@ -32,14 +30,6 @@ class Yaml(TreeOutput):
                 return {k: _sub(v) for k, v in tree.items()}
             else:
                 return self.convert(tree)
-
-        """
-        def sub(tree=StructureFactory.Container()):
-            if tree.haschildren:
-                return [sub(child) for child in tree.children]
-            else:
-                return {tree.name: tree.dataasobject.asdict()}
-        """
 
         _tree = self.integrateaggregates(_sub(projectstructure))
 
