@@ -32,14 +32,8 @@ class Json(TreeOutput):
             else:
                 return self.convert(tree) #, filterfunction=self.filter)  #tree.asdict(filterfunction=self.filter)
 
-        _tree = _sub(projectstructure)
-        if isinstance(_tree, dict):
-            for i in self.aggregates():
-                _tree.update(i)
-        elif isinstance(_tree, list):
-            _tree.extend(self.aggregates())
-        else:
-            raise TypeError('unexpected type in _tree')
+        _tree = self.integrateaggregates(_sub(projectstructure))
+
         return json.dumps(_tree, sort_keys=True, indent=4)
 
 

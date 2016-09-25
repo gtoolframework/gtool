@@ -1656,8 +1656,7 @@ def test40():
 
 def test41():
     outputscheme = '1'
-    aggregators = ['AVERAGE']
-    print('test 41 checks if aggregator logic works')
+    print('test 41 checks if aggregator logic works for tree based output - JSON')
     print('---- testing 41 begins ----')
 
     sf = projectloader('test\\test41\\', dbg=False, outputscheme=outputscheme)
@@ -1666,15 +1665,15 @@ def test41():
 
     print('--- explore results ---')
 
-    o = pluginnamespace()['YAML']()
+    o = pluginnamespace()['JSON']()
 
     _ret = o.output(sf)
 
     print(_ret)
 
+    """
     from gtool.core.aggregatorregistry import aggregatornamespace
 
-    """
     for k,v in aggregatornamespace().items():
         print(k,':',v)
 
@@ -1692,8 +1691,7 @@ def test41():
 
     #expected output
     """
-    test 40 checks if aggregator loading works
-    ---- testing 39 begins ----
+    ---- testing 41 begins ----
     loading plug-in: choice
     loading plug-in: combine
     loading plug-in: csv
@@ -1713,6 +1711,7 @@ def test41():
     loading plug-in: ref
     loading plug-in: static
     loading plug-in: string
+    loading plug-in: sum
     loading plug-in: url
     loading plug-in: xattrib
     loading plug-in: yaml
@@ -1736,8 +1735,170 @@ def test41():
                 "test2": 15,
                 "test3": 10
             }
+        },
+        {
+            "Sum of Sam": 25
         }
     ]
-    dict_keys(['AVERAGE', 'LIST1', 'TOTAL23'])
-    --- test 40 ends ---
+    --- test 41 ends ---
+    """
+
+
+def test41b():
+    outputscheme = '1'
+    print('test 41b checks if aggregator logic works for tree based output - YAML')
+    print('---- testing 41b begins ----')
+
+    sf = projectloader('test\\test41\\', dbg=False, outputscheme=outputscheme)
+
+    # x = sf.dataasobject
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['YAML']()
+
+    _ret = o.output(sf)
+
+    print(_ret)
+
+    """
+    from gtool.core.aggregatorregistry import aggregatornamespace
+
+    for k,v in aggregatornamespace().items():
+        print(k,':',v)
+
+    aggconfig = aggregatornamespace()
+
+    agg = pluginnamespace()['SUM']
+
+    _agg = agg(config=aggconfig)
+
+    print(_agg.compute())
+    """
+
+    print('--- test 41b ends ---')
+
+    # expected output
+    """
+    ---- testing 41b begins ----
+    loading plug-in: choice
+    loading plug-in: combine
+    loading plug-in: csv
+    loading plug-in: dummy
+    loading plug-in: enum
+    loading plug-in: excel
+    loading plug-in: filename
+    loading plug-in: fullpath
+    loading plug-in: grid
+    loading plug-in: json
+    loading plug-in: math
+    loading plug-in: nodename
+    loading plug-in: number
+    loading plug-in: parent
+    loading plug-in: path
+    loading plug-in: real
+    loading plug-in: ref
+    loading plug-in: static
+    loading plug-in: string
+    loading plug-in: sum
+    loading plug-in: url
+    loading plug-in: xattrib
+    loading plug-in: yaml
+    Registering Dynamic Class: CLASSONE
+    --- explore results ---
+    -   tf1:
+            num1: 10
+            num2: 20
+            test1: 30
+            test2: 15
+            test3: 15
+    -   tf2:
+            num1: 15
+            num2: 25
+            test1: 40
+            test2: 15
+            test3: 10
+    -   Sum of Sam: 25
+
+    --- test 41b ends ---
+    """
+
+
+def test41c():
+    outputscheme = '1'
+    print('test 41c checks if aggregator logic works for grid based output - grid')
+    print('---- testing 41c begins ----')
+
+    sf = projectloader('test\\test41\\', dbg=False, outputscheme=outputscheme)
+
+    # x = sf.dataasobject
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['GRID']()
+
+    _ret = o.output(sf)
+
+    print(_ret)
+
+    """
+    from gtool.core.aggregatorregistry import aggregatornamespace
+
+    for k,v in aggregatornamespace().items():
+        print(k,':',v)
+
+    aggconfig = aggregatornamespace()
+
+    agg = pluginnamespace()['SUM']
+
+    _agg = agg(config=aggconfig)
+
+    print(_agg.compute())
+    """
+
+    print('--- test 41c ends ---')
+
+    # expected output
+    """
+    ---- testing 41b begins ----
+    loading plug-in: choice
+    loading plug-in: combine
+    loading plug-in: csv
+    loading plug-in: dummy
+    loading plug-in: enum
+    loading plug-in: excel
+    loading plug-in: filename
+    loading plug-in: fullpath
+    loading plug-in: grid
+    loading plug-in: json
+    loading plug-in: math
+    loading plug-in: nodename
+    loading plug-in: number
+    loading plug-in: parent
+    loading plug-in: path
+    loading plug-in: real
+    loading plug-in: ref
+    loading plug-in: static
+    loading plug-in: string
+    loading plug-in: sum
+    loading plug-in: url
+    loading plug-in: xattrib
+    loading plug-in: yaml
+    Registering Dynamic Class: CLASSONE
+    --- explore results ---
+    -   tf1:
+            num1: 10
+            num2: 20
+            test1: 30
+            test2: 15
+            test3: 15
+    -   tf2:
+            num1: 15
+            num2: 25
+            test1: 40
+            test2: 15
+            test3: 10
+    -   Sum of Sam: 25
+
+    --- test 41b ends ---
     """

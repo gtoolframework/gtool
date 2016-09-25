@@ -105,6 +105,10 @@ class Output(ABC):
 
         return _retlist
 
+    @abstractmethod
+    def integrateaggregates(self):
+        pass
+
 class GridOutput(Output):
     """
     Output subclass for output that has aligned columns. Must override self.__output__
@@ -554,6 +558,17 @@ class TreeOutput(Output):
             key = k if headers is None else headers[i]
             _retdict[key] = _v
         return _retdict
+
+    def integrateaggregates(self, tree):
+        _tree = tree
+        if isinstance(_tree, dict):
+            for i in self.aggregates():
+                _tree.update(i)
+        elif isinstance(_tree, list):
+            _tree.extend(self.aggregates())
+        else:
+            raise TypeError('unexpected type in _tree')
+        return _tree
 
     def __output__(self, projectstructure, output=None): # TODO use output
 

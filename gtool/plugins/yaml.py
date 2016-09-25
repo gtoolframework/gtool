@@ -41,14 +41,8 @@ class Yaml(TreeOutput):
                 return {tree.name: tree.dataasobject.asdict()}
         """
 
-        _tree = _sub(projectstructure)
-        if isinstance(_tree, dict):
-            for i in self.aggregates():
-                _tree.update(i)
-        elif isinstance(_tree, list):
-            _tree.extend(self.aggregates())
-        else:
-            raise TypeError('unknown type in _tree')
+        _tree = self.integrateaggregates(_sub(projectstructure))
+
         return yaml.safe_dump(_tree, indent=4, default_flow_style=False)
 
 
