@@ -1839,7 +1839,8 @@ def test41c():
 
     _ret = o.output(sf)
 
-    print(_ret)
+    for row in _ret:
+        print(row)
 
     """
     from gtool.core.aggregatorregistry import aggregatornamespace

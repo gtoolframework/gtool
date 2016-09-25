@@ -1,0 +1,4 @@
+TOTAL33::
+*name = Sum of Sam 2
+*function = sum
+*select = @num2//CLASSONE

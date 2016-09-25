@@ -10,6 +10,7 @@ from gtool.core.types.matrix import Matrix
 from gtool.core.filewalker import striptoclassname
 from gtool.core.aggregatorregistry import aggregatornamespace
 from gtool.core.plugin import pluginnamespace
+from collections import defaultdict
 
 class Output(ABC):
 
@@ -88,22 +89,9 @@ class Output(ABC):
         else:
             return [aggregate.strip() for aggregate in  _aggregates.split(',')]
 
+    @abstractmethod
     def aggregates(self):
-        _retlist = []
-        _aggreagatorlist = self.__aggregates__()
-        if _aggreagatorlist is None or len(_aggreagatorlist) == 0:
-            return None
-        else:
-            for aggregator in _aggreagatorlist:
-                _aggregatorconfig = aggregatornamespace().get(aggregator.upper(), None)
-                _aggregatorfunctionname = _aggregatorconfig.get('function', None)
-                if _aggregatorfunctionname is not None:
-                    _aggregatorfunction = pluginnamespace().get(_aggregatorfunctionname.upper(), None)
-                if _aggregatorfunction is not None:
-                    aggregator = _aggregatorfunction(config={aggregator:_aggregatorconfig})
-                    _retlist.append(aggregator.compute())
-
-        return _retlist
+        pass
 
     @abstractmethod
     def integrateaggregates(self):
@@ -379,6 +367,75 @@ class GridOutput(Output):
             _separator = bytes('%s' % separator, "utf-8").decode("unicode_escape")  # prevent escaping
         return _separator
 
+    def aggregates(self):
+        _retdict = defaultdict(list)
+        _aggreagatorlist = self.__aggregates__()
+        if _aggreagatorlist is None or len(_aggreagatorlist) == 0:
+            return None
+        else:
+            for aggregator in _aggreagatorlist:
+                _aggregatorconfig = aggregatornamespace().get(aggregator.upper(), None)
+                _aggregatorfunctionname = _aggregatorconfig.get('function', None)
+                _aggregatortargetattribute = _aggregatorconfig.get('select', None).get('attribute', None)
+                if _aggregatorfunctionname is not None:
+                    _aggregatorfunction = pluginnamespace().get(_aggregatorfunctionname.upper(), None)
+                if _aggregatorfunction is not None:
+                    aggregator = _aggregatorfunction(config={aggregator:_aggregatorconfig})
+                    _retdict[_aggregatortargetattribute].append(aggregator.compute())
+
+        return _retdict
+
+    def integrateaggregates(self, obj):
+
+        def _sub(self, obj):
+            # design note: this is similar code to self.__getheaders__()
+            _formatdict = obj.__classoutputscheme__()
+
+            formatlist = _formatdict['format']
+
+            _attrorderlist = []
+
+            for cell in formatlist:
+                for element in cell:
+                    if isinstance(element, AttributeMatch):
+                        if not element.isconcatter and getattr(getattr(obj, element.__attrname__, None), 'isdynamic', False):
+                            attr = getattr(obj, element.__attrname__, None)
+                            _attrtype = attr.attrtype()
+                            _attrorderlist.extend(self.__getheaders__(_attrtype))
+                        else:
+                            _attrorderlist.append(element.__attrname__)
+                    elif isinstance(element, Filler) and len(cell) == 1:
+                        # handle formatting cells that only contain static Filler text
+                        _attrorderlist.append('')
+            return _attrorderlist
+
+        attrlist = _sub(self, obj)
+        _aggregatesdict = self.aggregates()
+        _aggregatesdict_keys = _aggregatesdict.keys()
+        _height = max([len(v) for k, v in _aggregatesdict.items()]) * 2
+        _width = len(attrlist)
+        _retgrid = Matrix(startwidth=_width, startheight=_height)
+
+        for attrib in attrlist:
+            if attrib in _aggregatesdict_keys:
+                for aggregate in _aggregatesdict[attrib]:
+                    cursor = _retgrid.cursor
+                    _retgrid.insert(cursor=cursor, datalist=[aggregate['name']], healthcheck=False)
+                    _retgrid.x += -1
+                    _retgrid.y += 1
+                    _cursor = _retgrid.cursor
+                    _retgrid.insert(cursor=_cursor, datalist=[aggregate['result']], healthcheck=False)
+                    x, y = cursor
+                    _retgrid.y = y
+            else:
+                try:
+                    _retgrid.x = _retgrid.x + 1
+                except IndexError:
+                    pass
+
+
+        return _retgrid
+
     def __gridoutput__(self, obj, separatoroverride=None, grid=None, headers=True): #TODO is grid kwarg needed?
 
         """
@@ -390,7 +447,7 @@ class GridOutput(Output):
         :param grid: Matrix object to write results into
         :return:
         """
-        def sub(self, obj, separatoroverride=None, grid=None):
+        def sub(self, obj, separatoroverride=None, grid=None, headers=headers):
             outputconfig = self.__outputconfig__()
 
             separatorname = 'separator'
@@ -415,10 +472,21 @@ class GridOutput(Output):
                 grid.carriagereturn()
 
         if isinstance(obj, list):
-            for _obj in obj:
-                sub(self, _obj, separatoroverride=separatoroverride, grid=grid)
+            for i, _obj in enumerate(obj):
+                _headers = headers if i == 0 else False # prevent headers being inserted repeatedly
+                sub(self, _obj, separatoroverride=separatoroverride, grid=grid, headers=_headers)
         else:
-            sub(self, obj, separatoroverride=separatoroverride, grid=grid)
+            sub(self, obj, separatoroverride=separatoroverride, grid=grid, headers=headers)
+
+        if self.__aggregates__() is not None:
+            _obj = obj[0] if isinstance(obj, list) else obj
+            grid.carriagereturn()
+            _aggregatesgrid = self.integrateaggregates(_obj)
+            if _aggregatesgrid is not None:
+                for row in _aggregatesgrid:
+                    _cursor = grid.cursor
+                    grid.insert(cursor=_cursor, datalist=row)
+                    grid.carriagereturn()
 
         return grid
 
@@ -507,6 +575,8 @@ class TreeOutput(Output):
 
         """
         Takes the tree structure read by __output__ and converts into a final form.
+
+        Must call self.integrateaggregates()
         :param projectstructure: must be a list or a dict containing DynamicType objects
         :return:
         """
@@ -559,13 +629,36 @@ class TreeOutput(Output):
             _retdict[key] = _v
         return _retdict
 
+    def aggregates(self):
+        _retlist = []
+        _aggreagatorlist = self.__aggregates__()
+        if _aggreagatorlist is None or len(_aggreagatorlist) == 0:
+            return None
+        else:
+            for aggregator in _aggreagatorlist:
+                _aggregatorconfig = aggregatornamespace().get(aggregator.upper(), None)
+                _aggregatorfunctionname = _aggregatorconfig.get('function', None)
+                if _aggregatorfunctionname is not None:
+                    _aggregatorfunction = pluginnamespace().get(_aggregatorfunctionname.upper(), None)
+                if _aggregatorfunction is not None:
+                    aggregator = _aggregatorfunction(config={aggregator:_aggregatorconfig})
+                    _resultdict = aggregator.compute()
+                    _retlist.append({_resultdict.get('name', None):_resultdict.get('result', None)})
+
+        return _retlist
+
     def integrateaggregates(self, tree):
+        _aggregates = {'Aggregrates': []}
+
+        for aggregate in self.aggregates():
+            _aggregates['Aggregrates'].append(aggregate)
+
         _tree = tree
         if isinstance(_tree, dict):
-            for i in self.aggregates():
-                _tree.update(i)
+            #for i in self.aggregates():
+            _tree.update(_aggregates) #i)
         elif isinstance(_tree, list):
-            _tree.extend(self.aggregates())
+            _tree.extend(_aggregates) #self.aggregates())
         else:
             raise TypeError('unexpected type in _tree')
         return _tree
@@ -589,7 +682,7 @@ class TreeOutput(Output):
 
         _output = _sub(projectstructure)
 
-        return self.outputprocessor(_output)
+        return self.outputprocessor({'Data': _output})
 
 class TemplatedOutput(Output):
     pass

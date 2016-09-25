@@ -558,15 +558,19 @@ class Aggregator(object):
 
         if self.function is None or not isinstance(self.function, str):
             raise TypeError('Aggregator function value, received via config dict, '
-                            'should be a string containing a function name but is', type(self.function))
+                            'should be a string containing a function name but got a', type(self.function))
 
         if not isinstance(self.selecttype, Selector):
             raise TypeError('select.type, received via config dict, should be derived '
-                            'from the Selector Class but is', type(self.selecttype))
+                            'from the Selector Class but got a', type(self.selecttype))
 
         if not isinstance(self.selectors, list):
             raise TypeError('select.config, received via config dict, should be a '
-                            'list but is', type(self.selecttype))
+                            'list but got a', type(self.selecttype))
+
+        if not isinstance(self.targetattribute, str):
+            raise TypeError('select.attribute, received via config dict, should be a '
+                            'string but got a', type(self.selecttype))
 
     @abstractmethod
     def compute(self):

@@ -22,7 +22,7 @@ class Sum(Aggregator):
         for num in values:
             _result += num.raw()
         """
-        return {_name: _result}
+        return {'name':_name, 'result': _result}
 
 
 def load():
