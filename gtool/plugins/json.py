@@ -39,7 +39,7 @@ class Json(TreeOutput):
         elif isinstance(_tree, list):
             _tree.extend(self.aggregates())
         else:
-            raise TypeError('unknown type in _tree')
+            raise TypeError('unexpected type in _tree')
         return json.dumps(_tree, sort_keys=True, indent=4)
 
 

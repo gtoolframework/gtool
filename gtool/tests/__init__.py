@@ -1666,7 +1666,7 @@ def test41():
 
     print('--- explore results ---')
 
-    o = pluginnamespace()['JSON']()
+    o = pluginnamespace()['YAML']()
 
     _ret = o.output(sf)
 
