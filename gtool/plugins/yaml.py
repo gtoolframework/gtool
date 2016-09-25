@@ -25,13 +25,23 @@ class Yaml(TreeOutput):
 
     def outputprocessor(self, projectstructure):
 
+        def _sub(tree):
+            if isinstance(tree, list):
+                return [_sub(item) for item in tree]
+            elif isinstance(tree, dict):
+                return {k: _sub(v) for k, v in tree.items()}
+            else:
+                return self.convert(tree)
+
+        """
         def sub(tree=StructureFactory.Container()):
             if tree.haschildren:
                 return [sub(child) for child in tree.children]
             else:
                 return {tree.name: tree.dataasobject.asdict()}
+        """
 
-        _tree = sub(projectstructure)
+        _tree = _sub(projectstructure)
         if isinstance(_tree, dict):
             for i in self.aggregates():
                 _tree.update(i)
@@ -39,7 +49,7 @@ class Yaml(TreeOutput):
             _tree.extend(self.aggregates())
         else:
             raise TypeError('unknown type in _tree')
-        return yaml.safe_dump(_tree, indent=4)
+        return yaml.safe_dump(_tree, indent=4, default_flow_style=False)
 
 
 def load():

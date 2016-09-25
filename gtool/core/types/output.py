@@ -555,9 +555,6 @@ class TreeOutput(Output):
             _retdict[key] = _v
         return _retdict
 
-    def intergate_aggregator(self, config=None):
-        pass
-
     def __output__(self, projectstructure, output=None): # TODO use output
 
         """
@@ -576,8 +573,6 @@ class TreeOutput(Output):
                 return {tree.name: _obj}
 
         _output = _sub(projectstructure)
-
-        print(self.__aggregates__())
 
         return self.outputprocessor(_output)
 
