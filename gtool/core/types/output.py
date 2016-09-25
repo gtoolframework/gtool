@@ -8,6 +8,8 @@ from gtool.core.utils.config import namespace as confignamespace
 from gtool.core.types.outputmanagers import Filler, AttributeMatch
 from gtool.core.types.matrix import Matrix
 from gtool.core.filewalker import striptoclassname
+from gtool.core.aggregatorregistry import aggregatornamespace
+from gtool.core.plugin import pluginnamespace
 
 class Output(ABC):
 
@@ -78,6 +80,30 @@ class Output(ABC):
         outputconfig = confignamespace()[outputconfigname(outputscheme_id)]
 
         return outputconfig
+
+    def __aggregates__(self):
+        _aggregates = self.__outputconfig__().get('aggregates', None)
+        if _aggregates is None:
+            return None
+        else:
+            return [aggregate.strip() for aggregate in  _aggregates.split(',')]
+
+    def aggregates(self):
+        _retlist = []
+        _aggreagatorlist = self.__aggregates__()
+        if _aggreagatorlist is None or len(_aggreagatorlist) == 0:
+            return None
+        else:
+            for aggregator in _aggreagatorlist:
+                _aggregatorconfig = aggregatornamespace().get(aggregator.upper(), None)
+                _aggregatorfunctionname = _aggregatorconfig.get('function', None)
+                if _aggregatorfunctionname is not None:
+                    _aggregatorfunction = pluginnamespace().get(_aggregatorfunctionname.upper(), None)
+                if _aggregatorfunction is not None:
+                    aggregator = _aggregatorfunction(config={aggregator:_aggregatorconfig})
+                    _retlist.append(aggregator.compute())
+
+        return _retlist
 
 class GridOutput(Output):
     """
@@ -529,6 +555,9 @@ class TreeOutput(Output):
             _retdict[key] = _v
         return _retdict
 
+    def intergate_aggregator(self, config=None):
+        pass
+
     def __output__(self, projectstructure, output=None): # TODO use output
 
         """
@@ -547,6 +576,8 @@ class TreeOutput(Output):
                 return {tree.name: _obj}
 
         _output = _sub(projectstructure)
+
+        print(self.__aggregates__())
 
         return self.outputprocessor(_output)
 

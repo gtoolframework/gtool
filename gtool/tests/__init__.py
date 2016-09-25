@@ -1662,7 +1662,7 @@ def test41():
 
     sf = projectloader('test\\test41\\', dbg=False, outputscheme=outputscheme)
 
-    x = sf.dataasobject
+    #x = sf.dataasobject
 
     print('--- explore results ---')
 
@@ -1677,7 +1677,6 @@ def test41():
     """
     for k,v in aggregatornamespace().items():
         print(k,':',v)
-    """
 
     aggconfig = aggregatornamespace()
 
@@ -1686,6 +1685,7 @@ def test41():
     _agg = agg(config=aggconfig)
 
     print(_agg.compute())
+    """
 
     print('--- test 41 ends ---')
 

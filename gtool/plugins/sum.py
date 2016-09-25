@@ -7,7 +7,10 @@ class Sum(Aggregator):
         super(Sum, self).__init__(config=config)
 
     def compute(self):
-        _selection = super(Sum, self).compute()
+        selectionDict = super(Sum, self).compute()
+
+        _selection = [v for v in selectionDict.values()][0]
+        _name = [k for k in selectionDict.keys()][0]
         values = []
         for val in _selection:
             _values = [v.raw() for v in getattr(val, self.targetattribute)]
@@ -19,7 +22,7 @@ class Sum(Aggregator):
         for num in values:
             _result += num.raw()
         """
-        return _result
+        return {_name: _result}
 
 
 def load():

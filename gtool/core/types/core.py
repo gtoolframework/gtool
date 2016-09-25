@@ -570,4 +570,4 @@ class Aggregator(object):
 
     @abstractmethod
     def compute(self):
-        return self.selecttype.method(*self.selectors)
+        return {self.name if self.name is not None else self.id : self.selecttype.method(*self.selectors)}
