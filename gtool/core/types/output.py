@@ -412,9 +412,9 @@ class GridOutput(Output):
         attrlist = _sub(self, obj)
         _aggregatesdict = self.aggregates()
         _aggregatesdict_keys = _aggregatesdict.keys()
-        _height = max([len(v) for k, v in _aggregatesdict.items()]) * 2
+        _height = (max([len(v) for k, v in _aggregatesdict.items()]) * 2) + 2 #add a buffer of 2
         _width = len(attrlist)
-        _retgrid = Matrix(startwidth=_width, startheight=_height+2)
+        _retgrid = Matrix(startwidth=_width, startheight=_height)
 
         for attrib in attrlist:
             if attrib in _aggregatesdict_keys:
@@ -425,11 +425,19 @@ class GridOutput(Output):
                     _retgrid.x += -1
                     _retgrid.y += 1
                     _cursor = _retgrid.cursor
-                    _retgrid.insert(cursor=_cursor, datalist=[aggregate['result']], healthcheck=False)
-                    #x, y = cursor
-                    #_retgrid.y = y
-                    _retgrid.x += -1
-                    _retgrid.y += 1
+
+                    _result = aggregate['result']
+
+                    if isinstance(_result, list):
+                        _retgrid.append_rows(rows=len(_result))
+                        for i in _result:
+                            _retgrid.insert(cursor=_cursor, datalist=[i], healthcheck=False)
+                            _retgrid.x += -1
+                            _retgrid.y += 1
+                    else:
+                        _retgrid.insert(cursor=_cursor, datalist=[_result], healthcheck=False)
+                        _retgrid.x += -1
+                        _retgrid.y += 1
                 _retgrid.y = homerow
                 _retgrid.x += 1
             else:
