@@ -429,7 +429,9 @@ class GridOutput(Output):
                     _result = aggregate['result']
 
                     if isinstance(_result, list):
-                        _retgrid.append_rows(rows=len(_result))
+                        # process multivalue aggregator results
+                        if len(_result) > (_retgrid.height - _retgrid.y) + 1:
+                            _retgrid.append_rows(rows=len(_result))
                         for i in _result:
                             _retgrid.insert(cursor=_cursor, datalist=[i], healthcheck=False)
                             _retgrid.x += -1
