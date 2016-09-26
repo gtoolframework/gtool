@@ -20,7 +20,6 @@ class Listing(Aggregator):
             else:
                 values.append(selectedvalue)
 
-        print(values)
         return {'name':_name, 'result': values}
 
 

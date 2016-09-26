@@ -1918,6 +1918,7 @@ def test42a():
 
     # expected output
     """
+    test 42a checks if average aggregator works
     ---- testing 42a begins ----
     loading plug-in: average
     loading plug-in: choice
@@ -1930,6 +1931,7 @@ def test42a():
     loading plug-in: fullpath
     loading plug-in: grid
     loading plug-in: json
+    loading plug-in: listing
     loading plug-in: math
     loading plug-in: nodename
     loading plug-in: number
@@ -1949,8 +1951,9 @@ def test42a():
     ['10', '20', '30', '15', '15']
     ['15', '25', '40', '15', '10']
     [None, None, None, None, None]
-    ['Sum of Sam', 'Adam Average', None, None, None]
-    [25, 22.5, None, None, None]
+    ['Sum of Sam', 'Adam Average', 'Larry List', None, None]
+    [25, 22.5, 30, None, None]
+    [None, None, 40, None, None]
     --- test 42a ends ---
     """
 
@@ -1975,7 +1978,7 @@ def test42b():
 
     # expected output
     """
-    ---- testing 42a begins ----
+    ---- testing 42b begins ----
     loading plug-in: average
     loading plug-in: choice
     loading plug-in: combine
@@ -1987,6 +1990,7 @@ def test42b():
     loading plug-in: fullpath
     loading plug-in: grid
     loading plug-in: json
+    loading plug-in: listing
     loading plug-in: math
     loading plug-in: nodename
     loading plug-in: number
@@ -2006,7 +2010,8 @@ def test42b():
     ['10', '20', '30', '15', '15']
     ['15', '25', '40', '15', '10']
     [None, None, None, None, None]
-    ['Sum of Sam', 'Adam Average', None, None, None]
-    [25, 22.5, None, None, None]
-    --- test 42a ends ---
+    ['Sum of Sam', 'Adam Average', 'Larry List', None, None]
+    [25, 22.5, 30, None, None]
+    [None, None, 40, None, None]
+    --- test 42b ends ---
     """
