@@ -5,14 +5,14 @@ from gtool.core.plugin import loadplugins
 from .classgen import generateClass
 from .classprocessor import readClass, processClass, debugClass
 from .config import configloader, register
+from gtool.core.utils.config import namespace as confignamespace
 from gtool.core.namespace import namespace
 from gtool.core.utils.output import parseformat, registerFormatter
 from gtool.core.utils.runtime import registerruntimeoption
 from gtool.core.utils.aggregatorprocessor import loadaggregators
 from gtool.core.aggregatorregistry import registerAggregator
 
-def projectloader(projectroot, dbg=False, outputscheme=None):
-
+def loadconfig(projectroot):
     PROJECTDATA = "data"
     PROJECTCLASS = "classes"
     PROJECTCONFIG = "gtool.cfg"
@@ -27,31 +27,47 @@ def projectloader(projectroot, dbg=False, outputscheme=None):
 
     register('config',
              {
-            'root': projectroot,
-            'classes': projectclassroot,
-            'dataroot': projectdataroot,
-            'configpath': projectconfigpath,
-            'plugin': projectpluginroot,
-            'aggregators': projectaggregatespath
+                 'root': projectroot,
+                 'classes': projectclassroot,
+                 'dataroot': projectdataroot,
+                 'configpath': projectconfigpath,
+                 'plugin': projectpluginroot,
+                 'aggregators': projectaggregatespath
              }
-            )
-    loadplugins(projectpluginroot)
-    configloader(projectconfigpath)
+             )
+
+    return confignamespace()['config']
+
+def projectloader(projectroot, dbg=False, outputscheme=None):
+
+    projectconfig = loadconfig(projectroot)
+
+    __loadplugins(projectconfig['root'])
+    __configloader(projectconfig['configpath'])
 
     if outputscheme is not None:
-        registerruntimeoption('outputscheme', outputscheme) # TODO confirm outputscheme exists
+        __registeroption('outputscheme', outputscheme) # TODO confirm outputscheme exists
 
     if dbg:
-        registerruntimeoption('debug', dbg)
+        __registeroption('debug', dbg)
 
-    __loadclasses(projectclassroot, dbg=dbg)
+    __loadclasses(projectconfig['classes'], dbg=dbg)
 
-    __loadaggregators(projectaggregatespath)
+    __loadaggregators(projectconfig['aggregators'])
 
     # loading output parser can only occur after all classes are loaded
 
-    __outputparser(namespace(), outputscheme=outputscheme) #TODO make this a functional style call <-- return namespace from __loadclasses
-    return StructureFactory.treewalk(projectdataroot) # returns the project data
+    __outputparser(outputscheme=outputscheme) #TODO make this a functional style call <-- return namespace from __loadclasses
+    return process(projectconfig['dataroot']) # returns the project data
+
+def __registeroption(key, value):
+    registerruntimeoption(key, value)
+
+def __loadplugins(configpath):
+    loadplugins(configpath)
+
+def __configloader(configpath):
+    configloader(configpath)
 
 def __loadclasses(classpath, dbg=False):
     if os.path.isfile(classpath):
@@ -60,9 +76,11 @@ def __loadclasses(classpath, dbg=False):
         for classfile in [f for f in os.listdir(classpath) if os.path.isfile(os.path.join(classpath, f))]:
             __loadclass(os.path.join(classpath, classfile), dbg=dbg)
 
-def __outputparser(globalnamespace, outputscheme=None):
+def __outputparser(outputscheme=None):
+    globalnamespace = namespace()
     if outputscheme is None:
         raise ValueError('An outputscheme was not provided, cannot build output format tree')
+        #TODO implement a default outputscheme that displays everything in alpha order
     #print('Namespace:...')
     for k, v in globalnamespace.items():
         _formatterdict = {}
@@ -152,6 +170,8 @@ def __loadaggregator(aggregatorpath, dbg=False):
         registerAggregator(_id, _config)
     f.close()
 
+def process(datapath):
+    return StructureFactory.treewalk(datapath)
 
 def debug(classdata):
     print('--- class debug ---')
