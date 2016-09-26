@@ -1953,3 +1953,60 @@ def test42a():
     [25, 22.5, None, None, None]
     --- test 42a ends ---
     """
+
+
+def test42b():
+    outputscheme = '1'
+    print('test 42b checks if average aggregator works')
+    print('---- testing 42b begins ----')
+
+    sf = projectloader('test\\test42\\', dbg=False, outputscheme=outputscheme)
+
+    print('--- explore results ---')
+
+    o = pluginnamespace()['GRID']()
+
+    _ret = o.output(sf)
+
+    for row in _ret:
+        print(row)
+
+    print('--- test 42b ends ---')
+
+    # expected output
+    """
+    ---- testing 42a begins ----
+    loading plug-in: average
+    loading plug-in: choice
+    loading plug-in: combine
+    loading plug-in: csv
+    loading plug-in: dummy
+    loading plug-in: enum
+    loading plug-in: excel
+    loading plug-in: filename
+    loading plug-in: fullpath
+    loading plug-in: grid
+    loading plug-in: json
+    loading plug-in: math
+    loading plug-in: nodename
+    loading plug-in: number
+    loading plug-in: parent
+    loading plug-in: path
+    loading plug-in: real
+    loading plug-in: ref
+    loading plug-in: static
+    loading plug-in: string
+    loading plug-in: sum
+    loading plug-in: url
+    loading plug-in: xattrib
+    loading plug-in: yaml
+    Registering Dynamic Class: CLASSONE
+    --- explore results ---
+    ['num1', 'num2', 'test1', 'test2', 'test3']
+    ['10', '20', '30', '15', '15']
+    ['15', '25', '40', '15', '10']
+    [None, None, None, None, None]
+    ['Sum of Sam', 'Adam Average', None, None, None]
+    [25, 22.5, None, None, None]
+    --- test 42a ends ---
+    """

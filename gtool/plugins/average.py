@@ -13,11 +13,16 @@ class Average(Aggregator):
         _name = [k for k in selectionDict.keys()][0]
         values = []
         for val in _selection:
-            _values = [v.raw() for v in getattr(val, self.targetattribute)]
-            values.extend(_values)
+            selectedvalue = getattr(val, self.targetattribute)
+            if hasattr(selectedvalue, '__iter__'):
+                _values = [v.raw() for v in selectedvalue]
+                values.extend(_values)
+            else:
+                values.append(selectedvalue)
         if len(values) == 0:
-            return None
-        _result = sum(values)/len(values)
+            _result = None
+        else:
+            _result = sum(values)/len(values)
         return {'name':_name, 'result': _result}
 
 

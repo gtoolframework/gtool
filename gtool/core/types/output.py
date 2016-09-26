@@ -436,6 +436,7 @@ class GridOutput(Output):
                             _retgrid.insert(cursor=_cursor, datalist=[i], healthcheck=False)
                             _retgrid.x += -1
                             _retgrid.y += 1
+                            _cursor = _retgrid.cursor
                     else:
                         _retgrid.insert(cursor=_cursor, datalist=[_result], healthcheck=False)
                         _retgrid.x += -1

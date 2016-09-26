@@ -1,13 +1,13 @@
 from gtool.core.types.core import Aggregator
 
 
-class Sum(Aggregator):
+class Listing(Aggregator):
 
     def __init__(self, config=None):
-        super(Sum, self).__init__(config=config)
+        super(Listing, self).__init__(config=config)
 
     def compute(self):
-        selectionDict = super(Sum, self).compute()
+        selectionDict = super(Listing, self).compute()
 
         _selection = [v for v in selectionDict.values()][0]
         _name = [k for k in selectionDict.keys()][0]
@@ -19,16 +19,10 @@ class Sum(Aggregator):
                 values.extend(_values)
             else:
                 values.append(selectedvalue)
-        if len(values) == 0:
-            _result = None
-        else:
-            _result = sum(values)
-        """
-        for num in values:
-            _result += num.raw()
-        """
-        return {'name':_name, 'result': _result}
+
+        print(values)
+        return {'name':_name, 'result': values}
 
 
 def load():
-    return Sum
+    return Listing
