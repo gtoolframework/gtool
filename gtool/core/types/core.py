@@ -9,11 +9,14 @@ from abc import abstractmethod
 from gtool.core.noderegistry import registerObject
 from gtool.core.noderegistry import getObjectByUri, searchByAttribAndObjectType, searchByAttrib
 
+
 class NotComputed(Exception):
     pass
 
+
 class HiddenObject(Exception):
     pass
+
 
 class CoreType(object):
     """
@@ -60,8 +63,8 @@ class CoreType(object):
         except ValueError:
             raise ValueError('cannot convert %s to type %s' %(item, cls.__converter__()))
 
-# TODO look at deriving this class from the ABC.mutablecollections
-class DynamicType(object):
+
+class DynamicType(object): # TODO look at deriving this class from the ABC.mutablecollections
     """
     base object for dynamically generated classes
     """
@@ -441,6 +444,9 @@ class DynamicType(object):
 
 
 class FunctionType(object):
+    """
+    Use as the base class for method plugins
+    """
 
     @abstractmethod
     def __init__(self, obj, config=str(), defer=False):
@@ -501,6 +507,7 @@ class FunctionType(object):
         self.compute() #TODO look at making this an if statement
         return self.__result__
 
+
 class Selector():
 
     @property
@@ -510,22 +517,29 @@ class Selector():
             raise NotImplemented('self.__method__ must be implemented by descendants of Selector class')
         return _method
 
+
 class AttrSelector(Selector):
 
     def __init__(self):
         self.__method__ = searchByAttrib
+
 
 class AttrByObjectSelector(Selector):
 
     def __init__(self):
         self.__method__ = searchByAttribAndObjectType
 
+
 class FullPathSelector(Selector):
 
     def __init__(self):
         self.__method__ = getObjectByUri
 
+
 class Aggregator(object):
+    """
+    Used as the base class for aggreagate plugins
+    """
 
     def __init__(self, config=None):
 

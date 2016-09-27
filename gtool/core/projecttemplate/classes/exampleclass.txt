@@ -1,0 +1,9 @@
+EXAMPLECLASS::
+*file = example
+*output.1 = @num1 || @num2 || !test1 || !test2 || !test3
+@num1:: single: Number (required = False)
+@num2:: single: Number (required = False)
+@text1:: single: String (required = False)
+!test1:: Math('@num1 + @num2')
+!test2:: Xattrib('/example2/@num1')
+!test3:: Xattrib('@text1')

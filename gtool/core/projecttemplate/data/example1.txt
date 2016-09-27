@@ -1,0 +1,3 @@
+@num1: 10
+@num2: 20
+@text1: /example2/@num1

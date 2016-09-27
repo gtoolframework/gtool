@@ -10,6 +10,7 @@ from gtool.core.utils import (loadconfig,
 from gtool.core.plugin import pluginnamespace
 from gtool.core.utils.config import partialnamespace
 import sys
+import shutil
 
 VERSION='Version 0.1 BETA'
 
@@ -178,6 +179,10 @@ def __cli__(path, scheme, verbose, silent, debug):
     if not silent:
         click.echo('Done')
     sys.exit(0)
+
+
+def __create__():
+    pass
 
 @click.command()
 @click.argument('path',

@@ -1,0 +1,4 @@
+EXAMPLEAVERAGE::
+*name = Example Aggregator
+*function = average
+*select = @num1//CLASSONE
