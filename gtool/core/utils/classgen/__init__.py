@@ -142,9 +142,10 @@ class factory(object):
         return type(className, (DynamicType,), factory.generateClassesDict(className, classDict))
 
 
-def generateClass(className, classDict):
+def generateClass(className, classDict, verbose=False):
     _newclass = factory.generate(className, classDict)
     registerClass(className, _newclass)
-    print('Registering Dynamic Class:', className)
+    if verbose:
+        print('[VERBOSE] Registering Dynamic Class:', className)
     # TODO no need to return the new class ist if registers correctly
     return _newclass

@@ -1,0 +1,4 @@
+AVERAGE1::
+*name = Adam Average
+*function = average
+*select = @num2//CLASSONE

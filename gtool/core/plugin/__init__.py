@@ -1,13 +1,18 @@
 from pluginbase import PluginBase
 import os
 
-def loadplugins(pluginbasepath):
+def loadplugins(pluginbasepath, verbose=False, silent=False):
     plugin_base = PluginBase(package='gtool.plugins')
     plugin_source = plugin_base.make_plugin_source(searchpath=__enumerateplugins(pluginbasepath), identifier='gtool', persist=True)
-    for plugin_name in plugin_source.list_plugins():
-        print('loading plug-in:', plugin_name)
+
+    _plugins = plugin_source.list_plugins()
+    for plugin_name in _plugins:  #plugin_source.list_plugins():
+        if verbose:
+            print('[VERBOSE] loading plug-in:', plugin_name)
         _plugin = plugin_source.load_plugin(plugin_name)
         registerPlugin(plugin_name.upper(), _plugin.load())
+    if not verbose and not silent:
+            print('Loaded %s plugins (use verbose mode to list them)' % len(_plugins))
 
 def __enumerateplugins(pluginbasepath):
     # TODO enumerate subdirs

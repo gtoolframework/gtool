@@ -8,6 +8,7 @@ from gtool.core.utils import projectloader
 from gtool.core.utils.output import checkalignment
 from gtool.core.plugin import pluginnamespace
 import sys
+from gtool.core.utils.command import __cli__
 
 
 def debug(config):
@@ -2014,4 +2015,64 @@ def test42b():
     [25, 22.5, 30, None, None]
     [None, None, 40, None, None]
     --- test 42b ends ---
+    """
+
+def test43():
+    outputscheme = '1'
+    projectpath = 'test\\test43\\'
+    print('test 43 checks if basic command line options work')
+    print('---- testing 43 begins ----')
+
+    verbose=False
+    silent=False
+    debug=False
+
+    __cli__(projectpath,outputscheme, verbose, silent, debug)
+
+    print('--- test 43 ends ---')
+
+    # expected output
+    """
+    ---- testing 43 begins ----
+    Loading project from test\test43\...
+    Loaded 24 plugins (use verbose mode to list them)
+    Registering 1 user classes (use verbose mode to list them).
+    Registering 3 aggregators (use verbose mode to list them).
+    {
+        "Aggregrates": [
+            {
+                "Sum of Sam": 25
+            },
+            {
+                "Adam Average": 22.5
+            },
+            {
+                "Larry List": [
+                    30,
+                    40
+                ]
+            }
+        ],
+        "Data": [
+            {
+                "tf1": {
+                    "num1": 10,
+                    "num2": 20,
+                    "test1": 30,
+                    "test2": 15,
+                    "test3": 15
+                }
+            },
+            {
+                "tf2": {
+                    "num1": 15,
+                    "num2": 25,
+                    "test1": 40,
+                    "test2": 15,
+                    "test3": 10
+                }
+            }
+        ]
+    }
+    Done
     """

@@ -1,0 +1,4 @@
+LIST7::
+*name = Larry List
+*function = listing
+*select = @test1//CLASSONE

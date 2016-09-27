@@ -8,9 +8,10 @@ from gtool.core.utils import (loadconfig,
                               __registeroption,
                               process)
 from gtool.core.plugin import pluginnamespace
+from gtool.core.utils.config import partialnamespace
 import sys
 
-VERSION='version 0.1 BETA'
+VERSION='Version 0.1 BETA'
 
 def version(ctx, param, value):
     if not value or ctx.resilient_parsing:
@@ -21,11 +22,16 @@ def version(ctx, param, value):
 def outputscheme(ctx, param, value):
     return value
 
-def __cli__(path, scheme, verbose, debug):
-    # debug mode (read err)
-    # load output mode
-    click.echo('Loading project configuration and data from %s' % path)
-    click.echo('Using output scheme %s' % scheme)
+def __cli__(path, scheme, verbose, silent, debug):
+
+    if verbose and silent:
+        click.echo('cannot use both the --verbose and --silent options together.')
+        sys.exit(1)
+
+    if verbose:
+        click.echo('[VERBOSE] Loading project from %s...' % path)
+    elif not silent:
+        click.echo('Loading project from %s...' % path)
 
     dbg = debug
     projectconfig = {}
@@ -40,11 +46,10 @@ def __cli__(path, scheme, verbose, debug):
                    'during the error: %s' % err)
         sys.exit(status=1)
 
-    if verbose:
-        click.echo('[VERBOSE] Bootstrap config loaded.')
-
     try:
-        __loadplugins(projectconfig['root'])
+        if verbose:
+            click.echo('[VERBOSE] Loading plugins from code base and %s\\plugins...' % projectconfig['root'])
+        __loadplugins(projectconfig['root'], verbose=verbose, silent=silent)
     except Exception as err:
         click.echo('While loading plugins '
                    'an error occurred. The following message was received '
@@ -52,6 +57,8 @@ def __cli__(path, scheme, verbose, debug):
         sys.exit(1)
 
     try:
+        if verbose:
+            click.echo('[VERBOSE] Loading project config from %s...' % projectconfig['configpath'])
         __configloader(projectconfig['configpath'])
     except Exception as err:
         click.echo('While processing bootstrap configuration directives '
@@ -60,7 +67,9 @@ def __cli__(path, scheme, verbose, debug):
         sys.exit(1)
 
     try:
-        __loadclasses(projectconfig['classes'], dbg=dbg)
+        if verbose:
+            click.echo('[VERBOSE] Loading user defined classes from %s...' % projectconfig['classes'])
+        __loadclasses(projectconfig['classes'], verbose=verbose, silent=silent, dbg=dbg)
     except Exception as err:
         click.echo('While loading user configured classes '
                    'an error occurred. The following message was received '
@@ -68,12 +77,17 @@ def __cli__(path, scheme, verbose, debug):
         sys.exit(1)
 
     try:
-        __loadaggregators(projectconfig['aggregators'])
+        if verbose:
+            click.echo('[VERBOSE] Loading user defined aggregators from %s...' % projectconfig['aggregators'])
+        __loadaggregators(projectconfig['aggregators'], verbose=verbose, silent=silent)
     except Exception as err:
         click.echo('While loading user configured aggregates '
                    'an error occurred. The following message was received '
                    'during the error: %s' % err)
         sys.exit(1)
+
+    if verbose:
+        click.echo('[VERBOSE] Registering run time options...')
 
     try:
         __registeroption('outputscheme', scheme)
@@ -103,6 +117,8 @@ def __cli__(path, scheme, verbose, debug):
     dataobject = None
 
     try:
+        if verbose:
+            click.echo('[VERBOSE] Loading data from %s...' % projectconfig['dataroot'])
         dataobject = process(projectconfig['dataroot'])
     except Exception as err:
         click.echo('While processing the data structure an error occurred. '
@@ -112,23 +128,45 @@ def __cli__(path, scheme, verbose, debug):
 
     outputprocessor = None
 
+    if verbose:
+        click.echo('[VERBOSE] Using output scheme %s...' % scheme)
+
+    outputschemeconfig = partialnamespace('output').get(scheme, None)
+
+    if outputschemeconfig is None:
+        click.echo('Could not find [output.%s] in gtool.cfg.')
+        sys.exit(1)
+
+    outputschemeplugin = outputschemeconfig.get('plugin', None)
+
+    if outputschemeplugin is None:
+        click.echo('an output plugin is not specified in [output.%s] in gtool.cfg.')
+        sys.exit(1)
+
     try:
-        outputprocessor = pluginnamespace()['JSON']()
+        if verbose:
+            click.echo('[VERBOSE] Preparing output processor...')
+        outputprocessor = pluginnamespace()[outputschemeplugin.upper()]()
     except Exception as err:
         click.echo('While loading the output processor specified in gtool.cfg '
-                   'for output scheme output.%s an error occurred. The '
+                   'for output scheme [output.%s] an error occurred. The '
                    'following message was received during the error: %s' % (scheme, err))
         sys.exit(1)
 
     result = None
 
     try:
+        if verbose:
+            click.echo('[VERBOSE] Processing the data...')
         result = outputprocessor.output(dataobject)
     except Exception as err:
         click.echo('While processing the data into output an error occurred. '
                    'The following message was received '
                    'during the error: %s' % err)
         sys.exit(1)
+
+    if verbose:
+        click.echo('[VERBOSE] Rendering output...')
 
     if not isinstance(result, str) and hasattr(result, '__iter__'):
         for row in result:
@@ -137,7 +175,8 @@ def __cli__(path, scheme, verbose, debug):
         print(result)
 
     # sf = projectloader(project, dbg=False, outputscheme=scheme)
-    click.echo('Done')
+    if not silent:
+        click.echo('Done')
     sys.exit(0)
 
 @click.command()
@@ -158,12 +197,20 @@ def __cli__(path, scheme, verbose, debug):
 @click.option('--verbose',
               is_flag=True,
               help='[OPTIONAL] makes gtool more chatty')
+@click.option('--silent',
+              is_flag=True,
+              help='[OPTIONAL] suppress all output except results (cannot use in combination with --verbose')
 @click.option('--debug',
               is_flag=True,
               help='[OPTIONAL] not implemented yet')
-def cli(path, scheme, verbose, debug):
+def cli(path, scheme, verbose, silent, debug):
     """gtool processes a project folder located at the provided PATH location."""
-    __cli__(path,scheme,verbose, debug)
+    __cli__(path, scheme, verbose, silent, debug)
 
 if __name__ == '__main__':
-    __cli__('test\\test42', '1', False)
+    argv = sys.argv
+    verbose = False
+    silent = False
+    debug = False
+
+    __cli__(argv[1], argv[2], verbose, silent, debug) #'test\\test42', '1', False)

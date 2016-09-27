@@ -63,18 +63,18 @@ def projectloader(projectroot, dbg=False, outputscheme=None):
 def __registeroption(key, value):
     registerruntimeoption(key, value)
 
-def __loadplugins(configpath):
-    loadplugins(configpath)
+def __loadplugins(configpath, verbose=False, silent=False):
+    loadplugins(configpath, verbose=verbose, silent=silent)
 
 def __configloader(configpath):
     configloader(configpath)
 
-def __loadclasses(classpath, dbg=False):
+def __loadclasses(classpath, verbose=False, silent=False, dbg=False):
     if os.path.isfile(classpath):
-        __loadclass(classpath, dbg=dbg)
+        __loadclass(classpath, verbose=verbose, silent=silent, dbg=dbg)
     elif os.path.isdir(classpath):
         for classfile in [f for f in os.listdir(classpath) if os.path.isfile(os.path.join(classpath, f))]:
-            __loadclass(os.path.join(classpath, classfile), dbg=dbg)
+            __loadclass(os.path.join(classpath, classfile), verbose=verbose, silent=silent, dbg=dbg)
 
 def __outputparser(outputscheme=None):
     globalnamespace = namespace()
@@ -108,7 +108,7 @@ def __outputparser(outputscheme=None):
 
         registerFormatter(k, _formatterdict)
 
-def __loadclass(classpath, dbg=False):
+def __loadclass(classpath, verbose=False, silent=False, dbg=False):
     """
 
     :param configpath: path to config file
@@ -132,18 +132,26 @@ def __loadclass(classpath, dbg=False):
     classDict = classData
     for classname, classconfig in classDict.items():
         # TODO capture exceptions
-        generateClass(classname, classconfig)
+        generateClass(classname, classconfig, verbose=verbose)
     f.close()
+    if not verbose and not silent:
+        print('Registering %s user classes (use verbose mode to list them).' % len(classDict))
 
-def __loadaggregators(aggregatespath, dbg=False):
+def __loadaggregators(aggregatespath, verbose=False, silent=False, dbg=False):
     if os.path.exists(aggregatespath):
         if os.path.isfile(aggregatespath):
-            __loadaggregator(aggregatespath, dbg=dbg)
+            __loadaggregator(aggregatespath, verbose=verbose, dbg=dbg)
+            if not verbose and not silent:
+                print('Registering aggregators (use verbose mode to list them).')
         elif os.path.isdir(aggregatespath):
-            for aggregatefile in [f for f in os.listdir(aggregatespath) if os.path.isfile(os.path.join(aggregatespath, f))]:
-                __loadaggregator(os.path.join(aggregatespath, aggregatefile), dbg=dbg)
+            aggregatefiles = [f for f in os.listdir(aggregatespath) if os.path.isfile(os.path.join(aggregatespath, f))]
+            for aggregatefile in aggregatefiles:
+                __loadaggregator(os.path.join(aggregatespath, aggregatefile), verbose=verbose, dbg=dbg)
+            if not verbose and not silent:
+                print('Registering %s aggregators (use verbose mode to list them).' % len(aggregatefiles))
 
-def __loadaggregator(aggregatorpath, dbg=False):
+
+def __loadaggregator(aggregatorpath, verbose=False, dbg=False):
     if os.path.exists(aggregatorpath):
         # TODO check if file is readable
         f = open(aggregatorpath, 'r')
@@ -167,7 +175,7 @@ def __loadaggregator(aggregatorpath, dbg=False):
         _id = aggregatorData['id']
         del aggregatorData['id']
         _config = aggregatorData
-        registerAggregator(_id, _config)
+        registerAggregator(_id, _config, verbose=verbose)
     f.close()
 
 def process(datapath):
