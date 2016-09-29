@@ -9,8 +9,8 @@ from gtool.core.utils import (loadconfig,
                               process)
 from gtool.core.plugin import pluginnamespace
 from gtool.core.utils.config import partialnamespace
-import sys
-import shutil
+from gtool.core.utils.scaffold import newproject
+import sys, os
 
 VERSION='Version 0.1 BETA'
 
@@ -215,10 +215,23 @@ def process(path, scheme, verbose, silent, debug):
 
 @click.command(short_help="Create a new project using the standard template")
 @click.argument('path',
-                type=click.Path(exists=True, file_okay=False, resolve_path=True))
-def create(newproject):
-    """gtool CREATE will create a new project scaffold that can be processed by G.Tool"""
-    pass
+                default='.',
+                type=click.Path(exists=False, file_okay=False, resolve_path=True))
+def create(path):
+    """gtool CREATE will create a new project scaffold,
+    at the location specified by PATH that can be processed by G.Tool"""
+
+    __TEMPLATEPATH__ = os.path.realpath(os.path.join(os.path.dirname(__file__), '..\\..\\projecttemplate\\'))
+
+    try:
+        newproject(__TEMPLATEPATH__, path)
+    except Exception as err:
+        click.echo('While attempting to create a new project, '
+                   'an error occured and the following message was received: %s' % err)
+        sys.exit(1)
+
+    click.echo('New project created at %s' % os.path.realpath(os.path.join(os.getcwd(), path)))
+    sys.exit(0)
 
 cli.add_command(process, name='process')
 cli.add_command(create, name='create')

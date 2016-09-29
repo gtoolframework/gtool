@@ -8,18 +8,19 @@ def newproject(templatepath, newprojectpath):
     if not os.path.isdir(templatepath):
         raise NotADirectoryError('template location must be a directory')
 
-    if not os.path.exists(newprojectpath):
-        raise FileNotFoundError('project location does not exist')
-    if not os.path.isdir(newprojectpath):
-        raise NotADirectoryError('project location must be a directory')
+    if os.path.exists(newprojectpath):
+        #os.makedirs(newprojectpath)
+        raise Exception('project location already exists')
+    #if not os.path.isdir(newprojectpath):
+    #    raise NotADirectoryError('project location must be a directory')
 
     if templatepath == newprojectpath:
         raise ValueError
 
     try:
-        shutil.copy(templatepath, newprojectpath)
+        shutil.copytree(templatepath, newprojectpath)
     except Exception as err:
-        raise Exception('Could not deploy the project template; received the following error:' % err)
+        raise Exception('Could not deploy the project template; received the following error: %s' % err)
 
     return True
 
