@@ -20,10 +20,7 @@ def version(ctx, param, value):
     click.echo(VERSION)
     ctx.exit()
 
-def outputscheme(ctx, param, value):
-    return value
-
-def __cli__(path, scheme, verbose, silent, debug):
+def __process__(path, scheme, verbose, silent, debug):
 
     if verbose and silent:
         click.echo('cannot use both the --verbose and --silent options together.')
@@ -184,11 +181,15 @@ def __cli__(path, scheme, verbose, silent, debug):
 def __create__():
     pass
 
-@click.command()
+@click.group()
+def cli():
+    """G.Tool is a framework for creating and processing Governance, Risk and Compliance data structures."""
+    pass
+
+@click.command(short_help="Process a project into final output")
 @click.argument('path',
                 default='.',
-                type=click.Path(exists=True, file_okay=False, resolve_path=True),
-                callback=outputscheme)
+                type=click.Path(exists=True, file_okay=False, resolve_path=True))
 @click.option('--scheme',
               prompt=True,
               help='[REQUIRED] one of the output schemes specified in gtool.cfg. '
@@ -208,9 +209,19 @@ def __create__():
 @click.option('--debug',
               is_flag=True,
               help='[OPTIONAL] not implemented yet')
-def cli(path, scheme, verbose, silent, debug):
-    """gtool processes a project folder located at the provided PATH location."""
-    __cli__(path, scheme, verbose, silent, debug)
+def process(path, scheme, verbose, silent, debug):
+    """gtool PROCESS will read a project folder located at the provided PATH location and generate an output."""
+    __process__(path, scheme, verbose, silent, debug)
+
+@click.command(short_help="Create a new project using the standard template")
+@click.argument('path',
+                type=click.Path(exists=True, file_okay=False, resolve_path=True))
+def create(newproject):
+    """gtool CREATE will create a new project scaffold that can be processed by G.Tool"""
+    pass
+
+cli.add_command(process, name='process')
+cli.add_command(create, name='create')
 
 if __name__ == '__main__':
     argv = sys.argv
@@ -218,4 +229,4 @@ if __name__ == '__main__':
     silent = False
     debug = False
 
-    __cli__(argv[1], argv[2], verbose, silent, debug) #'test\\test42', '1', False)
+    __process__(argv[1], argv[2], verbose, silent, debug) #'test\\test42', '1', False)
