@@ -172,7 +172,6 @@ def __process__(path, scheme, verbose, silent, debug):
     else:
         print(result)
 
-    # sf = projectloader(project, dbg=False, outputscheme=scheme)
     if not silent:
         click.echo('Done')
     sys.exit(0)
@@ -218,8 +217,8 @@ def process(path, scheme, verbose, silent, debug):
                 default='.',
                 type=click.Path(exists=False, file_okay=False, resolve_path=True))
 def create(path):
-    """gtool CREATE will create a new project scaffold,
-    at the location specified by PATH that can be processed by G.Tool"""
+    """gtool CREATE will create a new directory PATH containing a
+    project scaffold that can be processed by G.Tool"""
 
     __TEMPLATEPATH__ = os.path.realpath(os.path.join(os.path.dirname(__file__), '..\\..\\projecttemplate\\'))
 
@@ -242,4 +241,4 @@ if __name__ == '__main__':
     silent = False
     debug = False
 
-    __process__(argv[1], argv[2], verbose, silent, debug) #'test\\test42', '1', False)
+    __process__(argv[1], argv[2], verbose, silent, debug)

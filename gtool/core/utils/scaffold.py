@@ -11,8 +11,6 @@ def newproject(templatepath, newprojectpath):
     if os.path.exists(newprojectpath):
         #os.makedirs(newprojectpath)
         raise Exception('project location already exists')
-    #if not os.path.isdir(newprojectpath):
-    #    raise NotADirectoryError('project location must be a directory')
 
     if templatepath == newprojectpath:
         raise ValueError
