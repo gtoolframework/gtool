@@ -20,8 +20,18 @@ class Directedgraph(TreeOutput):
         if _outputconfig is None:
             raise ValueError('Output scheme configuration was not retrieved')
 
-        self.linkattribute = _outputconfig.get('link', None)
-        self.linkproperties = _outputconfig.get('linkprops', None)
+        _linkattribute = _outputconfig.get('link', None)
+        if _linkattribute is None:
+            raise ValueError('a "link:" value must be set in [output.%s] '
+                             'in gtool.cfg when using directedgraph output' % _scheme)
+        self.linkattribute = _linkattribute
+
+        _linkproperties = _outputconfig.get('linkprops', None)
+        if _linkproperties is not None:
+            self.linkproperties = [l.strip() for l in _linkproperties.split(',')]
+        else:
+            self.linkproperties = None
+
         super(Directedgraph, self).__init__()
 
     def __output__(self, projectstructure, output=None):
@@ -52,7 +62,7 @@ class Directedgraph(TreeOutput):
                 nodename = tree.__context__['class']
                 nodedict = _dict
                 network.add_node(nodename, nodedict)
-                network.add_edge('*', nodename)
+                network.add_edge(tree.__context__['parent'].name, nodename)
                 return _dict
 
         def _sub(projectstructure):
