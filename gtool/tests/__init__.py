@@ -1,14 +1,9 @@
 import gtool.core.utils.classprocessor as conf
-#import gtool.utils.classgen as gen
-#import gtool.types.common as t
-#from gtool.types.attributes import attribute
-#from gtool.namespace import namespace, registerClass
-#from gtool.filewalker import filematch, filematchspace, StructureFactory
 from gtool.core.utils import projectloader
 from gtool.core.utils.output import checkalignment
 from gtool.core.plugin import pluginnamespace
 import sys
-from gtool.core.utils.command import __cli__
+from gtool.core.utils.command.process import processproject
 
 
 def debug(config):
@@ -2027,9 +2022,146 @@ def test43():
     silent=False
     debug=False
 
-    __cli__(projectpath,outputscheme, verbose, silent, debug)
+    processproject(path=projectpath,
+                   output=None,
+                   scheme=outputscheme,
+                   verbose=verbose,
+                   silent=silent,
+                   debug=debug)
 
     print('--- test 43 ends ---')
+
+    # expected output
+    """
+    ---- testing 43 begins ----
+    Loading project from test\test43\...
+    Loaded 24 plugins (use verbose mode to list them)
+    Registering 1 user classes (use verbose mode to list them).
+    Registering 3 aggregators (use verbose mode to list them).
+    {
+        "Aggregrates": [
+            {
+                "Sum of Sam": 25
+            },
+            {
+                "Adam Average": 22.5
+            },
+            {
+                "Larry List": [
+                    30,
+                    40
+                ]
+            }
+        ],
+        "Data": [
+            {
+                "tf1": {
+                    "num1": 10,
+                    "num2": 20,
+                    "test1": 30,
+                    "test2": 15,
+                    "test3": 15
+                }
+            },
+            {
+                "tf2": {
+                    "num1": 15,
+                    "num2": 25,
+                    "test1": 40,
+                    "test2": 15,
+                    "test3": 10
+                }
+            }
+        ]
+    }
+    Done
+    """
+
+def test44():
+    # TODO this test not needed - may have created by mistake
+    outputscheme = '1'
+    projectpath = 'test\\test44\\'
+    print('test 44 checks if basic command line options work')
+    print('---- testing 44 begins ----')
+
+    verbose=False
+    silent=False
+    debug=False
+
+    processproject(path=projectpath,
+                   output=None,
+                   scheme=outputscheme,
+                   verbose=verbose,
+                   silent=silent,
+                   debug=debug)
+
+    print('--- test 44 ends ---')
+
+    # expected output
+    """
+    ---- testing 43 begins ----
+    Loading project from test\test43\...
+    Loaded 24 plugins (use verbose mode to list them)
+    Registering 1 user classes (use verbose mode to list them).
+    Registering 3 aggregators (use verbose mode to list them).
+    {
+        "Aggregrates": [
+            {
+                "Sum of Sam": 25
+            },
+            {
+                "Adam Average": 22.5
+            },
+            {
+                "Larry List": [
+                    30,
+                    40
+                ]
+            }
+        ],
+        "Data": [
+            {
+                "tf1": {
+                    "num1": 10,
+                    "num2": 20,
+                    "test1": 30,
+                    "test2": 15,
+                    "test3": 15
+                }
+            },
+            {
+                "tf2": {
+                    "num1": 15,
+                    "num2": 25,
+                    "test1": 40,
+                    "test2": 15,
+                    "test3": 10
+                }
+            }
+        ]
+    }
+    Done
+    """
+
+def test45():
+    outputscheme = '1'
+    projectpath = 'test\\test45\\'
+    output = 'test2.gml'
+    print('test 45 tests if the multipgraph plugin works')
+    print('---- testing 45 begins ----')
+
+    verbose=False
+    silent=False
+    debug=True
+
+    processproject(path=projectpath,
+                   output=output,
+                   scheme=outputscheme,
+                   verbose=verbose,
+                   silent=silent,
+                   debug=debug)
+
+    print('--- test 45 ends ---')
 
     # expected output
     """

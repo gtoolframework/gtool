@@ -18,6 +18,7 @@ class Output(ABC):
     Output object, override __aligned__ on init
     """
 
+    # TODO create params to receive config variables - *arg, **kwarg
     def __init__(self, aligned=None):
         if aligned is None:
             raise NotImplemented('Output classes must explicitly set keyword arg aligned as True or False')
@@ -666,9 +667,17 @@ class TreeOutput(Output):
         return _retlist
 
     def integrateaggregates(self, tree):
-        _aggregates = {'Aggregrates': []}
 
-        for aggregate in self.aggregates():
+        aggregateslist = self.aggregates()
+
+        if aggregateslist is None:
+            return tree
+
+        if len(aggregateslist) == 0:
+            return tree
+
+        _aggregates = {'Aggregrates': []}
+        for aggregate in aggregateslist:
             _aggregates['Aggregrates'].append(aggregate)
 
         _tree = tree

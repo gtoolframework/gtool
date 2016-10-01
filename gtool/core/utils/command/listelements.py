@@ -11,7 +11,7 @@ from gtool.core.plugin import pluginnamespace
 from gtool.core.utils.config import partialnamespace
 import sys
 
-def processproject(path=None, scheme=None, output=None, verbose=False, silent=False, debug=False):
+def listelements(path, scheme, verbose, silent, debug):
 
     if verbose and silent:
         click.echo('cannot use both the --verbose and --silent options together.')
@@ -40,8 +40,6 @@ def processproject(path=None, scheme=None, output=None, verbose=False, silent=Fa
             click.echo('[VERBOSE] Loading plugins from code base and %s\\plugins...' % projectconfig['root'])
         __loadplugins(projectconfig['root'], verbose=verbose, silent=silent)
     except Exception as err:
-        if dbg:
-            raise
         click.echo('While loading plugins '
                    'an error occurred. The following message was received '
                    'during the error: %s' % err)
@@ -52,8 +50,6 @@ def processproject(path=None, scheme=None, output=None, verbose=False, silent=Fa
             click.echo('[VERBOSE] Loading project config from %s...' % projectconfig['configpath'])
         __configloader(projectconfig['configpath'])
     except Exception as err:
-        if dbg:
-            raise
         click.echo('While processing bootstrap configuration directives '
                    'an error occurred. The following message was received '
                    'during the error: %s' % err)
@@ -62,11 +58,8 @@ def processproject(path=None, scheme=None, output=None, verbose=False, silent=Fa
     try:
         if verbose:
             click.echo('[VERBOSE] Loading user defined classes from %s...' % projectconfig['classes'])
-        __loadclasses(projectconfig['classes'], verbose=verbose, silent=silent, dbg=False) #hard coded dbg, see TODO
-        # TODO fix dbg routines in class loading
+        __loadclasses(projectconfig['classes'], verbose=verbose, silent=silent, dbg=dbg)
     except Exception as err:
-        if dbg:
-            raise
         click.echo('While loading user configured classes '
                    'an error occurred. The following message was received '
                    'during the error: %s' % err)
@@ -77,8 +70,6 @@ def processproject(path=None, scheme=None, output=None, verbose=False, silent=Fa
             click.echo('[VERBOSE] Loading user defined aggregators from %s...' % projectconfig['aggregators'])
         __loadaggregators(projectconfig['aggregators'], verbose=verbose, silent=silent)
     except Exception as err:
-        if dbg:
-            raise
         click.echo('While loading user configured aggregates '
                    'an error occurred. The following message was received '
                    'during the error: %s' % err)
@@ -90,8 +81,6 @@ def processproject(path=None, scheme=None, output=None, verbose=False, silent=Fa
     try:
         __registeroption('outputscheme', scheme)
     except Exception as err:
-        if dbg:
-            raise
         click.echo('While registering the output scheme specified via the command line '
                    'switch an error occurred. '
                    'Please make sure that the section [output.%s] exists in gtool.cfg. '
@@ -101,8 +90,6 @@ def processproject(path=None, scheme=None, output=None, verbose=False, silent=Fa
     try:
         __registeroption('debug', dbg)
     except Exception as err:
-        if dbg:
-            raise
         click.echo('While registering a runtime debug option an error occurred. '
                    'This error is internal and you need to file a bug report. '
                    'The following message was received during the error: %s' % err)
@@ -111,8 +98,6 @@ def processproject(path=None, scheme=None, output=None, verbose=False, silent=Fa
     try:
         __outputparser(outputscheme=scheme)
     except Exception as err:
-        if dbg:
-            raise
         click.echo('While registering output schemes for user configured classes '
                    'an error occurred. The following message was received '
                    'during the error: %s' % err)
@@ -125,8 +110,6 @@ def processproject(path=None, scheme=None, output=None, verbose=False, silent=Fa
             click.echo('[VERBOSE] Loading data from %s...' % projectconfig['dataroot'])
         dataobject = process(projectconfig['dataroot'])
     except Exception as err:
-        if dbg:
-            raise
         click.echo('While processing the data structure an error occurred. '
                    'The following message was received '
                    'during the error: %s' % err)
@@ -151,14 +134,12 @@ def processproject(path=None, scheme=None, output=None, verbose=False, silent=Fa
 
     try:
         if verbose:
-            click.echo('[VERBOSE] Preparing output processor %s...' % outputschemeplugin.upper())
-        outputprocessor = pluginnamespace()[outputschemeplugin.upper()]() #TODO read cfg variables and pass in via init
+            click.echo('[VERBOSE] Preparing output processor...')
+        outputprocessor = pluginnamespace()[outputschemeplugin.upper()]()
     except Exception as err:
-        if dbg:
-            raise
-        click.echo('While loading the output processor, %s, specified in gtool.cfg '
+        click.echo('While loading the output processor specified in gtool.cfg '
                    'for output scheme [output.%s] an error occurred. The '
-                   'following message was received during the error: %s' % (outputschemeplugin.upper(), scheme, err))
+                   'following message was received during the error: %s' % (scheme, err))
         sys.exit(1)
 
     result = None
@@ -166,26 +147,21 @@ def processproject(path=None, scheme=None, output=None, verbose=False, silent=Fa
     try:
         if verbose:
             click.echo('[VERBOSE] Processing the data...')
-        result = outputprocessor.output(dataobject, output=output)
+        result = outputprocessor.output(dataobject)
     except Exception as err:
-        if dbg:
-            raise
         click.echo('While processing the data into output an error occurred. '
                    'The following message was received '
                    'during the error: %s' % err)
         sys.exit(1)
 
     if verbose:
-        click.echo('[VERBOSE] Rendering output to %s...' % output if output is not None else "standard out")
-    elif not silent and output is not None:
-        click.echo('Output written to %s' % output)
+        click.echo('[VERBOSE] Rendering output...')
 
-    if not isinstance(result, bool):
-        if not isinstance(result, str) and hasattr(result, '__iter__'):
-            for row in result:
-                print(row)
-        else:
-            print(result)
+    if not isinstance(result, str) and hasattr(result, '__iter__'):
+        for row in result:
+            print(row)
+    else:
+        print(result)
 
     if not silent:
         click.echo('Done')

@@ -1,7 +1,11 @@
 import click
 from .process import processproject
+from .listelements import listelements
 from gtool.core.utils.scaffold import newproject
 import sys, os
+
+if sys.version_info[:2] < (3, 5):
+    raise ImportError("Python 3.5 or later is required for G.Tool (%d.%d detected)." % sys.version_info[:2])
 
 VERSION='Version 0.1 BETA'
 
@@ -21,6 +25,9 @@ def cli():
               prompt=True,
               help='[REQUIRED] one of the output schemes specified in gtool.cfg. '
                    'For outsceme output.1 write "gtool --scheme 1"')
+@click.option('--output',
+              type=click.Path(exists=False, file_okay=True, resolve_path=False),
+              help='[OPTIONAL] location to output data (may be required by some output schemes)')
 @click.option('--verbose',
               is_flag=True,
               help='[OPTIONAL] makes gtool more chatty')
@@ -30,9 +37,15 @@ def cli():
 @click.option('--debug',
               is_flag=True,
               help='[OPTIONAL] not implemented yet')
-def process(path, scheme, verbose, silent, debug):
+def process(path, scheme, output, verbose, silent, debug):
     """gtool PROCESS will read a project folder located at the provided PATH location and generate an output."""
-    processproject(path, scheme, verbose, silent, debug)
+    #processproject(path, scheme, output, verbose, silent, debug)
+    processproject(path=path,
+                   output=output,
+                   scheme=scheme,
+                   verbose=verbose,
+                   silent=silent,
+                   debug=debug)
 
 @click.command(short_help="Create a new project using the standard template")
 @click.argument('path',
@@ -66,7 +79,7 @@ def version():
                 type=click.Path(exists=True, file_okay=False, resolve_path=True))
 @click.option('--list-type',
               default='all',
-              type=click.Choice(['all', 'aggregates', 'classes', 'outputs', 'plugins']))
+              type=click.Choice(['all', 'aggregates', 'classes', 'outputplugins', 'outputschemes', 'types', 'methods', 'plugins']))
 def listelements(path, list_type):
     """List classes, aggregates, plugins, outputs and other non-data elements in the project"""
     click.echo(path)

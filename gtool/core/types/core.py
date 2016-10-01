@@ -395,7 +395,7 @@ class DynamicType(object): # TODO look at deriving this class from the ABC.mutab
 
     @classmethod
     def displayname(cls):
-        return cls.metas()['displayname'] if 'displayname' in cls.metas() else '%s' % cls
+        return cls.metas()['displayname'] if 'displayname' in cls.metas() else '%s' % striptoclassname(cls)
 
     # TODO determine which methods from utils.classgen.methods can be moved in here
 
