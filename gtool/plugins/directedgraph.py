@@ -2,15 +2,12 @@ from gtool.core.types.output import TreeOutput
 import networkx
 from gtool.core.utils.config import partialnamespace
 from gtool.core.utils.runtime import runtimenamespace
+from gtool.core.noderegistry import getObjectByUri
+from distutils.util import strtobool
 
 class Directedgraph(TreeOutput):
 
     def __init__(self):
-        #TODO load from config args for link attribute name
-        #TODO load from config arg for link name
-        #TODO load from config args for link properties
-        #TODO load from config node name
-        #TODO load from config node properties
 
         _scheme = runtimenamespace().get('outputscheme', None)
         if _scheme is None:
@@ -31,6 +28,13 @@ class Directedgraph(TreeOutput):
             self.linkproperties = [l.strip() for l in _linkproperties.split(',')]
         else:
             self.linkproperties = None
+
+
+        _autolink = _outputconfig.get('autolink', None)
+        if _autolink is not None:
+            self.autolink = strtobool(_autolink)
+        else:
+            self.autolink = True
 
         super(Directedgraph, self).__init__()
 
@@ -62,7 +66,30 @@ class Directedgraph(TreeOutput):
                 nodename = tree.__context__['class']
                 nodedict = _dict
                 network.add_node(nodename, nodedict)
-                network.add_edge(tree.__context__['parent'].name, nodename)
+                if self.autolink:
+                    # if autolink is false, only explicit links will be set
+                    network.add_edge(tree.__context__['parent'].name, nodename) #TODO what if parent doesn't exist?
+
+                _link = getattr(tree, self.linkattribute, None)
+
+                if _link is not None:
+
+                    for link in _link:
+                        #print('link:', link)
+                        _obj = getObjectByUri('%s' % link)
+                        #print(_obj)
+                        network.add_edge(nodename, _obj.__context__['class'])
+
+                for attrib in self.linkproperties:
+                    _attrib = getattr(tree, attrib, None)
+                    if _attrib is not None:
+                        if hasattr(_attrib, '__iter__'):
+                            for attr in _attrib:
+                                print(attr)
+                        else:
+                            print(_attrib)
+                #TODO read link attr
+                #TODO read attr's for edge
                 return _dict
 
         def _sub(projectstructure):

@@ -1,0 +1,4 @@
+@num1: 10
+@num2: 20
+@text1: /tf2/@num1
+@link: /tf2

@@ -2152,7 +2152,7 @@ def test45():
 
     verbose=False
     silent=False
-    debug=True
+    debug=False
 
     processproject(path=projectpath,
                    output=output,
@@ -2165,46 +2165,44 @@ def test45():
 
     # expected output
     """
-    ---- testing 43 begins ----
-    Loading project from test\test43\...
-    Loaded 24 plugins (use verbose mode to list them)
+    test 45 tests if the multipgraph plugin works
+    ---- testing 45 begins ----
+    Loading project from test\test45\...
+    Loaded 25 plugins (use verbose mode to list them)
     Registering 1 user classes (use verbose mode to list them).
     Registering 3 aggregators (use verbose mode to list them).
-    {
-        "Aggregrates": [
-            {
-                "Sum of Sam": 25
-            },
-            {
-                "Adam Average": 22.5
-            },
-            {
-                "Larry List": [
-                    30,
-                    40
-                ]
-            }
-        ],
-        "Data": [
-            {
-                "tf1": {
-                    "num1": 10,
-                    "num2": 20,
-                    "test1": 30,
-                    "test2": 15,
-                    "test3": 15
-                }
-            },
-            {
-                "tf2": {
-                    "num1": 15,
-                    "num2": 25,
-                    "test1": 40,
-                    "test2": 15,
-                    "test3": 10
-                }
-            }
-        ]
-    }
+    Output written to test2.gml
+    Done
+    """
+
+def test46():
+    outputscheme = '1'
+    projectpath = 'test\\test46\\'
+    output = 'test\\test46\\test.gml'
+    print('test 46 tests if the multipgraph plugin works with additional config in gtool.cfg')
+    print('---- testing 46 begins ----')
+
+    verbose=False
+    silent=False
+    debug=True
+
+    processproject(path=projectpath,
+                   output=output,
+                   scheme=outputscheme,
+                   verbose=verbose,
+                   silent=silent,
+                   debug=debug)
+
+    print('--- test 46 ends ---')
+
+    # expected output
+    """
+    test 45 tests if the multipgraph plugin works
+    ---- testing 45 begins ----
+    Loading project from test\test45\...
+    Loaded 25 plugins (use verbose mode to list them)
+    Registering 1 user classes (use verbose mode to list them).
+    Registering 3 aggregators (use verbose mode to list them).
+    Output written to test2.gml
     Done
     """
