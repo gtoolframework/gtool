@@ -3,6 +3,7 @@ import networkx
 from gtool.core.utils.config import partialnamespace
 from gtool.core.utils.runtime import runtimenamespace
 from gtool.core.noderegistry import getObjectByUri
+from gtool.core.utils.misc import striptoclassname
 from distutils.util import strtobool
 
 class Directedgraph(TreeOutput):
@@ -56,11 +57,11 @@ class Directedgraph(TreeOutput):
 
     def outputprocessor(self, projectstructure):
 
-        def _sub2(tree, network=None):
+        def _generatenetwork(tree, network=None):
             if isinstance(tree, list):
-                return [_sub2(item, network=network) for item in tree]
+                return [_generatenetwork(item, network=network) for item in tree]
             elif isinstance(tree, dict):
-                return {k: _sub2(v, network=network) for k, v in tree.items()}
+                return {k: _generatenetwork(v, network=network) for k, v in tree.items()}
             else:
                 _dict = self.convert(tree)
                 nodename = tree.__context__['class']
@@ -70,31 +71,37 @@ class Directedgraph(TreeOutput):
                     # if autolink is false, only explicit links will be set
                     network.add_edge(tree.__context__['parent'].name, nodename) #TODO what if parent doesn't exist?
 
-                _link = getattr(tree, self.linkattribute, None)
-
-                if _link is not None:
-
-                    for link in _link:
-                        #print('link:', link)
-                        _obj = getObjectByUri('%s' % link)
-                        #print(_obj)
-                        network.add_edge(nodename, _obj.__context__['class'])
+                _linkattribdict = {}
 
                 for attrib in self.linkproperties:
                     _attrib = getattr(tree, attrib, None)
                     if _attrib is not None:
                         if hasattr(_attrib, '__iter__'):
-                            for attr in _attrib:
-                                print(attr)
+                            if len(_attrib) > 1:
+                                raise ValueError('%s in %s (%s) has multiple values and cannot '
+                                                 'be used for link properties' % (attrib,
+                                                                                  tree.__context__['class'],
+                                                                                  striptoclassname(type(tree))
+                                                                                  )
+                                                 )
+                            _linkattribdict[attrib] = _attrib[0]
                         else:
-                            print(_attrib)
-                #TODO read link attr
-                #TODO read attr's for edge
+                            _linkattribdict[attrib] = _attrib
+
+                for k in _linkattribdict.keys():
+                    del(_dict[k])
+
+                _link = getattr(tree, self.linkattribute, None)
+                if _link is not None:
+                    for link in _link:
+                        _obj = getObjectByUri('%s' % link)
+                        network.add_edge(nodename, _obj.__context__['class'], attr_dict=_linkattribdict)
+
                 return _dict
 
         def _sub(projectstructure):
-            network = networkx.MultiDiGraph(name='test')
-            _sub2(projectstructure, network)
+            network = networkx.MultiDiGraph()
+            _generatenetwork(projectstructure, network)
             return network
 
         return _sub(projectstructure)

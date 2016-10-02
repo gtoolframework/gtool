@@ -4,7 +4,7 @@ CLASSONE::
 @num1:: single: Number (required = False)
 @num2:: single: Number (required = False)
 @text1:: single: String (required = False)
-@link:: single: String (required = False)
+@link:: multiple: String (required = False)
 !test1:: Math('@num1 + @num2')
 !test2:: Xattrib('/tf2/@num1')
 !test3:: Xattrib('@text1')
