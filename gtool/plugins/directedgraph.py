@@ -12,30 +12,33 @@ class Directedgraph(TreeOutput):
 
         _scheme = runtimenamespace().get('outputscheme', None)
         if _scheme is None:
-            raise ValueError('Output scheme is not define')
+            raise ValueError('Output scheme is not defined')
 
         _outputconfig = partialnamespace('output').get(_scheme, None)
         if _outputconfig is None:
             raise ValueError('Output scheme configuration was not retrieved')
-
-        _linkattribute = _outputconfig.get('link', None)
-        if _linkattribute is None:
-            raise ValueError('a "link:" value must be set in [output.%s] '
-                             'in gtool.cfg when using directedgraph output' % _scheme)
-        self.linkattribute = _linkattribute
-
-        _linkproperties = _outputconfig.get('linkprops', None)
-        if _linkproperties is not None:
-            self.linkproperties = [l.strip() for l in _linkproperties.split(',')]
-        else:
-            self.linkproperties = None
-
 
         _autolink = _outputconfig.get('autolink', None)
         if _autolink is not None:
             self.autolink = strtobool(_autolink)
         else:
             self.autolink = True
+
+        _linkattribute = _outputconfig.get('link', None)
+        if _linkattribute is None and not self.autolink:
+            raise ValueError('a "link:" value must be set in [output.%s] '
+                             'in gtool.cfg when using directedgraph output '
+                             'and autolink is disabled' % _scheme)
+        self.linkattribute = _linkattribute
+
+        _linkproperties = _outputconfig.get('linkprops', None)
+        if _linkproperties is not None:
+            self.linkproperties = [l.strip() for l in _linkproperties.split(',')]
+        else:
+            self.linkproperties = []
+
+
+
 
         super(Directedgraph, self).__init__()
 
@@ -69,7 +72,9 @@ class Directedgraph(TreeOutput):
                 network.add_node(nodename, nodedict)
                 if self.autolink:
                     # if autolink is false, only explicit links will be set
-                    network.add_edge(tree.__context__['parent'].name, nodename) #TODO what if parent doesn't exist?
+                    network.add_edge(tree.__context__['parent'].name, nodename)
+                    #TODO what if parent doesn't exist?
+                    #TODO add link properties to parent link
 
                 _linkattribdict = {}
 
@@ -84,14 +89,26 @@ class Directedgraph(TreeOutput):
                                                                                   striptoclassname(type(tree))
                                                                                   )
                                                  )
-                            _linkattribdict[attrib] = _attrib[0]
+                            if hasattr(_attrib[0], '__convert__'):
+                                #handles coretypes
+                                _val = _attrib[0].__convert__(_attrib[0])
+                            else:
+                                _val = _attrib[0]
                         else:
-                            _linkattribdict[attrib] = _attrib
+                            _val = _attrib
 
+                        _linkattribdict[attrib] = _val
+
+                """
                 for k in _linkattribdict.keys():
-                    del(_dict[k])
+                    if k in _dict:
+                        del(_dict[k])
+                """
 
-                _link = getattr(tree, self.linkattribute, None)
+                if self.linkattribute is not None:
+                    _link = getattr(tree, self.linkattribute, None)
+                else:
+                    _link = None
                 if _link is not None:
                     for link in _link:
                         _obj = getObjectByUri('%s' % link)

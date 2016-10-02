@@ -1,3 +1,4 @@
 @num1: 15
 @num2: 25
 @text1: /tf1/@num1
+@text2: placeholder
