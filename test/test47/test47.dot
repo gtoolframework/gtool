@@ -1,0 +1,7 @@
+digraph G {
+"world domination!!" [shape=octagon];
+"escape cage" [tooltip="get out of the cage", shape=square];
+"world domination!!" -> "escape cage";
+"mind control \nassistants" [tooltip="use mind control thinger", shape=square];
+"world domination!!" -> "mind control \nassistants";
+}

@@ -1,0 +1,28 @@
+GOAL::
+*file = goal
+*shape = octagon
+*color = red
+*output.1 = @title
+@title:: single: String
+@nodes:: multiple: Nodes (required = False)
+@ands:: multiple: Ands (required = False)
+@description:: single: String (required = False)
+@url: single: Url (required = False)
+
+NODES::
+*file = node
+*shape = square
+*output.1 = @title
+@title:: single: String
+@nodes:: multiple: Nodes (required = False)
+@ands:: multiple: Ands (required = False)
+@description:: single: String (required = False)
+@url: single: Url (required = False)
+
+ANDS::
+*file = and
+*shape = house
+*output.1 = @title
+@title:: @static('AND')
+@nodes:: multiple: Nodes (required = False)
+@ands:: multiple: Ands (required = False)

@@ -2197,12 +2197,38 @@ def test46():
 
     # expected output
     """
-    test 45 tests if the multipgraph plugin works
-    ---- testing 45 begins ----
-    Loading project from test\test45\...
+    test 46 tests if the multipgraph plugin works with additional config in gtool.cfg
+    ---- testing 46 begins ----
+    Loading project from test\\test46\...
     Loaded 25 plugins (use verbose mode to list them)
     Registering 1 user classes (use verbose mode to list them).
     Registering 3 aggregators (use verbose mode to list them).
-    Output written to test2.gml
+    Output written to test\\test46\\test.gml
     Done
+    """
+
+def test47():
+    outputscheme = '1'
+    projectpath = 'test\\test47\\'
+    output = 'test\\test47\\test47.dot'
+    print('test 47 tests graphviz dot generator works')
+    print('---- testing 47 begins ----')
+
+    verbose=True
+    silent=False
+    debug=True
+
+    processproject(path=projectpath,
+                   output=output,
+                   scheme=outputscheme,
+                   verbose=verbose,
+                   silent=silent,
+                   debug=debug)
+
+    print('--- test 47 ends ---')
+
+    # expected output
+    """
+
+
     """
