@@ -1,8 +1,8 @@
 from gtool.core.types.output import TreeOutput
 from gtool.core.utils.config import partialnamespace
 from gtool.core.utils.runtime import runtimenamespace
-from gtool.core.noderegistry import getObjectByUri
-from gtool.core.utils.misc import striptoclassname
+#from gtool.core.noderegistry import getObjectByUri
+#from gtool.core.utils.misc import striptoclassname
 import pydot
 
 class Decisiontree(TreeOutput):
@@ -56,19 +56,22 @@ class Decisiontree(TreeOutput):
 
     def outputprocessor(self, projectstructure):
 
-        def _generatenetwork(tree, decisiontree, parent=None):
+        def _generatenetwork(tree, decisiontree, parent=None, identifier=None):
+
             if isinstance(tree, list):
-                return [_generatenetwork(item, decisiontree, parent=parent) for item in tree]
+                return [_generatenetwork(item, decisiontree, parent=parent, identifier=identifier) for item in tree]
             elif isinstance(tree, dict):
-                return {k: _generatenetwork(v, decisiontree, parent=parent) for k, v in tree.items()}
+                return {k: _generatenetwork(v, decisiontree, parent=parent, identifier=identifier) for k, v in tree.items()}
             else:
                 _dict = self.convert(tree)
                 #nodename = tree.__context__['class']
                 #nodedict = _dict
 
                 _title = "%s" % tree.title[0] if not isinstance(tree.title, str) else tree.title
-                nodetitle = (_title,)
+                nodetitle = (identifier[0],) #_title,)
                 nodeconfig = {}
+                nodeconfig['id'] = identifier[0]
+                nodeconfig['label'] = _title
 
                 _shape = tree.metas().get('shape', None)
                 if _shape is not None:
@@ -95,63 +98,27 @@ class Decisiontree(TreeOutput):
                 decisiontree.add_node(pydot.Node(*nodetitle, **nodeconfig))
 
                 if parent is not None:
-                    decisiontree.add_edge(pydot.Edge(src=parent, dst='%s' % _title))
+                    decisiontree.add_edge(pydot.Edge(src=parent, dst=identifier[0])) #'%s' % _title))
 
-                _parent = '%s' % _title
+                _parent = identifier[0] #'%s' % _title
+                identifier[0] += 1
+
+
                 for node in getattr(tree, self.attribute_node):
-                    _generatenetwork(node, decisiontree, parent=_parent)
+                    _generatenetwork(node, decisiontree, parent=_parent, identifier=identifier)
+                    identifier[0] += 1
 
                 for _and in getattr(tree, self.attribute_and):
-                    _generatenetwork(_and, decisiontree, parent=_parent)
-
-                """
-                decisiontree.add_node(nodename, nodedict)
-                if self.autolink:
-                    # if autolink is false, only explicit links will be set
-                    decisiontree.add_edge(tree.__context__['parent'].name, nodename)
-                    #TODO what if parent doesn't exist?
-                    #TODO add link properties to parent link
-
-                _linkattribdict = {}
-
-                for attrib in self.linkproperties:
-                    _attrib = getattr(tree, attrib, None)
-                    if _attrib is not None:
-                        if hasattr(_attrib, '__iter__'):
-                            if len(_attrib) > 1:
-                                raise ValueError('%s in %s (%s) has multiple values and cannot '
-                                                 'be used for link properties' % (attrib,
-                                                                                  tree.__context__['class'],
-                                                                                  striptoclassname(type(tree))
-                                                                                  )
-                                                 )
-                            if hasattr(_attrib[0], '__convert__'):
-                                #handles coretypes
-                                _val = _attrib[0].__convert__(_attrib[0])
-                            else:
-                                _val = _attrib[0]
-                        else:
-                            _val = _attrib
-
-                        _linkattribdict[attrib] = _val
+                    _generatenetwork(_and, decisiontree, parent=_parent, identifier=identifier)
+                    identifier[0] += 1
 
 
-                if self.linkattribute is not None:
-                    _link = getattr(tree, self.linkattribute, None)
-                else:
-                    _link = None
-                if _link is not None:
-                    for link in _link:
-                        _obj = getObjectByUri('%s' % link)
-                        decisiontree.add_edge(nodename, _obj.__context__['class'], attr_dict=_linkattribdict)
-
-                return _dict
-                """
 
         def _sub(projectstructure):
             decisiontree = pydot.Dot()
+            counter = [0]
 
-            _generatenetwork(projectstructure, decisiontree)
+            _generatenetwork(projectstructure, decisiontree, identifier=counter)
             return decisiontree
 
         return _sub(projectstructure)
