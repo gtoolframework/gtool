@@ -22,7 +22,8 @@ NODES::
 ANDS::
 *file = and
 *shape = house
-*output.1 = @title
-@title:: @static('AND')
+*output.1 = !title
+!title:: Static('AND')
+@ignore:: single: String (required = False)
 @nodes:: multiple: Nodes (required = False)
 @ands:: multiple: Ands (required = False)

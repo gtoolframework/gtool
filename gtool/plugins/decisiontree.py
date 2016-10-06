@@ -1,5 +1,4 @@
 from gtool.core.types.output import TreeOutput
-import networkx
 from gtool.core.utils.config import partialnamespace
 from gtool.core.utils.runtime import runtimenamespace
 from gtool.core.noderegistry import getObjectByUri
@@ -65,7 +64,8 @@ class Decisiontree(TreeOutput):
                 #nodename = tree.__context__['class']
                 #nodedict = _dict
 
-                nodetitle = ('%s' % tree.title[0],)
+                _title = "%s" % tree.title[0] if not isinstance(tree.title, str) else tree.title
+                nodetitle = (_title,)
                 nodeconfig = {}
 
                 _shape = tree.metas().get('shape', None)
@@ -93,9 +93,9 @@ class Decisiontree(TreeOutput):
                 decisiontree.add_node(pydot.Node(*nodetitle, **nodeconfig))
 
                 if parent is not None:
-                    decisiontree.add_edge(pydot.Edge(src=parent, dst='%s' % tree.title[0]))
+                    decisiontree.add_edge(pydot.Edge(src=parent, dst='%s' % _title))
 
-                _parent = '%s' % tree.title[0]
+                _parent = '%s' % _title
                 for node in getattr(tree, self.attribute_node):
                     _generatenetwork(node, decisiontree, parent=_parent)
 

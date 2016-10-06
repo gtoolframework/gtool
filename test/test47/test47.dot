@@ -1,7 +1,13 @@
 digraph G {
 "world domination!!" [shape=octagon];
-"escape cage" [tooltip="get out of the cage", shape=square];
+"escape cage" [shape=square, tooltip="get out of the cage"];
 "world domination!!" -> "escape cage";
-"mind control \nassistants" [tooltip="use mind control thinger", shape=square];
+"mind control \nassistants" [shape=square, tooltip="use mind control thinger"];
 "world domination!!" -> "mind control \nassistants";
+AND [shape=house];
+"world domination!!" -> AND;
+"escape cage 2" [shape=square, tooltip="get out of the cage 2"];
+AND -> "escape cage 2";
+"mind control \nassistants 2" [shape=square, tooltip="use mind control thinger 2"];
+AND -> "mind control \nassistants 2";
 }
