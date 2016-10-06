@@ -19,10 +19,11 @@ class Output(ABC):
     """
 
     # TODO create params to receive config variables - *arg, **kwarg
-    def __init__(self, aligned=None):
+    def __init__(self, aligned=None, recursionpermitted=False):
         if aligned is None:
             raise NotImplemented('Output classes must explicitly set keyword arg aligned as True or False')
         self.__aligned__ = aligned
+        self.__recursionpermitted__ = recursionpermitted
 
     def output(self, projectstructure, output=None):
         """
@@ -35,7 +36,9 @@ class Output(ABC):
         if not isinstance(projectstructure, StructureFactory.Container):
             raise TypeError('Expected StructureFactory.Container as argument but got %s' % type(projectstructure))
 
-        self.isnotrecursive(projectstructure)
+        recursionpermitted = False
+        if not self.__recursionpermitted__:
+            self.isnotrecursive(projectstructure)
         self.isaligned(projectstructure)
 
         return self.__output__(projectstructure, output=output)
@@ -111,7 +114,7 @@ class GridOutput(Output):
     """
 
     def __init__(self):
-        super(GridOutput, self).__init__(aligned=True)
+        super(GridOutput, self).__init__(aligned=True, recursionpermitted=False)
 
     @abstractmethod
     def __output__(self, projectstructure, output=None):
@@ -529,7 +532,7 @@ class TreeOutput(Output):
     """
 
     def __init__(self):
-        super(TreeOutput, self).__init__(aligned=False)
+        super(TreeOutput, self).__init__(aligned=False, recursionpermitted=False)
 
     def integrate(self, obj):
         """

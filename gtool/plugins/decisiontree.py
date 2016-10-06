@@ -34,7 +34,9 @@ class Decisiontree(TreeOutput):
         self.attribute_tooltip = _outputconfig.get('attribute_tooltip', None)
         self.attribute_url = _outputconfig.get('attribute_url', None)
 
-        super(Decisiontree, self).__init__()
+        self.__aligned__ = False
+        self.__recursionpermitted__ = True
+        #super(Decisiontree, self).__init__()
 
     def __output__(self, projectstructure, output=None):
 
