@@ -316,7 +316,7 @@ class DynamicType(object): # TODO look at deriving this class from the ABC.mutab
 
         self.__context__ = context
         ret = parseLoadstring(loadstring)
-        
+
         attriblist = [k for k in ret.keys()]
         # check if all attribs required by class definition are in the data file
         for prop in self.__dynamic_properties__:

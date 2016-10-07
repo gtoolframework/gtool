@@ -121,6 +121,7 @@ class StructureFactory(object):
 
         def __init__(self, name=None, fileobject=None, parent=None, flattened=False):
             # TODO consolidate fileobjects and children
+            # TODO implement logic for flattened mode (not sure it's needed)
             self.__name__ = name
             self.__inode__ = fileobject
             self.__parent__ = parent
