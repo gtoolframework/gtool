@@ -119,12 +119,13 @@ class StructureFactory(object):
 
     class Node(object):
 
-        def __init__(self, name=None, fileobject=None, parent=None):
+        def __init__(self, name=None, fileobject=None, parent=None, flattened=False):
             # TODO consolidate fileobjects and children
             self.__name__ = name
             self.__inode__ = fileobject
             self.__parent__ = parent
             self.__children__ = []
+            self.__flattened__ = flattened
 
         def addchildren(self, node):
             if isinstance(node, list):
@@ -320,7 +321,9 @@ class StructureFactory(object):
             context = {'file': self.path,
                        'parent': self.__parent__,
                        'class': self.name}  # also set in core.DynamicObject.load and Node aboce
-            if not _retobject.loads(self.__data__, softload=_softload, context=context):  # True if loadstring works
+            if not _retobject.loads(self.__data__, softload=_softload, context=context) and len(self.__data__) > 0:
+                # True if loadstring works but can only be false if self.__data__ has some content
+                # TODO .loads should return true if it functioned correctly, even if self.__data__ is empty
                 raise TypeError('Could not parse the data from %s into a %s class' % (self.path, type(_retobject)))
             if len(_retobject.missingproperties) == 0 and len(_retobject.missingoptionalproperties) == 0:
                 return _retobject

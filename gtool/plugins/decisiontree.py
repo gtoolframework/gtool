@@ -70,7 +70,7 @@ class Decisiontree(TreeOutput):
                 _title = "%s" % tree.title[0] if not isinstance(tree.title, str) else tree.title
                 nodetitle = (identifier[0],) #_title,)
                 nodeconfig = {}
-                nodeconfig['id'] = identifier[0]
+                #nodeconfig['id'] = identifier[0]
                 nodeconfig['label'] = _title
 
                 _shape = tree.metas().get('shape', None)

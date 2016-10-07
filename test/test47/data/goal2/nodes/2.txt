@@ -1,0 +1,2 @@
+@title: mind control \nassistants
+@description: use mind control thinger

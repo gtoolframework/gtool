@@ -316,6 +316,7 @@ class DynamicType(object): # TODO look at deriving this class from the ABC.mutab
 
         self.__context__ = context
         ret = parseLoadstring(loadstring)
+        
         attriblist = [k for k in ret.keys()]
         # check if all attribs required by class definition are in the data file
         for prop in self.__dynamic_properties__:
@@ -346,6 +347,7 @@ class DynamicType(object): # TODO look at deriving this class from the ABC.mutab
 
         registerObject(self.__context__['file'], self)
 
+        #TODO make this true if the process completes correctly instead of true if results are returned
         return True if len(ret) > 0 else False
 
     def load(self, loadfile, softload=False):
