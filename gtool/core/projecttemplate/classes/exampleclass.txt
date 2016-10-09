@@ -1,9 +1,12 @@
 EXAMPLECLASS::
 *file = example
-*output.1 = @num1 || @num2 || !test1 || !test2 || !test3
+*output.1 = @num1 || @num2 || !test1 || !test2 || !test3 || !test4 || !test5 || !test6
 @num1:: single: Number (required = False)
 @num2:: single: Number (required = False)
 @text1:: single: String (required = False)
 !test1:: Math('@num1 + @num2')
 !test2:: Xattrib('/example2/@num1')
 !test3:: Xattrib('@text1')
+!test4:: Static('Hello World')
+!test5:: Fullpath()
+!test6:: Artefacts()

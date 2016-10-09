@@ -2,12 +2,13 @@ from gtool.core.types.core import FunctionType
 import os
 from gtool.core.utils.misc import striptoclassname
 from distutils.util import strtobool
+import codecs
 
 FILEONLY = 'fileonly'
 
 class Artefacts(FunctionType):
     """
-    Will return a list of artefacts (relative path)
+    Will return a list of artefacts (relative path) inside directories starting with !
     If fileonly == True is passed in then only filenames will be listed
     """
 
@@ -32,10 +33,32 @@ class Artefacts(FunctionType):
     def compute(self):
         # TODO make this plugin recurse into subdirectories (if recurse param is set to True)
 
+        def walkartefactdir(basepath):
+
+            def scantree(path):
+                """Recursively yield DirEntry objects for given directory."""
+                for entry in os.scandir(path):
+                    if entry.is_dir(follow_symlinks=False):
+                        yield from scantree(entry.path)
+                    else:
+                        yield entry
+
+            _retlist = []
+            for direntry in scantree(basepath):
+                _retlist.append(direntry.path[len(basepath)+1:])
+
+            return _retlist
+
         def listfiles(path):
-            _ret = [f for f in os.listdir(path) if f.startswith('!')]
+
+            artefact_direntries = [f for f in os.scandir(path) if f.is_dir(follow_symlinks=False) and f.name.startswith('!')]
+            _ret = []
+            for f in artefact_direntries:
+                _path = os.path.normpath(os.path.join(path, f.name))
+                _ret.extend(walkartefactdir(_path))
+
             if self.config[FILEONLY]:
-                _ret = [os.path.join(path, f) for f in _ret]
+                _ret = [os.path.normpath(os.path.join(path, f.name)) for f in _ret]
             return _ret
 
         if self.computable:
