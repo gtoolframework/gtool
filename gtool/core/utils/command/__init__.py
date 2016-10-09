@@ -46,6 +46,7 @@ def process(path, scheme, output, verbose, silent, debug):
                    verbose=verbose,
                    silent=silent,
                    debug=debug)
+    sys.exit(0)
 
 @click.command(short_help="Create a new project using the standard template")
 @click.argument('path',

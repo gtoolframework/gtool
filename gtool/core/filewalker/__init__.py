@@ -459,6 +459,8 @@ class StructureFactory(object):
             if isinstance(location, StructureFactory.Directory):
                 if '_.txt' in [f.name for f in location.children]:
                     return StructureFactory.CNode(fileobject=location, name=location.name)
+                #elif location.name.startswith('!'):
+                #    pass # do nothing
                 else:
                     # special handler for root of structure
                     _locationname = location.name if isroot is False else '*'
@@ -467,8 +469,9 @@ class StructureFactory(object):
                         _ret.addchildren(recursivewalk(location=child))
                     return _ret
             elif isinstance(location, StructureFactory.File):
-                _rootname = location.name.split('.')[0]
-                return StructureFactory.Node(fileobject=location, name=_rootname)
+                if not location.name.startswith('!'):
+                    _rootname = location.name.split('.')[0]
+                    return StructureFactory.Node(fileobject=location, name=_rootname)
 
         if not isinstance(location, StructureFactory.Directory):
             raise TypeError('start of file system must be a directory')

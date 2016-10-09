@@ -189,4 +189,3 @@ def processproject(path=None, scheme=None, output=None, verbose=False, silent=Fa
 
     if not silent:
         click.echo('Done')
-    sys.exit(0)

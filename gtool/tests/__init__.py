@@ -2225,10 +2225,122 @@ def test47():
                    silent=silent,
                    debug=debug)
 
+    print('---- opening DOT file ----')
+
+    with open(output) as f:
+        print(f.read())
+        f.close()
+
     print('--- test 47 ends ---')
 
     # expected output
     """
+    ---- testing 47 begins ----
+    [VERBOSE] Loading project from test\test47\...
+    [VERBOSE] Loading bootstrap config...
+    [VERBOSE] Loading plugins from code base and test\test47\\plugins...
+    [VERBOSE] loading plug-in: average
+    [VERBOSE] loading plug-in: choice
+    [VERBOSE] loading plug-in: combine
+    [VERBOSE] loading plug-in: csv
+    [VERBOSE] loading plug-in: decisiontree
+    [VERBOSE] loading plug-in: directedgraph
+    [VERBOSE] loading plug-in: enum
+    [VERBOSE] loading plug-in: excel
+    [VERBOSE] loading plug-in: filename
+    [VERBOSE] loading plug-in: fullpath
+    [VERBOSE] loading plug-in: grid
+    [VERBOSE] loading plug-in: json
+    [VERBOSE] loading plug-in: listing
+    [VERBOSE] loading plug-in: math
+    [VERBOSE] loading plug-in: nodename
+    [VERBOSE] loading plug-in: number
+    [VERBOSE] loading plug-in: parent
+    [VERBOSE] loading plug-in: path
+    [VERBOSE] loading plug-in: real
+    [VERBOSE] loading plug-in: ref
+    [VERBOSE] loading plug-in: static
+    [VERBOSE] loading plug-in: string
+    [VERBOSE] loading plug-in: sum
+    [VERBOSE] loading plug-in: url
+    [VERBOSE] loading plug-in: xattrib
+    [VERBOSE] loading plug-in: yaml
+    [VERBOSE] Loading project config from test\test47\gtool.cfg...
+    [VERBOSE] Loading user defined classes from test\test47\classes...
+    [VERBOSE] Registering Dynamic Class: NODES
+    [VERBOSE] Registering Dynamic Class: ANDS
+    [VERBOSE] Registering Dynamic Class: GOAL
+    [VERBOSE] Loading user defined aggregators from test\test47\aggregates...
+    [VERBOSE] Registering run time options...
+    [VERBOSE] Loading data from test\test47\data...
+    [VERBOSE] Using output scheme 1...
+    [VERBOSE] Preparing output processor DECISIONTREE...
+    [VERBOSE] Processing the data...
+    [VERBOSE] Rendering output to test\test47\test47.dot...
+    Done
+    ---- opening DOT file ----
+    digraph G {
+    0 [label="world domination!!", shape=octagon];
+    1 [label="escape cage", tooltip="get out of the cage", shape=square];
+    0 -> 1;
+    3 [label="mind control \nassistants", tooltip="use mind control thinger", shape=square];
+    0 -> 3;
+    5 [label=AND, shape=house];
+    0 -> 5;
+    6 [label="escape cage 2", tooltip="get out of the cage 2", shape=square];
+    5 -> 6;
+    8 [label="mind control \nassistants 2", tooltip="use mind control thinger 2", shape=square];
+    5 -> 8;
+    10 [label=AND, shape=house];
+    5 -> 10;
+    11 [label="escape cage 3", tooltip="get out of the cage 3", shape=square];
+    10 -> 11;
+    13 [label="mind control \nassistants 3", tooltip="use mind control thinger 3", shape=square];
+    10 -> 13;
+    17 [label="world domination 2!!", shape=octagon];
+    18 [label="escape cage", tooltip="get out of the cage", shape=square];
+    17 -> 18;
+    20 [label="mind control \nassistants", tooltip="use mind control thinger", shape=square];
+    17 -> 20;
+    22 [label=AND, shape=house];
+    17 -> 22;
+    23 [label="escape cage 2", tooltip="get out of the cage 2", shape=square];
+    22 -> 23;
+    25 [label="mind control \nassistants 2", tooltip="use mind control thinger 2", shape=square];
+    22 -> 25;
+    27 [label=AND, shape=house];
+    22 -> 27;
+    28 [label="escape cage 3", tooltip="get out of the cage 3", shape=square];
+    27 -> 28;
+    30 [label="mind control \nassistants 3", tooltip="use mind control thinger 3", shape=square];
+    27 -> 30;
+    }
 
+    --- test 47 ends ---
+    """
+
+def test48():
+    testnumber = 48
+    outputscheme = '1'
+    projectpath = 'test\\test48\\'
+    #output = 'test\\test47\\test47.dot'
+    print('test %s tests if artefact files are ignored' % testnumber)
+    print('---- testing %s begins ----' % testnumber)
+
+    verbose = True
+    silent = False
+    debug = True
+
+    processproject(path=projectpath,
+                   output=None,
+                   scheme=outputscheme,
+                   verbose=verbose,
+                   silent=silent,
+                   debug=debug)
+
+    print('--- test %s ends ---' % testnumber)
+
+    # expected output
+    """
 
     """
