@@ -1,0 +1,2 @@
+hello world!
+This file should be ignored by filewalker

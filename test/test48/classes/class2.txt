@@ -5,3 +5,4 @@ SUBA::
 @testpropd1:: single: String (required = True)
 @testpropd2:: multiple: String (required = True)
 @testpropd3:: multiple: TESTCLASSSFOURTEEN (required = False)
+!artefactlist:: Artefacts()

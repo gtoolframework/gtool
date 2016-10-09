@@ -2342,5 +2342,59 @@ def test48():
 
     # expected output
     """
+    test 48 tests if artefact files are ignored
+    ---- testing 48 begins ----
+    [VERBOSE] Loading project from test\test48\...
+    [VERBOSE] Loading bootstrap config...
+    [VERBOSE] Loading plugins from code base and test\test48\\plugins...
+    [VERBOSE] loading plug-in: average
+    [VERBOSE] loading plug-in: choice
+    [VERBOSE] loading plug-in: combine
+    [VERBOSE] loading plug-in: csv
+    [VERBOSE] loading plug-in: decisiontree
+    [VERBOSE] loading plug-in: directedgraph
+    [VERBOSE] loading plug-in: enum
+    [VERBOSE] loading plug-in: excel
+    [VERBOSE] loading plug-in: filename
+    [VERBOSE] loading plug-in: fullpath
+    [VERBOSE] loading plug-in: grid
+    [VERBOSE] loading plug-in: json
+    [VERBOSE] loading plug-in: listing
+    [VERBOSE] loading plug-in: math
+    [VERBOSE] loading plug-in: nodename
+    [VERBOSE] loading plug-in: number
+    [VERBOSE] loading plug-in: parent
+    [VERBOSE] loading plug-in: path
+    [VERBOSE] loading plug-in: real
+    [VERBOSE] loading plug-in: ref
+    [VERBOSE] loading plug-in: static
+    [VERBOSE] loading plug-in: string
+    [VERBOSE] loading plug-in: sum
+    [VERBOSE] loading plug-in: url
+    [VERBOSE] loading plug-in: xattrib
+    [VERBOSE] loading plug-in: yaml
+    [VERBOSE] Loading project config from test\test48\gtool.cfg...
+    [VERBOSE] Loading user defined classes from test\test48\classes...
+    [VERBOSE] Registering Dynamic Class: TESTCLASSSFOURTEEN
+    [VERBOSE] Registering Dynamic Class: SUBA
+    [VERBOSE] Loading user defined aggregators from test\test48\aggregates...
+    [VERBOSE] Registering run time options...
+    [VERBOSE] Loading data from test\test48\data...
+    [VERBOSE] Using output scheme 1...
+    [VERBOSE] Preparing output processor GRID...
+    [VERBOSE] Processing the data...
+    standard out
+    ['testpropd1', 'testpropd2', 'testpropd3']
+    ['d1 ipsum lorum horus', 'dk1 test 123\nhello world', 'tdk1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    ['d2 ipsum lorum horus', 'test 123', '']
+    ['d3 ipsum lorum horus', 'test 123\nhello world', 'tdk3-1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    ['d4 ipsum lorum horus', 'test 123\nhello world', 'tdk4-1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    [None, None, 'tdk4-2 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    ['d5 ipsum lorum horus', 'test 123\nhello world', 'tdk5-1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    [None, None, 'tdk5-2 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    ['d6 ipsum lorum horus', 'test 123\nhello world', 'tdk6 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    Done
+    --- test 48 ends ---
 
+    Process finished with exit code 0
     """
