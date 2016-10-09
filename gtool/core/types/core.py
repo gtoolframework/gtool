@@ -503,7 +503,7 @@ class FunctionType(object):
             raise NotComputed('Computation deferred')
 
     def __repr__(self):
-        return self.config
+        return '<%s>:()' % (self.__class__, self.config)
 
     def __str__(self):
         self.compute() #TODO look at making this an if statement
