@@ -1,0 +1,9 @@
+TESTCLASSSFOURTEEN::
+*file = cr
+*moo = 1
+*displayname = Blah
+*output = default@testprop1 || @testprop2 || @testprop3
+*output.1 = schemeone@testprop1 || @testprop2 || @testprop3
+@testprop1:: single: String (required = False)
+@testprop2:: multiple: String (required = True)
+@testprop3:: single: Real (required = False, max = 6)
