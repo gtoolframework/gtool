@@ -442,14 +442,15 @@ class StructureFactory(object):
     def __treewalk__(root):
         inodes = os.listdir(root.path)
         for inode in inodes:
-            fullpath = os.path.join(root.path, inode)
-            if os.path.isfile(fullpath):
-                _f = StructureFactory.File(nodename=inode, nodepath=fullpath)  # parent=root,
-                root.addchild(_f)
-            elif os.path.isdir(fullpath):
-                _d = StructureFactory.Directory(nodename=inode, nodepath=fullpath)  # , parent=root
-                root.addchild(_d)
-                StructureFactory.__treewalk__(_d)
+            if not inode.startswith('!'):
+                fullpath = os.path.join(root.path, inode)
+                if os.path.isfile(fullpath):
+                    _f = StructureFactory.File(nodename=inode, nodepath=fullpath)  # parent=root,
+                    root.addchild(_f)
+                elif os.path.isdir(fullpath):
+                    _d = StructureFactory.Directory(nodename=inode, nodepath=fullpath)  # , parent=root
+                    root.addchild(_d)
+                    StructureFactory.__treewalk__(_d)
 
     @staticmethod
     def __walk__(location=None):
@@ -459,8 +460,6 @@ class StructureFactory(object):
             if isinstance(location, StructureFactory.Directory):
                 if '_.txt' in [f.name for f in location.children]:
                     return StructureFactory.CNode(fileobject=location, name=location.name)
-                #elif location.name.startswith('!'):
-                #    pass # do nothing
                 else:
                     # special handler for root of structure
                     _locationname = location.name if isroot is False else '*'
@@ -469,9 +468,8 @@ class StructureFactory(object):
                         _ret.addchildren(recursivewalk(location=child))
                     return _ret
             elif isinstance(location, StructureFactory.File):
-                if not location.name.startswith('!'):
-                    _rootname = location.name.split('.')[0]
-                    return StructureFactory.Node(fileobject=location, name=_rootname)
+                _rootname = location.name.split('.')[0]
+                return StructureFactory.Node(fileobject=location, name=_rootname)
 
         if not isinstance(location, StructureFactory.Directory):
             raise TypeError('start of file system must be a directory')
