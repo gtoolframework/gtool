@@ -44,8 +44,15 @@ class Artefacts(FunctionType):
                         yield entry
 
             _retlist = []
+            _container = os.path.split(basepath)[-1]
             for direntry in scantree(basepath):
-                _retlist.append(direntry.path[len(basepath)+1:])
+                if self.config[FILEONLY]:
+                    _retlist.append(direntry.name)
+                elif direntry.path == basepath:
+                    _retlist.append(os.path.join(_container, direntry.name)) #direntry.path[len(basepath)+1:])
+                else:
+                    _relpath = os.path.relpath(os.path.dirname(direntry.path), basepath)
+                    _retlist.append(os.path.normpath(os.path.join(_container, _relpath, direntry.name)).replace('\\\\', '\\'))
 
             return _retlist
 
@@ -57,8 +64,6 @@ class Artefacts(FunctionType):
                 _path = os.path.normpath(os.path.join(path, f.name))
                 _ret.extend(walkartefactdir(_path))
 
-            if self.config[FILEONLY]:
-                _ret = [os.path.normpath(os.path.join(path, f.name)) for f in _ret]
             return _ret
 
         if self.computable:

@@ -2323,7 +2323,6 @@ def test48():
     testnumber = 48
     outputscheme = '1'
     projectpath = 'test\\test48\\'
-    #output = 'test\\test47\\test47.dot'
     print('test %s tests if artefact files are ignored' % testnumber)
     print('---- testing %s begins ----' % testnumber)
 
@@ -2347,6 +2346,7 @@ def test48():
     [VERBOSE] Loading project from test\test48\...
     [VERBOSE] Loading bootstrap config...
     [VERBOSE] Loading plugins from code base and test\test48\\plugins...
+    [VERBOSE] loading plug-in: artefacts
     [VERBOSE] loading plug-in: average
     [VERBOSE] loading plug-in: choice
     [VERBOSE] loading plug-in: combine
@@ -2384,17 +2384,15 @@ def test48():
     [VERBOSE] Preparing output processor GRID...
     [VERBOSE] Processing the data...
     standard out
-    ['testpropd1', 'testpropd2', 'testpropd3']
-    ['d1 ipsum lorum horus', 'dk1 test 123\nhello world', 'tdk1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
-    ['d2 ipsum lorum horus', 'test 123', '']
-    ['d3 ipsum lorum horus', 'test 123\nhello world', 'tdk3-1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
-    ['d4 ipsum lorum horus', 'test 123\nhello world', 'tdk4-1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
-    [None, None, 'tdk4-2 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
-    ['d5 ipsum lorum horus', 'test 123\nhello world', 'tdk5-1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
-    [None, None, 'tdk5-2 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
-    ['d6 ipsum lorum horus', 'test 123\nhello world', 'tdk6 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    ['testpropd1', 'testpropd2', 'artefactlist', 'testpropd3']
+    ['d1 ipsum lorum horus', 'dk1 test 123\nhello world', '[]', 'tdk1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    ['d2 ipsum lorum horus', 'test 123', '[]', '']
+    ['d3 ipsum lorum horus', 'test 123\nhello world', '[]', 'tdk3-1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    ['d4 ipsum lorum horus', 'test 123\nhello world', '[]', 'tdk4-1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    [None, None, None, 'tdk4-2 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    ['d5 ipsum lorum horus', 'test 123\nhello world', "['!ignoredir\\\\test1.txt', '!ignoredir\\\\test2.txt', '!ignoredir\\\\testdir\\\\test3.txt', '!ignoredir\\\\testdir\\\\test4.txt']", 'tdk5-1 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    [None, None, None, 'tdk5-2 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
+    ['d6 ipsum lorum horus', 'test 123\nhello world', "['!ignorethis3\\\\test3_1.txt', '!ignorethis3\\\\test3_2.txt']", 'tdk6 ipsum lorum horus\nalpha beta\nipsum lorum horus rictum\n4.0']
     Done
     --- test 48 ends ---
-
-    Process finished with exit code 0
     """
