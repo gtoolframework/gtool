@@ -79,18 +79,19 @@ def version():
                 default='.',
                 type=click.Path(exists=True, file_okay=False, resolve_path=True))
 @click.option('--list-type',
-              default='all',
-              type=click.Choice(['all', 'aggregates', 'classes', 'outputplugins', 'outputschemes', 'types', 'methods', 'plugins']))
-def listelements(path, list_type):
-    """List classes, aggregates, plugins, outputs and other non-data elements in the project"""
-    click.echo(path)
-    click.echo(list_type)
-    sys.exit(0)
+              type=click.Choice(['aggregates', 'classes', 'outputplugins', 'types', 'methods', 'plugins']))
+def list_elements(path, list_type):
+    """List classes, aggregates, plugins, outputs and other non-data elements in the project.
+    By default the current working directory will be used unless a PATH argument is supplied."""
+    if listelements(path, list_type):
+        sys.exit(0)
+    else:
+        sys.exit(1)
 
 cli.add_command(process, name='process')
 cli.add_command(create, name='create')
 cli.add_command(version, name='version')
-cli.add_command(listelements, name='list')
+cli.add_command(list_elements, name='list')
 
 if __name__ == '__main__':
     argv = sys.argv
