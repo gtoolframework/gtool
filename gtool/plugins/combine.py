@@ -1,6 +1,7 @@
 from gtool.core.types.core import FunctionType
 import pyparsing as p
 
+#TODO integrate Slice functionality into Combine
 
 class Combine(FunctionType):
     """
