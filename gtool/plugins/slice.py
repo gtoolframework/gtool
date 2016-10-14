@@ -1,6 +1,6 @@
 from gtool.core.types.core import FunctionType
 import pyparsing as p
-
+from gtool.core.utils.misc import striptoclassname
 
 class Slice(FunctionType):
     """
@@ -29,7 +29,9 @@ class Slice(FunctionType):
 
         def slicer(stringvalue, start=None, end=None):
             if not isinstance(stringvalue, str):
-                raise ValueError('Slice plugin only works on string or string like attributes but got a %s instead' % type(stringvalue))
+                raise ValueError('Slice plugin only works on string '
+                                 'or string like attributes but got '
+                                 'a %s instead' %  striptoclassname(type(self.targetobject)))
 
             if start is None and end is None:
                 raise ValueError('Slice plugin expects at least one of either a start and stop value')
@@ -63,6 +65,12 @@ class Slice(FunctionType):
             if _val is None:
                 return _val
 
+            # handling for values from a method
+            if isinstance(_val, str):
+                return _val
+
+            # handling for values in an Attribute
+            # TODO integrate logic for value native string and strings in Attributes
             try:
                 if _val.isdynamic: #TODO make this work for non-attributes, non-dynamics (use .issingleton? - what about a concat mode?)
                     raise ValueError('Slice plugin cannot process %s because it contains a dynamic class' % name)
@@ -73,7 +81,7 @@ class Slice(FunctionType):
                 _ret = '%s' % _val[0].raw()
             else:
                 raise ValueError('Slice method plugin specified in user defined class %s '
-                                 'only works on singleton attributes' % self.__context__)
+                                 'only works on singleton attributes' % striptoclassname(type(self.targetobject)))
 
             return _ret
 
@@ -89,13 +97,21 @@ class Slice(FunctionType):
         parseresult = sliceexpr.parseString(self.config)
 
 
-        _attrname = parseresult.get('attribute', None)
+        _attrname = parseresult.get('attribute', None)[0]
+        _slicestart = parseresult.get('start', None)
+        _sliceend = parseresult.get('end', None)
+
+        if isinstance(_slicestart, p.ParseResults) and len(_slicestart) > 0:
+            self.slicestart = int(_slicestart[0]) if len(_slicestart[0]) > 0 else None
+
+        if isinstance(_sliceend, p.ParseResults) and len(_sliceend) > 0:
+            self.sliceend = int(_sliceend[0]) if len(_sliceend[0]) > 0 else None
 
         if _attrname is None:
             raise ValueError('The configuration string provided to the Slice method '
                              'plugin in user defined class %s does not contain an '
                              'identifiable attribute. Please provide a configuration '
-                             'string in the form of \'@attribute[#:#]\'' % self.__context__)
+                             'string in the form of \'@attribute[#:#]\'' % striptoclassname(type(self.targetobject)))
 
         self.stringvalue = getname(self.targetobject, _attrname)
 

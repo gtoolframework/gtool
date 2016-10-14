@@ -2396,3 +2396,103 @@ def test48():
     Done
     --- test 48 ends ---
     """
+
+def test49a():
+    testnumber = "49a"
+    outputscheme = '1'
+    projectpath = 'test\\test49\\'
+    print('test %s tests if slice method plugin works with grid output' % testnumber)
+    print('---- testing %s begins ----' % testnumber)
+
+    verbose = False
+    silent = True
+    debug = False
+
+    processproject(path=projectpath,
+                   output=None,
+                   scheme=outputscheme,
+                   verbose=verbose,
+                   silent=silent,
+                   debug=debug)
+
+    print('--- test %s ends ---' % testnumber)
+
+    # expected output
+    """
+    ---- testing 49a begins ----
+    ['ref', 'description']
+    ['12345', 'hello world!']
+    --- test 49a ends ---
+    """
+
+def test49b():
+    testnumber = "49b"
+    outputscheme = '2'
+    projectpath = 'test\\test49\\'
+    print('test %s tests if slice method plugin works with json output' % testnumber)
+    print('---- testing %s begins ----' % testnumber)
+
+    verbose = False
+    silent = True
+    debug = False
+
+    processproject(path=projectpath,
+                   output=None,
+                   scheme=outputscheme,
+                   verbose=verbose,
+                   silent=silent,
+                   debug=debug)
+
+    print('--- test %s ends ---' % testnumber)
+
+    # expected output
+    """
+    ---- testing 49b begins ----
+    {
+        "Data": [
+            {
+                "risk_12345": {
+                    "description": "hello world!",
+                    "ref": "12345"
+                }
+            }
+        ]
+    }
+    --- test 49b ends ---
+    """
+
+def test50():
+    testnumber = "50"
+    outputscheme = '2'
+    projectpath = 'test\\test50\\'
+    print('test %s tests if json output reflects Containers' % testnumber)
+    print('---- testing %s begins ----' % testnumber)
+
+    verbose = False
+    silent = True
+    debug = False
+
+    processproject(path=projectpath,
+                   output=None,
+                   scheme=outputscheme,
+                   verbose=verbose,
+                   silent=silent,
+                   debug=debug)
+
+    print('--- test %s ends ---' % testnumber)
+
+    # expected output
+    """
+    ---- testing 49b begins ----
+    {
+        "Data": [
+            {
+                "risk_12345": {
+                    "description": "hello world!",
+                    "ref": "12345"
+                }
+            }
+        ]
+    }
+    --- test 49b ends ---
+    """
