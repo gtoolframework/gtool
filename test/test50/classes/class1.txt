@@ -3,6 +3,6 @@ CLASSONE::
 *output.1 = !ref || @created || @description
 *output.2 = !ref || @created || @description
 @description:: single: String (required = True)
-@created:: single: Date (required = True, displayformat = [%B %d %Y])
+@created:: single: Date (required = True, dateformat = [%m/%d/%Y], displayformat = [%B %d %Y])
 !filename:: Nodename()
 !ref:: Slice('!filename[5:]')

@@ -190,7 +190,7 @@ def readClass(configString):
                         p.Literal('[').suppress() + p.SkipTo(']') + p.Literal(']').suppress()
                     )
                 ).setResultsName('value') +
-                p.Optional(p.Literal(',').suppress())
+                p.Optional(p.Literal(',').suppress()) #TODO figure out how to make quotes work as enclosers instead of []
             )
         ).setResultsName('kwargs')
 

@@ -4,6 +4,27 @@ from gtool.core.types.core import CoreType
 
 class Date(CoreType):
 
+    """
+    A date handling coretype. Reads in a string and converts it into
+    a desired format. By default the date is expected in the normal
+    local format (for North America that is MM/DD/YY) and will display
+    as in the normal local format (for North America that is MM/DD/YY).
+
+    @created:: single: Date (required = True)
+
+    Two arguments are supported: dateformat and displayformat.
+
+    Dateformat controls how the date should be entered.
+    Displayformat controls how the date will be displayed.
+
+    Format strings should be encapsulated in []. Examples include:
+
+    @created:: single: Date (required = True, displayformat = [%B %d %Y])
+    @created:: single: Date (required = True, dateformat = [%m/%d/%Y])
+    @created:: single: Date (required = True, dateformat = [%m/%d/%Y], displayformat = [%B %d %Y])
+    https://www.tutorialspoint.com/python/time_strptime.htm
+    """
+
     def __validate__(self, valuedict):
 
         _dateformat = valuedict.get('dateformat', None)
@@ -33,8 +54,8 @@ class Date(CoreType):
 
     def __init__(self, *args, **kwargs):
         self.__validators__ = ['dateformat', 'displayformat']
-        self.dateformat = '%m/%d/%Y'
-        self.datedisplayformat = '%m/%d/%Y'
+        self.dateformat = '%x'
+        self.datedisplayformat = '%x'
         super().__init__(*args, valuetype=str, **kwargs)
 
 def load():

@@ -2468,9 +2468,9 @@ def test50():
     print('test %s tests if the date plugin core type works' % testnumber)
     print('---- testing %s begins ----' % testnumber)
 
-    verbose = True
-    silent = False
-    debug = True
+    verbose = False
+    silent = True
+    debug = False
 
     processproject(path=projectpath,
                    output=None,
@@ -2483,18 +2483,19 @@ def test50():
 
     # expected output
     """
-    ---- testing 49b begins ----
+    ---- testing 50 begins ----
     {
         "Data": [
             {
                 "risk_12345": {
+                    "created": "October 31 2016",
                     "description": "hello world!",
                     "ref": "12345"
                 }
             }
         ]
     }
-    --- test 49b ends ---
+    --- test 50 ends ---
     """
 
 def test51():
