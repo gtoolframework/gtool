@@ -1,0 +1,7 @@
+CLASSONE::
+*file = risk_
+*output.1 = !ref || @description
+*output.2 = !ref || @description
+@description:: single: String (required = True)
+!filename:: Nodename()
+!ref:: Slice('!filename[5:]')

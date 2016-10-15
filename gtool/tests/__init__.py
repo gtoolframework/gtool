@@ -2465,6 +2465,42 @@ def test50():
     testnumber = "50"
     outputscheme = '2'
     projectpath = 'test\\test50\\'
+    print('test %s tests if the date plugin core type works' % testnumber)
+    print('---- testing %s begins ----' % testnumber)
+
+    verbose = True
+    silent = False
+    debug = True
+
+    processproject(path=projectpath,
+                   output=None,
+                   scheme=outputscheme,
+                   verbose=verbose,
+                   silent=silent,
+                   debug=debug)
+
+    print('--- test %s ends ---' % testnumber)
+
+    # expected output
+    """
+    ---- testing 49b begins ----
+    {
+        "Data": [
+            {
+                "risk_12345": {
+                    "description": "hello world!",
+                    "ref": "12345"
+                }
+            }
+        ]
+    }
+    --- test 49b ends ---
+    """
+
+def test51():
+    testnumber = "50"
+    outputscheme = '2'
+    projectpath = 'test\\test50\\'
     print('test %s tests if json output reflects Containers' % testnumber)
     print('---- testing %s begins ----' % testnumber)
 

@@ -1,7 +1,8 @@
 CLASSONE::
 *file = risk_
-*output.1 = !ref || @description
-*output.2 = !ref || @description
+*output.1 = !ref || @created || @description
+*output.2 = !ref || @created || @description
 @description:: single: String (required = True)
+@created:: single: Date (required = True, displayformat = [%B %d %Y])
 !filename:: Nodename()
 !ref:: Slice('!filename[5:]')

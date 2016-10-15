@@ -332,8 +332,9 @@ class DynamicType(object): # TODO look at deriving this class from the ABC.mutab
         # reverse check of above and to ensure only attributes required by class file are present in data file
         for attrname, attrval in ret.items():
             if attrname not in self.__dynamic_properties__:
-                raise AttributeError('attribute %s found in string but not in %s class definition file' %
-                                     (attrname, self.__class__))
+                raise AttributeError('attribute "%s" found in load string from %s '
+                                     'but not in %s class definition file' %
+                                     (attrname, self.__context__['file'], striptoclassname(self.__class__)))
             else:
                 # TODO load into object attribs
                 # TODO pass in args (also refactor load so dict args are correct)

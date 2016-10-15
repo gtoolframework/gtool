@@ -179,13 +179,15 @@ def readClass(configString):
             p.Optional(p.Literal(',').suppress())
         ).setResultsName('posargs')
 
+        kwargprintables = p.printables.translate(str.maketrans('', '', '=,[]()'))
+
         attributeKwargs = p.ZeroOrMore(
             p.Group(
                 p.Word(p.alphanums).setResultsName('keyword') +
                 p.Literal('=').suppress() +
                 (
-                    p.Word(p.alphanums) | p.Combine(
-                        p.Literal('[') + p.SkipTo(']') + p.Literal(']')
+                    p.Word(kwargprintables) | p.Combine(
+                        p.Literal('[').suppress() + p.SkipTo(']') + p.Literal(']').suppress()
                     )
                 ).setResultsName('value') +
                 p.Optional(p.Literal(',').suppress())
