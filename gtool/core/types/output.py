@@ -704,15 +704,25 @@ class TreeOutput(Output):
         """
 
         def _sub(tree):
-            if tree.haschildren:
-                return [_sub(child) for child in tree.children]
+            if isinstance(tree, StructureFactory.Container) and tree.haschildren: #and tree.name == '*':
+                return {child.name: _sub(child) for child in tree.children}
+            #elif isinstance(tree, StructureFactory.Container) and tree.haschildren and tree.name != '*':
+            #    return {child.name:_sub(child) for child in tree.children}
+            else:
+                _obj = tree.dataasobject
+                return _obj #{tree.name: _obj}
+
+            """
+            if tree.haschildren and tree.parent is None:
+                return _sub(tree.children)
+            elif tree.haschildren and tree.parent is not None:
+                return {tree.name: [_sub(child) for child in tree.children]}
             else:
                 _obj = tree.dataasobject
                 return {tree.name: _obj}
+            """
 
         _output = _sub(projectstructure)
 
         return self.outputprocessor({'Data': _output})
 
-class TemplatedOutput(Output):
-    pass

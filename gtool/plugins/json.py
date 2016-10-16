@@ -30,7 +30,7 @@ class Json(TreeOutput):
             elif isinstance(tree, dict):
                 return {k: _sub(v) for k, v in tree.items()}
             else:
-                return self.convert(tree) #, filterfunction=self.filter)  #tree.asdict(filterfunction=self.filter)
+                return self.convert(tree)
 
         _tree = self.integrateaggregates(_sub(projectstructure))
 

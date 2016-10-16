@@ -2449,14 +2449,12 @@ def test49b():
     """
     ---- testing 49b begins ----
     {
-        "Data": [
-            {
-                "risk_12345": {
-                    "description": "hello world!",
-                    "ref": "12345"
-                }
+        "Data": {
+            "risk_12345": {
+                "description": "hello world!",
+                "ref": "12345"
             }
-        ]
+        }
     }
     --- test 49b ends ---
     """
@@ -2485,23 +2483,21 @@ def test50():
     """
     ---- testing 50 begins ----
     {
-        "Data": [
-            {
-                "risk_12345": {
-                    "created": "October 31 2016",
-                    "description": "hello world!",
-                    "ref": "12345"
-                }
+        "Data": {
+            "risk_12345": {
+                "created": "October 31 2016",
+                "description": "hello world!",
+                "ref": "12345"
             }
-        ]
+        }
     }
     --- test 50 ends ---
     """
 
 def test51():
-    testnumber = "50"
+    testnumber = "51"
     outputscheme = '2'
-    projectpath = 'test\\test50\\'
+    projectpath = 'test\\test51\\'
     print('test %s tests if json output reflects Containers' % testnumber)
     print('---- testing %s begins ----' % testnumber)
 
@@ -2520,16 +2516,80 @@ def test51():
 
     # expected output
     """
-    ---- testing 49b begins ----
+    ---- testing 51 begins ----
     {
-        "Data": [
-            {
+        "Data": {
+            "Risks1": {
                 "risk_12345": {
                     "description": "hello world!",
                     "ref": "12345"
+                },
+                "risk_12346": {
+                    "description": "hello world!",
+                    "ref": "12346"
+                }
+            },
+            "Risks2": {
+                "risk_12347": {
+                    "description": "hello world!",
+                    "ref": "12347"
+                },
+                "risk_12348": {
+                    "description": "hello world!",
+                    "ref": "12348"
                 }
             }
-        ]
+        }
     }
-    --- test 49b ends ---
+    --- test 51 ends ---
+    """
+
+def test52():
+    testnumber = "52"
+    outputscheme = '2'
+    projectpath = 'test\\test52\\'
+    print('test %s tests if json output reflects CNodes properly' % testnumber)
+    print('---- testing %s begins ----' % testnumber)
+
+    verbose = False
+    silent = True
+    debug = False
+
+    processproject(path=projectpath,
+                   output=None,
+                   scheme=outputscheme,
+                   verbose=verbose,
+                   silent=silent,
+                   debug=debug)
+
+    print('--- test %s ends ---' % testnumber)
+
+    # expected output
+    """
+    ---- testing 52 begins ----
+    {
+        "Data": {
+            "Risks1": {
+                "risk_12345": {
+                    "description": "hello world!",
+                    "ref": "12345"
+                },
+                "risk_12346": {
+                    "description": "hello world!",
+                    "ref": "12346"
+                }
+            },
+            "Risks2": {
+                "risk_12347": {
+                    "description": "hello world!",
+                    "ref": "12347"
+                },
+                "risk_12348": {
+                    "description": "hello world!",
+                    "ref": "12348"
+                }
+            }
+        }
+    }
+    --- test 52 ends ---
     """
