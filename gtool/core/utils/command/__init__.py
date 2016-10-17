@@ -7,7 +7,8 @@ import sys, os
 if sys.version_info[:2] < (3, 5):
     raise ImportError("Python 3.5 or later is required for G.Tool (%d.%d detected)." % sys.version_info[:2])
 
-VERSION='Version 0.1.1 BETA'
+#TODO read from central version file (such as \projecttemplate)
+VERSION='Version 0.1.2 BETA'
 
 def __create__():
     pass

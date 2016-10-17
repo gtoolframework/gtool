@@ -1,21 +1,14 @@
 from setuptools import setup, find_packages
-import os
-
-#TODO add version checking for Python
-
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
-
 
 setup(name='g.tool',
-      version='0.1.1',
+      version='0.1.2',
       author='Ben Sapiro',
       author_email = "https://ca.linkedin.com/in/sapiro",
       license='GPLv3',
       keywords='security risk governance compliance framework',
       description=('A framework for building security governance, risk and compliance tools.'),
-      long_description=read('README.MD'),
-      download_url = 'https://github.com/gtoolframework/gtool/tarball/0.1.1',
+      long_description="G.Tool is a framework for building governance, risk and compliance security tools. It's a barebones framework, that is highly extensible but comes with a a lot of common functionality included.",
+      download_url = 'https://github.com/gtoolframework/gtool/tarball/0.1.2',
       url='https://gtoolframework.github.io/',
       packages=find_packages(),
       include_package_data=True,
