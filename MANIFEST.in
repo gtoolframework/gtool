@@ -1,2 +1,5 @@
 include gtool/plugins/*
-include gtool/core/projecttemplate/*
+recursive-include gtool/core/projecttemplate *
+include README.MD
+include LICENSE
+include gtool/LICENSE

@@ -1,14 +1,14 @@
 from setuptools import setup, find_packages
 
 setup(name='gtool',
-      version='0.1.4',
+      version='0.1.7',
       author='Ben Sapiro',
       author_email = "https://ca.linkedin.com/in/sapiro",
       license='GPLv3',
       keywords='security risk governance compliance framework',
       description=('A framework for building security governance, risk and compliance tools.'),
       long_description="G.Tool is a framework for building governance, risk and compliance security tools. It's a barebones framework, that is highly extensible but comes with a a lot of common functionality included.",
-      download_url = 'https://github.com/gtoolframework/gtool/tarball/0.1.4',
+      download_url = 'https://github.com/gtoolframework/gtool/tarball/0.1.7',
       url='https://gtoolframework.github.io/',
       packages=find_packages(),
       include_package_data=True,
