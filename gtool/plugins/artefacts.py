@@ -2,7 +2,6 @@ from gtool.core.types.core import FunctionType
 import os
 from gtool.core.utils.misc import striptoclassname
 from distutils.util import strtobool
-import codecs
 
 FILEONLY = 'fileonly'
 

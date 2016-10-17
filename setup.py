@@ -1,14 +1,16 @@
 from setuptools import setup, find_packages
 
+version = '0.1.10'
+
 setup(name='gtool',
-      version='0.1.9',
+      version=version,
       author='Ben Sapiro',
       author_email = "https://ca.linkedin.com/in/sapiro",
       license='GPLv3',
       keywords='security risk governance compliance framework',
       description=('A framework for building security governance, risk and compliance tools.'),
       long_description="G.Tool is a framework for building governance, risk and compliance security tools. It's a barebones framework, that is highly extensible but comes with a a lot of common functionality included.",
-      download_url = 'https://github.com/gtoolframework/gtool/tarball/0.1.9',
+      download_url = 'https://github.com/gtoolframework/gtool/tarball/%s' % version,
       url='https://gtoolframework.github.io/',
       packages=find_packages(),
       include_package_data=True,
@@ -17,8 +19,10 @@ setup(name='gtool',
           'click',
           'configparser',
           'decorator',
+          'networkx',
           'patricia-trie',
           'pluginbase',
+          'pydot',
           'pyparsing',
           'PyYAML',
           'simpleeval',
@@ -26,7 +30,6 @@ setup(name='gtool',
           'validators',
           'XlsxWriter'
       ],
-      package_data = {'gtool': ['core/projecttemplate/*']},
       classifiers=[
           "Development Status :: 4 - Beta",
           "Topic :: Utilities",

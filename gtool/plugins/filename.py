@@ -1,5 +1,4 @@
 from gtool.core.types.core import FunctionType
-#import codecs
 import os.path as path
 
 
