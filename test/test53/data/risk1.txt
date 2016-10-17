@@ -1,0 +1,7 @@
+@Ref: 1
+@Description: An individual human stock could gain sufficient awareness of the Matrix so as to be able to manipulate and became "The One"
+@Impact: H
+@Likelihood: M
+@Risk: maybe
+@Remediation: Continue to kill any human stock that show signs of recognizing what the matrix is
+@RemediationStatus: Open

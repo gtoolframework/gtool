@@ -351,7 +351,7 @@ class DynamicType(object): # TODO look at deriving this class from the ABC.mutab
                 except Exception as err:
                     raise TypeError('got an error when trying to load data for %s from %s: %s'
                                     % (
-                                        self.__class__,
+                                        striptoclassname(self.__class__),
                                         self.__context__['file'],
                                         err
                                     ))

@@ -1,0 +1,7 @@
+@Ref: 2
+@Description: An agent program could copy itself repeatedly into human stock
+@Impact: H
+@Likelihood: L
+@Risk: L
+@Remediation: Write control code the prevents agents from copying themselves
+@RemediationStatus: Closed

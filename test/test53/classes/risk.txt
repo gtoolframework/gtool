@@ -1,0 +1,11 @@
+RISK::
+*file = risk
+*output = @Ref || @Description || @Impact || @Likelihood || @Risk|| @Remediation || @RemediationStatus
+*output.headers = Ref || Description ||  Risk || Impact || Likelihood || Remediation || Remediation Status
+@Ref:: single: Number
+@Description:: single: String
+@Impact:: single: Choice (choices = [H, M, L])
+@Likelihood:: single: Choice (choices = [H, M, L])
+@Risk:: single: String
+@Remediation:: single: String
+@RemediationStatus:: single: String

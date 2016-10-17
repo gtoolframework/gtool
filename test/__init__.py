@@ -2595,3 +2595,53 @@ def test52():
     }
     --- test 52 ends ---
     """
+
+def test53():
+    testnumber = "53"
+    outputscheme = '2'
+    projectpath = 'test\\test53\\'
+    print('test %s tests if Choice coretype is working properly' % testnumber)
+    print('---- testing %s begins ----' % testnumber)
+
+    verbose = False
+    silent = True
+    debug = False
+
+    processproject(path=projectpath,
+                   output=None,
+                   scheme=outputscheme,
+                   verbose=verbose,
+                   silent=silent,
+                   debug=debug)
+
+    print('--- test %s ends ---' % testnumber)
+
+    # expected output
+    """
+    ---- testing 52 begins ----
+    {
+        "Data": {
+            "Risks1": {
+                "risk_12345": {
+                    "description": "hello world!",
+                    "ref": "12345"
+                },
+                "risk_12346": {
+                    "description": "hello world!",
+                    "ref": "12346"
+                }
+            },
+            "Risks2": {
+                "risk_12347": {
+                    "description": "hello world!",
+                    "ref": "12347"
+                },
+                "risk_12348": {
+                    "description": "hello world!",
+                    "ref": "12348"
+                }
+            }
+        }
+    }
+    --- test 52 ends ---
+    """
