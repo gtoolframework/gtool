@@ -323,8 +323,12 @@ class DynamicType(object): # TODO look at deriving this class from the ABC.mutab
             # TODO don't raise for non-mandatory attribs
             if prop not in attriblist:
                 if prop in self.__mandatory_properties__ and softload is False:
-                    raise AttributeError('attribute %s required by %s class definition file but not found' %
-                                         (prop, self.__class__))
+                    raise AttributeError('attribute %s required by %s class definition file but not found in %s' %
+                                         (
+                                             prop,
+                                             striptoclassname(self.__class__),
+                                             self.__context__['file']
+                                         ))
                 if prop in self.__mandatory_properties__ and softload is True:
                     self.__missing_mandatory_properties__.append(prop)
                 if prop not in self.__mandatory_properties__:
@@ -334,14 +338,23 @@ class DynamicType(object): # TODO look at deriving this class from the ABC.mutab
             if attrname not in self.__dynamic_properties__:
                 raise AttributeError('attribute "%s" found in load string from %s '
                                      'but not in %s class definition file' %
-                                     (attrname, self.__context__['file'], striptoclassname(self.__class__)))
+                                     (
+                                         attrname,
+                                         self.__context__['file'],
+                                         striptoclassname(self.__class__)
+                                     ))
             else:
                 # TODO load into object attribs
                 # TODO pass in args (also refactor load so dict args are correct)
                 try:
                     self.__list_slots__[attrname].__load__(convertandload(self, attrname, attrval))
                 except Exception as err:
-                    raise TypeError('got an error when trying to load data for %s: %s' % (self.__class__, err))
+                    raise TypeError('got an error when trying to load data for %s from %s: %s'
+                                    % (
+                                        self.__class__,
+                                        self.__context__['file'],
+                                        err
+                                    ))
 
         for k, v in self.__methods__.items():
             self.loadmethod(k,v)
