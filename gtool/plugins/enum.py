@@ -102,13 +102,12 @@ class Enum(FunctionType):
                 #print('got a string')
                 return _inputval
 
-            try:
-                if not _inputval.issingleton():
-                    raise ValueError('Enum plugin cannot process multi value attributes in %s' % name)
-            except AttributeError:
-                raise TypeError('Expected an attribute but got a %s' % type(_inputval))
-
-            return '%s' % _inputval[0]
+            if hasattr(_inputval, 'issingleton') and not _inputval.issingleton():
+                raise ValueError('Enum plugin cannot process multi value attributes in %s' % name)
+            elif hasattr(_inputval, 'issingleton') and  _inputval.issingleton():
+                return '%s' % _inputval[0]
+            elif not hasattr(_inputval, 'issingleton'):
+                return '%s' % _inputval
 
         _inputval = getname(self.targetobject, self.input)
 
@@ -126,6 +125,8 @@ class Enum(FunctionType):
 
         try:
             self.__result__ = num(self.mapping[self.mapping.key(_inputval.lower())])
+        except ValueError:
+            self.__result__ = self.mapping[self.mapping.key(_inputval.lower())]
         except KeyError:
             self.__result__ = None
 
