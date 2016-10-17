@@ -7,7 +7,7 @@ import sys, os
 if sys.version_info[:2] < (3, 5):
     raise ImportError("Python 3.5 or later is required for G.Tool (%d.%d detected)." % sys.version_info[:2])
 
-VERSION='Version 0.1 BETA'
+VERSION='Version 0.1.1 BETA'
 
 def __create__():
     pass

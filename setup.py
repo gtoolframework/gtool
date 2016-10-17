@@ -8,14 +8,14 @@ def read(fname):
 
 
 setup(name='g.tool',
-      version='0.1.0',
+      version='0.1.1',
       author='Ben Sapiro',
       author_email = "https://ca.linkedin.com/in/sapiro",
       license='GPLv3',
       keywords='security risk governance compliance framework',
       description=('A framework for building security governance, risk and compliance tools.'),
       long_description=read('README.MD'),
-      download_url = 'https://github.com/gtoolframework/gtool',
+      download_url = 'https://github.com/gtoolframework/gtool/tarball/0.1.1',
       url='https://github.com/gtoolframework/gtool',
       packages=find_packages(),
       include_package_data=True,
