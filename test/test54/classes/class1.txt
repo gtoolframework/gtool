@@ -1,0 +1,9 @@
+CLASSONE::
+*file = risk_
+*output = !ref || @created || @description || !score
+@description:: single: String (required = True)
+@created:: single: Date (required = True, dateformat = [%m/%d/%Y], displayformat = [%B %d %Y])
+@vector:: single: String (required = True)
+!score:: Cvssv2('@vector')
+!filename:: Nodename()
+!ref:: Slice('!filename[5:]')

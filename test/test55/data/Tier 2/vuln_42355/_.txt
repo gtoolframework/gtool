@@ -1,0 +1,6 @@
+@uri: internalapp.local/portal
+@cwe: 45
+@type: Application
+@categorization: XSS
+@reported: 4/16/16
+@fixed: No

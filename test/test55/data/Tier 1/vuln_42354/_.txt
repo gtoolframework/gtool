@@ -1,0 +1,8 @@
+@uri: internalapp.local/admin
+@cwe: 90
+@type: Application
+@categorization: SQLi
+@reported: 4/15/16
+@description: Doubtful on an juvenile as of servants insisted.
+Judge why maids led sir whose guest drift her point.
+@fixed: No

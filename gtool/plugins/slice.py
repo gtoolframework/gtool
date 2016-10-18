@@ -23,7 +23,7 @@ class Slice(FunctionType):
         super(Slice, self).__init__(obj, config=config)
 
         if self.config is None or len(self.config) < 1 or not isinstance(self.config, str):
-            raise ValueError('Combine plugin function requires an formatting string')
+            raise ValueError('Slice plugin function requires a attribute and string slice be specified such as "@state[1:3]"')
 
     def compute(self):
 

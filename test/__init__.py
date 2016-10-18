@@ -2618,30 +2618,72 @@ def test53():
 
     # expected output
     """
-    ---- testing 52 begins ----
-    {
-        "Data": {
-            "Risks1": {
-                "risk_12345": {
-                    "description": "hello world!",
-                    "ref": "12345"
-                },
-                "risk_12346": {
-                    "description": "hello world!",
-                    "ref": "12346"
-                }
-            },
-            "Risks2": {
-                "risk_12347": {
-                    "description": "hello world!",
-                    "ref": "12347"
-                },
-                "risk_12348": {
-                    "description": "hello world!",
-                    "ref": "12348"
-                }
-            }
-        }
-    }
-    --- test 52 ends ---
+    ---- testing 53 begins ----
+    ['Ref', 'Description', 'Risk', 'Impact', 'Likelihood', 'Remediation', 'Remediation Status']
+    ['1', 'An individual human stock could gain sufficient awareness of the Matrix so as to be able to manipulate and became "The One"', 'H', 'M', 'maybe', 'Continue to kill any human stock that show signs of recognizing what the matrix is', 'Open']
+    ['2', 'An agent program could copy itself repeatedly into human stock', 'H', 'L', 'L', 'Write control code the prevents agents from copying themselves', 'Closed']
+    ['3', 'Zion may find a way to destroy the Matrix from the outside', 'H', 'M', 'H', 'Find Zion and destroy it (again)', 'Open']
+    ['4', 'Fanboys might make unlicensed content inspired by the matrix', 'H', 'H', 'H', 'Lawyers!!!', 'Closed']
+    --- test 53 ends ---
+    """
+
+def test54():
+    testnumber = "54"
+    outputscheme = '1'
+    projectpath = 'test\\test54\\'
+    print('test %s tests if CVSSv2 method plugin is working properly' % testnumber)
+    print('---- testing %s begins ----' % testnumber)
+
+    verbose = False
+    silent = True
+    debug = False
+
+    processproject(path=projectpath,
+                   output=None,
+                   scheme=outputscheme,
+                   verbose=verbose,
+                   silent=silent,
+                   debug=debug)
+
+    print('--- test %s ends ---' % testnumber)
+
+    # expected output
+    """
+    ---- testing 54 begins ----
+    ['ref', 'created', 'description', 'score']
+    ['12345', 'October 31 2016', 'hello world!', '1.2']
+    ['12346', 'October 31 2016', 'hello world 2!', '5.8']
+    ['12347', 'October 31 2016', 'hello world 3!', '6.4']
+    --- test 54 ends ---
+    """
+
+def test55():
+    testnumber = "55"
+    outputscheme = '1'
+    output = 'test\\test55\\test55.xlsx'
+    projectpath = 'test\\test55\\'
+    print('test %s tests if CVSSv2 method plugin is working properly in complex object' % testnumber)
+    print('---- testing %s begins ----' % testnumber)
+
+    verbose = False
+    silent = True
+    debug = True
+
+    processproject(path=projectpath,
+                   output=output,
+                   scheme=outputscheme,
+                   verbose=verbose,
+                   silent=silent,
+                   debug=debug)
+
+    print('--- test %s ends ---' % testnumber)
+
+    # expected output
+    """
+    ---- testing 54 begins ----
+    ['ref', 'created', 'description', 'score']
+    ['12345', 'October 31 2016', 'hello world!', '1.2']
+    ['12346', 'October 31 2016', 'hello world 2!', '5.8']
+    ['12347', 'October 31 2016', 'hello world 3!', '6.4']
+    --- test 54 ends ---
     """
