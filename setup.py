@@ -4,7 +4,7 @@ import sys
 if sys.version_info[:2] < (3, 5):
     sys.exit('Sorry, Python < 3.5 is not supported')
 
-version = '0.1.11'
+version = '0.1.12'
 
 setup(name='gtool',
       version=version,
