@@ -1,0 +1,6 @@
+@uri: otherapp.local
+@cwe: 53
+@type: Application
+@categorization: XSS
+@reported: 4/17/16
+@fixed: Yes

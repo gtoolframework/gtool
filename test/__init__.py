@@ -2680,10 +2680,33 @@ def test55():
 
     # expected output
     """
-    ---- testing 54 begins ----
-    ['ref', 'created', 'description', 'score']
-    ['12345', 'October 31 2016', 'hello world!', '1.2']
-    ['12346', 'October 31 2016', 'hello world 2!', '5.8']
-    ['12347', 'October 31 2016', 'hello world 3!', '6.4']
-    --- test 54 ends ---
+    ---- testing 55 begins ----
+    --- test 55 ends ---
+    """
+
+def test56():
+    testnumber = "56"
+    outputscheme = '1'
+    output = None
+    projectpath = 'test\\test56\\'
+    print('test %s tests if CVSSv2 method plugin is working properly with aggregators' % testnumber)
+    print('---- testing %s begins ----' % testnumber)
+
+    verbose = False
+    silent = True
+    debug = True
+
+    processproject(path=projectpath,
+                   output=output,
+                   scheme=outputscheme,
+                   verbose=verbose,
+                   silent=silent,
+                   debug=debug)
+
+    print('--- test %s ends ---' % testnumber)
+
+    # expected output
+    """
+    ---- testing 55 begins ----
+    --- test 55 ends ---
     """

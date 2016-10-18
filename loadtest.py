@@ -1,4 +1,4 @@
 import test as t
 
 if __name__ == '__main__':
-    t.test55()
+    t.test56()

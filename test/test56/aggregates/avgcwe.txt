@@ -1,0 +1,4 @@
+AVERAGECWE1::
+*name = CWE Mean
+*function = average
+*select = @cwe//VULNERABILITY
